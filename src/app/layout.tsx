@@ -24,6 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Remove all favicon links. You will add your own favicon code here. */}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors min-h-screen`}
       >

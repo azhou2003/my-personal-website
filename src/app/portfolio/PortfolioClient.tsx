@@ -19,6 +19,7 @@ const popupAccentClasses = [
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
   projects.forEach((p) => {
+    if (!Array.isArray(p.tags)) return;
     p.tags.forEach((tag) => {
       freq[tag] = (freq[tag] || 0) + 1;
     });
@@ -106,10 +107,10 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
     () =>
       projects.filter((p) => {
         const matchesSearch =
-          p.title.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase());
+          typeof p.title === 'string' && p.title.toLowerCase().includes(search.toLowerCase()) ||
+          typeof p.description === 'string' && p.description.toLowerCase().includes(search.toLowerCase());
         const matchesTags =
-          selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag));
+          Array.isArray(p.tags) && (selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag)));
         return matchesSearch && matchesTags;
       }),
     [search, selectedTags, projects]
@@ -148,7 +149,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           <div className="flex flex-wrap gap-2 justify-center">
             {allTags.map((tag, i) => (
               <Tag
-                key={tag}
+                key={tag + '-' + i}
                 label={`${tag}: ${tagFrequency[tag]}`}
                 colorClass={accentClasses[i % accentClasses.length]}
                 onClick={() => handleTagClick(tag)}
@@ -171,15 +172,17 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
               const isLeft = idx % 2 === 0;
               return (
                 <FadeInSection key={triggerKey + '-' + idx} delay={idx * 100}>
-                  <div className="relative flex items-center min-h-[180px]">
+                  <div className="relative flex items-center min-h-[180px] group">
                     {/* Timeline node */}
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                      <div className="w-6 h-6 rounded-full bg-accent-yellow border-4 border-[#23201c] dark:border-[#ece7d5] shadow-lg" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
+                      <div className="w-6 h-6 rounded-full border-4 border-[#23201c] dark:border-[#ece7d5] shadow-lg bg-[#23201c] dark:bg-[#ece7d5] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
                     </div>
                     {/* Left side */}
                     <div className="w-1/2 flex justify-end pr-10 pl-10">
                       {isLeft ? (
-                        <span className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap">
+                        <span
+                          className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-transform duration-300 group-hover:scale-110 group-focus:scale-110"
+                        >
                           {new Date(project.date).toLocaleDateString(undefined, {
                             year: "numeric",
                             month: "long",
@@ -204,7 +207,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             </a>
                             {/* Expanding Popup (expands outwards, not stacked) */}
                             <div
-                              className="absolute top-1/2 right-full mr-10 origin-right -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center"
+                              className="absolute top-1/2 right-full mr-10 origin-right -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center"
                               tabIndex={-1}
                             >
                               <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
@@ -242,7 +245,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                               />
                             </a>
                             {/* Expanding Popup (expands outwards, not stacked) */}
-                            <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
+                            <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                               <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                               <div className="flex flex-wrap gap-2 mb-2 justify-center">
                                 {project.tags.map((tag, i) => (
@@ -258,7 +261,9 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           </div>
                         </div>
                       ) : (
-                        <span className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap">
+                        <span className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-transform duration-300 group-hover:scale-110 group-focus:scale-110"
+                          tabIndex={0}
+                        >
                           {new Date(project.date).toLocaleDateString(undefined, {
                             year: "numeric",
                             month: "long",

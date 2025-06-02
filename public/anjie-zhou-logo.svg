@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="200" height="200" viewBox="30.756 49.175 136.055 98.87" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradientA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fca311"/>
+      <stop offset="1" stop-color="#ff8c42"/>
+    </linearGradient>
+    <linearGradient id="gradientZ" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e76f51"/>
+      <stop offset="1" stop-color="#9b2226"/>
+    </linearGradient>
+  </defs>
+  <text x="31" y="135" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="url(#gradientA)" style="white-space: pre;">A</text>
+  <text x="96" y="148" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="url(#gradientZ)" style="white-space: pre;">Z</text>
+</svg>

@@ -50,11 +50,19 @@ function FadeInSection({ children, delay = 0, isInitial = false }: { children: R
         } else {
           node.classList.remove('opacity-100', 'translate-y-0');
           // Use faster fade for scroll-out, slower for initial load/filter
+          const classesToAdd = ['opacity-0'];
           if (scrollDir === 'down') {
-            node.classList.add('opacity-0', 'fade-out-down', hasLoaded ? 'duration-500' : '');
+            classesToAdd.push('fade-out-down');
+          } else {
+            classesToAdd.push('fade-out-up');
+          }
+          if (hasLoaded) {
+            classesToAdd.push('duration-500');
+          }
+          node.classList.add(...classesToAdd);
+          if (scrollDir === 'down') {
             node.classList.remove('fade-out-up');
           } else {
-            node.classList.add('opacity-0', 'fade-out-up', hasLoaded ? 'duration-500' : '');
             node.classList.remove('fade-out-down');
           }
         }
@@ -148,7 +156,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
           >
             <Link
               href={`/blog/${post.slug}`}
-              className="group rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow hover:shadow-lg transition-all overflow-hidden flex flex-col"
+              className="group rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow hover:shadow-2xl transition-all overflow-hidden flex flex-col h-80 transform-gpu hover:scale-105 focus:scale-105 duration-300"
             >
               <div className="relative w-full h-48 bg-[#ece7d5] dark:bg-[#23201c]">
                 {post.image && (
@@ -180,9 +188,12 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                     day: "numeric",
                   })}
                 </span>
-                <p className="text-sm text-foreground-light dark:text-foreground-dark mb-2 line-clamp-2">
-                  {post.summary}
-                </p>
+                <div className="relative flex-1 overflow-hidden">
+                  <p className="text-sm text-foreground-light dark:text-foreground-dark mb-2">
+                    {post.summary}
+                  </p>
+                  <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background-light dark:from-background-dark to-transparent pointer-events-none" />
+                </div>
               </div>
             </Link>
           </FadeInSection>
