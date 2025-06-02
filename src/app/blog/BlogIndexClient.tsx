@@ -3,6 +3,8 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Tag from "../../components/Tag";
+import { accentClasses } from "../../components/styles/tagColors";
+import SearchBar from "../../components/SearchBar";
 
 interface BlogMeta {
   slug: string;
@@ -12,12 +14,6 @@ interface BlogMeta {
   summary: string;
   image?: string;
 }
-
-const accentClasses = [
-  "bg-[#b7c7a3]/70 text-[#4b5d3a] border-[#b7c7a3]", // sage (light mode only)
-  "bg-[#ffe066]/70 text-[#a68c1d] border-[#ffe066]", // yellow (light mode only)
-  "bg-[#ffb385]/70 text-[#a65c1d] border-[#ffb385]", // orange (light mode only)
-];
 
 function FadeInSection({ children, delay = 0, isInitial = false }: { children: React.ReactNode; delay?: number; isInitial?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -124,12 +120,10 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       </h1>
       {/* Centered Search Bar */}
       <div className="flex justify-center mb-8 w-full">
-        <input
-          type="text"
-          placeholder="Search by title or summary..."
+        <SearchBar
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md px-4 py-2 rounded border border-border-light dark:border-border-dark bg-white dark:bg-[#23201c] text-[#1a1a1a] dark:text-[#f5f5f5] placeholder:text-[#b7c7a3] dark:placeholder:text-[#b7c7a3] focus:outline-none"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          placeholder="Search by title or summary..."
         />
       </div>
       {/* Tag Filter */}
