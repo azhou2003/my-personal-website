@@ -41,7 +41,7 @@ export default function BlogIndexPage() {
   // This file must NOT have 'use client' at the top!
   const posts = getAllPosts();
   return (
-    <div className="min-h-screen flex flex-col bg-background-light text-foreground-light transition-colors">
+    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors">
       <Navbar />
       <BlogIndexClient posts={posts} />
       <Footer />

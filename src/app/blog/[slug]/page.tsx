@@ -55,15 +55,11 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
       {data.date && <p className="text-muted text-sm mb-6">{data.date}</p>}
       {data.tags && Array.isArray(data.tags) && (
         <div className="flex flex-wrap gap-2 mb-8">
-          {data.tags.map((tag: string) => (
+          {data.tags.map((tag: string, i: number) => (
             <span
               key={tag}
-              className="px-2 py-1 rounded text-xs font-medium border"
-              style={{
-                background: "var(--color-accent-bg)",
-                color: "var(--color-accent-text)",
-                borderColor: "var(--color-accent-border)",
-              }}
+              className={`px-2 py-1 rounded text-xs font-medium border transition-all cursor-pointer hover:scale-110 hover:shadow-md \
+                bg-[#b7c7a3]/70 text-[#4b5d3a] border-[#b7c7a3] dark:bg-[#3f4a36] dark:text-[#e6e4d9] dark:border-[#b7c7a3]`}
             >
               {tag}
             </span>
