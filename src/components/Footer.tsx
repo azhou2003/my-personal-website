@@ -20,7 +20,7 @@ const Footer = () => (
         icon={<FaLinkedin />}
       />
     </div>
-    <span className="text-border-light dark:text-border-dark">© {new Date().getFullYear()} Anjie</span>
+    <span className="text-border-light dark:text-border-dark">© {new Date().getFullYear()} Anjie Zhou</span>
   </footer>
 );
 

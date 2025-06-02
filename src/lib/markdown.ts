@@ -1,4 +1,6 @@
 import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
 import path from "path";
 import fs from "fs";
 
@@ -9,6 +11,20 @@ export interface BlogMeta {
   tags: string[];
   summary: string;
   image?: string;
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  const postPath = path.join(process.cwd(), "src/posts", `${slug}.md`);
+  if (!fs.existsSync(postPath)) return null;
+
+  const file = fs.readFileSync(postPath, "utf8");
+  const { data, content } = matter(file);
+  const processedContent = await remark().use(html).process(content);
+
+  return {
+    metadata: data,
+    contentHtml: processedContent.toString(),
+  };
 }
 
 export function getAllBlogPosts(): BlogMeta[] {

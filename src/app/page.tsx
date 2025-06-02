@@ -2,6 +2,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Image from "next/image";
 
+export const metadata = {
+  title: "Home | Anjie Zhou",
+  description: "Get to know Anjie Zhou",
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors">
