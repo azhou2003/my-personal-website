@@ -150,7 +150,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
           >
             <Link
               href={`/blog/${post.slug}`}
-              className="group rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow hover:shadow-2xl transition-all overflow-hidden flex flex-col h-80 transform-gpu hover:scale-105 focus:scale-105 duration-300"
+              className="group rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden flex flex-col h-80 transform-gpu hover:scale-105 focus:scale-105 duration-300"
             >
               <div className="relative w-full h-48 bg-[#ece7d5] dark:bg-[#23201c]">
                 {post.image && (

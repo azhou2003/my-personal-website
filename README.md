@@ -1,8 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Personal Website
 
-## Getting Started
+This is a personal website built with [Next.js](https://nextjs.org), featuring a markdown-powered blog and a portfolio section. The site is fully responsive, supports dark mode, and is easily extensible.
 
-First, run the development server:
+---
+
+## 🚀 Getting Started
+
+To run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +18,61 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✍️ Adding a Blog Post
 
-## Learn More
+Blog posts are written in Markdown and stored in `src/posts/`.
 
-To learn more about Next.js, take a look at the following resources:
+**To add a new blog post:**
+1. Create a new `.md` file in `src/posts/` (e.g., `my-new-post.md`).
+2. Add frontmatter at the top of the file:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```markdown
+   ---
+   title: My New Blog Post
+   date: "2024-06-01"
+   tags: ["Next.js", "React"]
+   summary: "A short summary of my new post."
+   image: "/path/to/image.png"
+   ---
+   
+   Your blog content goes here. You can use Markdown syntax!
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Save the file. The post will automatically appear on the blog page.
 
-## Deploy on Vercel
+---
+
+## 🗂️ Adding a Portfolio Project
+
+Portfolio projects are defined as JSON files in `src/data/`.
+
+**To add a new project:**
+1. Create a new `.json` file in `src/data/` (e.g., `my-cool-project.json`).
+2. Use the following structure:
+
+   ```json
+   {
+     "title": "My Cool Project",
+     "description": "A brief description of the project.",
+     "date": "2024-05-15",
+     "tags": ["Next.js", "TypeScript"],
+     "images": ["/path/to/image.png"],
+     "link": "https://github.com/yourusername/my-cool-project"
+   }
+   ```
+
+3. Save the file. The project will automatically appear in the portfolio section.
+
+---
+
+## 🌐 Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+---
