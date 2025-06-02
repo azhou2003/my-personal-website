@@ -58,10 +58,14 @@ function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; del
           node.classList.remove('opacity-100', 'translate-y-0');
           // Use faster fade for scroll-out, slower for initial load
           if (scrollDir === 'down') {
-            node.classList.add('opacity-0', 'fade-out-down', hasLoaded ? 'duration-500' : '');
+            const classes = ['opacity-0', 'fade-out-down'];
+            if (hasLoaded) classes.push('duration-500');
+            node.classList.add(...classes);
             node.classList.remove('fade-out-up');
           } else {
-            node.classList.add('opacity-0', 'fade-out-up', hasLoaded ? 'duration-500' : '');
+            const classes = ['opacity-0', 'fade-out-up'];
+            if (hasLoaded) classes.push('duration-500');
+            node.classList.add(...classes);
             node.classList.remove('fade-out-down');
           }
         }
