@@ -5,6 +5,8 @@ body {
   font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
   font-size: 1rem;
   line-height: 1.7;
+  background: #fefae0;
+  color: #1a1a1a;
 }
 
 h1, h2, h3, h4 {
@@ -16,7 +18,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
   font-size: 1.1rem;
   line-height: 1.8;
-  color: inherit;
+  color: #1a1a1a;
 }
 
 code, pre {
@@ -24,8 +26,7 @@ code, pre {
   font-size: 0.95em;
 }
 
-/* Remove default Next.js starter background and color overrides */
 :root, html, body {
-  background: none !important;
-  color: inherit !important;
+  background: #fefae0 !important;
+  color: #1a1a1a !important;
 }

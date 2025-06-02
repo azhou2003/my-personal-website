@@ -6,9 +6,9 @@ import { PortfolioProject } from "../../lib/portfolio";
 import { useState, useMemo, useEffect } from "react";
 
 const accentClasses = [
-  "bg-accent-sage/40 dark:bg-accent-sage/20 text-accent-sage border-accent-sage/30",
-  "bg-accent-yellow/40 dark:bg-accent-yellow/20 text-accent-yellow border-accent-yellow/30",
-  "bg-accent-orange/40 dark:bg-accent-orange/20 text-accent-orange border-accent-orange/30",
+  "bg-[#b7c7a3]/70 text-[#4b5d3a] border-[#b7c7a3]", // sage
+  "bg-[#ffe066]/70 text-[#a68c1d] border-[#ffe066]", // yellow
+  "bg-[#ffb385]/70 text-[#a65c1d] border-[#ffb385]", // orange
 ];
 
 async function loadProjects(): Promise<PortfolioProject[]> {
@@ -71,24 +71,23 @@ export default function PortfolioPage() {
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
           Portfolio
         </h1>
-        {/* Search */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-8 w-full max-w-2xl">
+        {/* Centered Search */}
+        <div className="flex justify-center mb-8 w-full">
           <input
             type="text"
             placeholder="Search by title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full md:w-1/2 px-4 py-2 rounded border border-border-light dark:border-border-dark bg-white dark:bg-background-dark/80 text-base focus:outline-none"
+            className="w-full max-w-md px-4 py-2 rounded border border-border-light dark:border-border-dark bg-white dark:bg-background-dark/80 text-base focus:outline-none"
           />
         </div>
         {/* Frequency Widget (now used for tag filtering) */}
-        <div className="w-full max-w-2xl mb-8">
-          <h2 className="text-lg font-semibold mb-2">Tech Frequency</h2>
-          <div className="flex flex-wrap gap-2">
+        <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             {allTags.map((tag, i) => (
               <button
                 key={tag}
-                className={`px-2 py-1 rounded-full border text-xs font-medium transition-colors focus:outline-none
+                className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors focus:outline-none flex items-center justify-center
                   ${accentClasses[i % accentClasses.length]}
                   ${selectedTag === tag ? 'ring-2 ring-accent-yellow' : ''}
                 `}
@@ -132,11 +131,11 @@ export default function PortfolioPage() {
                   })}
                 </span>
                 <p className="text-base mb-2">{project.description}</p>
-                <div className="flex flex-wrap gap-2 mb-2">
+                <div className="flex flex-wrap gap-2 mb-2 justify-center">
                   {project.tags.map((tag, i) => (
                     <span
                       key={i}
-                      className={`px-2 py-1 rounded-full border text-xs font-medium transition-colors ${accentClasses[i % accentClasses.length]}`}
+                      className={`px-2 py-1 rounded-full border text-xs font-medium transition-colors flex items-center justify-center ${accentClasses[i % accentClasses.length]}`}
                     >
                       {tag}
                     </span>
