@@ -1,0 +1,9 @@
+{
+  "title": "Personal Portfolio Website",
+  "description": "A minimalist, modern portfolio and blog built with Next.js, Tailwind CSS, and MDX.",
+  "date": "2025-05-20",
+  "tags": ["Next.js", "Tailwind", "MDX"],
+  "images": ["/next.svg"],
+  "github": "https://github.com/yourusername/portfolio",
+  "demo": "https://yourdomain.com"
+}

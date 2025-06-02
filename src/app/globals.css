@@ -1,27 +1,31 @@
 @import "tailwindcss";
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
+  font-weight: 700;
+}
+
+.prose {
+  font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: inherit;
+}
+
+code, pre {
+  font-family: var(--font-mono, 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace);
+  font-size: 0.95em;
+}
+
+/* Remove default Next.js starter background and color overrides */
+:root, html, body {
+  background: none !important;
+  color: inherit !important;
 }
