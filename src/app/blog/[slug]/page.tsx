@@ -6,11 +6,7 @@ import html from "remark-html";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-interface BlogPostProps {
-  params: { slug: string };
-}
-
-export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
   try {
     const file = fs.readFileSync(postPath, "utf8");
@@ -24,7 +20,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
   }
 }
 
-export default async function BlogPostPage({ params }: BlogPostProps) {
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
   let content = "";
   let data: any = {};
@@ -45,6 +41,22 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
       </main>
     );
   }
+
+  // Find all posts and sort by date
+  const postsDir = path.join(process.cwd(), "src", "posts");
+  const postFiles = fs.readdirSync(postsDir).filter(f => f.endsWith('.md'));
+  const posts = postFiles.map(filename => {
+    const file = fs.readFileSync(path.join(postsDir, filename), "utf8");
+    const { data } = matter(file);
+    return {
+      slug: filename.replace(/\.md$/, ""),
+      date: data.date,
+      title: data.title || filename,
+    };
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const currentIdx = posts.findIndex(p => p.slug === params.slug);
+  const prevPost = currentIdx > 0 ? posts[currentIdx - 1] : null;
+  const nextPost = currentIdx < posts.length - 1 ? posts[currentIdx + 1] : null;
 
   return (
     <main className="max-w-2xl mx-auto py-16 px-4">
@@ -70,6 +82,18 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: content }}
       />
+      <div className="flex justify-between items-center mt-16">
+        {prevPost ? (
+          <Link href={`/blog/${prevPost.slug}`} className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors">
+            ← Previous: {prevPost.title}
+          </Link>
+        ) : <div />}
+        {nextPost ? (
+          <Link href={`/blog/${nextPost.slug}`} className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors ml-auto">
+            Next: {nextPost.title} →
+          </Link>
+        ) : <div />}
+      </div>
     </main>
   );
 }

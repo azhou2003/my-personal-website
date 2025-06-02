@@ -4,6 +4,5 @@
   "date": "2024-11-10",
   "tags": ["React", "D3.js", "Security"],
   "images": ["/globe.svg"],
-  "github": "https://github.com/yourusername/cyber-dashboard",
-  "demo": "https://cyberdashboard.com"
+  "link": "https://github.com/yourusername/cyber-dashboard"
 }

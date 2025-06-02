@@ -4,6 +4,5 @@
   "date": "2023-12-01",
   "tags": ["Next.js", "Markdown", "Blog"],
   "images": ["/vercel.svg"],
-  "github": "https://github.com/yourusername/blog-platform",
-  "demo": ""
+  "link": "https://github.com/yourusername/blog-platform"
 }

@@ -1,0 +1,8 @@
+{
+  "title": "Weather App",
+  "description": "A responsive weather dashboard using OpenWeatherMap API and React.",
+  "date": "2024-09-10",
+  "tags": ["React", "API", "Weather"],
+  "images": ["/window.svg"],
+  "link": "https://github.com/yourusername/weather-app"
+}

@@ -4,6 +4,5 @@
   "date": "2025-05-20",
   "tags": ["Next.js", "Tailwind", "MDX"],
   "images": ["/next.svg"],
-  "github": "https://github.com/yourusername/portfolio",
-  "demo": "https://yourdomain.com"
+  "link": "https://github.com/yourusername/portfolio"
 }

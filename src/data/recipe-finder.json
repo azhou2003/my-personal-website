@@ -1,0 +1,8 @@
+{
+  "title": "Recipe Finder",
+  "description": "A web app to search and save recipes using the Spoonacular API.",
+  "date": "2024-06-18",
+  "tags": ["Vue.js", "API", "Food"],
+  "images": ["/vercel.svg"],
+  "link": "https://github.com/yourusername/recipe-finder"
+}

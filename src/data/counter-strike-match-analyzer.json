@@ -4,6 +4,5 @@
   "date": "2024-07-15",
   "tags": ["Node.js", "Express", "CS:GO"],
   "images": ["/file.svg"],
-  "github": "https://github.com/yourusername/csgo-analyzer",
-  "demo": ""
+  "link": "https://github.com/yourusername/csgo-analyzer"
 }

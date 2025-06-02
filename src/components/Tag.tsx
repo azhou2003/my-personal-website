@@ -8,19 +8,13 @@ interface TagProps {
   className?: string;
 }
 
-const Tag: React.FC<TagProps> = ({ label, colorClass = "bg-accent text-accent-foreground border-accent", onClick, className = "" }) => {
-  return (
-    <span
-      className={`inline-block px-3 py-1 rounded-full border text-xs font-medium transition-transform duration-150 cursor-pointer hover:scale-110 focus:scale-110 ${colorClass} ${className}`}
-      tabIndex={onClick ? 0 : -1}
-      onClick={onClick}
-      onKeyDown={e => { if (onClick && (e.key === 'Enter' || e.key === ' ')) onClick(); }}
-      role={onClick ? "button" : undefined}
-      aria-pressed={onClick ? false : undefined}
-    >
-      {label}
-    </span>
-  );
-};
+const Tag: React.FC<TagProps> = ({ label, colorClass = "", onClick, className = "" }) => (
+  <span
+    onClick={onClick}
+    className={`inline-block px-3 py-1 rounded-full border text-xs font-semibold cursor-pointer transition-colors duration-200 select-none ${colorClass} ${className} hover:brightness-110 hover:scale-105`}
+  >
+    {label}
+  </span>
+);
 
 export default Tag;

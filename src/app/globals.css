@@ -40,3 +40,13 @@ body.dark input[type="text"] {
   color: #f5f5f5;
   background: #23201c;
 }
+
+.fade-out-up {
+  transform: translateY(-32px);
+  transition: opacity 0.7s, transform 0.7s;
+}
+
+.fade-out-down {
+  transform: translateY(32px);
+  transition: opacity 0.7s, transform 0.7s;
+}

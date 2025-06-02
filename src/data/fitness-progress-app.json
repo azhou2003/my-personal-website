@@ -1,0 +1,8 @@
+{
+  "title": "Fitness Progress App",
+  "description": "Log workouts, set goals, and track fitness progress over time.",
+  "date": "2023-10-30",
+  "tags": ["Fitness", "React", "Charts"],
+  "images": ["/file.svg"],
+  "link": "https://github.com/yourusername/fitness-progress-app"
+}

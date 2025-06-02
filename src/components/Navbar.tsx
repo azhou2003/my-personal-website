@@ -2,44 +2,39 @@
 
 import Link from 'next/link';
 import DarkModeToggle from './DarkModeToggle';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const navRef = useRef<HTMLDivElement>(null);
-  // Use a ref to store lastScroll so it persists across renders
-  const lastScroll = useRef(0);
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
+    let lastY = window.scrollY;
     const handleScroll = () => {
-      const nav = navRef.current;
-      if (!nav) return;
-      const curr = window.scrollY;
-      if (curr > lastScroll.current && curr > 60) {
-        nav.style.transform = 'translateY(-100%)';
-      } else {
-        nav.style.transform = 'translateY(0)';
+      const currentY = window.scrollY;
+      if (currentY < lastY) {
+        setShow(true);
+      } else if (currentY > lastY) {
+        setShow(false);
       }
-      lastScroll.current = curr;
+      lastY = currentY;
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      ref={navRef}
-      className="w-full flex items-center justify-between py-4 px-6 border-b border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-md sticky top-0 z-50 transition-all duration-300"
-      style={{ transition: 'transform 0.3s' }}
+      className={`w-full flex items-center justify-between px-6 py-4 bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark shadow-md z-50 transition-transform duration-300 ${show ? "translate-y-0" : "-translate-y-full"}`}
     >
       <div className="flex items-center gap-3">
         <Link href="/">
-          <span className="font-bold text-lg text-foreground-light dark:text-foreground-dark">Anjie</span>
+          <span className="font-bold text-lg">Anjie</span>
         </Link>
       </div>
-      <div className="flex items-center gap-6">
-        <Link href="/portfolio" className="hover:underline text-foreground-light dark:text-foreground-dark">Portfolio</Link>
-        <Link href="/blog" className="hover:underline text-foreground-light dark:text-foreground-dark">Blog</Link>
-        <div className="ml-2"><DarkModeToggle /></div>
+      <div className="flex items-center gap-4 ml-auto">
+        <Link href="/portfolio" className="hover:underline">Portfolio</Link>
+        <Link href="/blog" className="hover:underline">Blog</Link>
+        <DarkModeToggle />
       </div>
     </nav>
   );
