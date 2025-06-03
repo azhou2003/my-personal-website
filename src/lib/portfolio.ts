@@ -1,17 +1,9 @@
 import fs from "fs";
 import path from "path";
-
-export type PortfolioProject = {
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  images: string[];
-  link?: string;
-};
+import type { PortfolioProject } from "./types";
 
 export async function getAllProjects(): Promise<PortfolioProject[]> {
-  const dataDir = path.join(process.cwd(), "src/data");
+  const dataDir = path.join(process.cwd(), "src/content/data");
   const files = fs.readdirSync(dataDir).filter((f) => f.endsWith(".json"));
   return files.map((file) => {
     const filePath = path.join(dataDir, file);

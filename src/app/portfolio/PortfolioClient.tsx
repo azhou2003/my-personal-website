@@ -2,14 +2,17 @@
 import { PortfolioProject } from "../../lib/portfolio";
 import { useState, useMemo, useRef, useEffect } from "react";
 import Tag from "../../components/Tag";
+import TagList from "../../components/TagList";
 import { accentClasses, popupAccentClasses } from "../../components/styles/tagColors";
 import SearchBar from "../../components/SearchBar";
+import { formatDate } from "../../lib/formatDate";
+import Image from "next/image";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
   projects.forEach((p) => {
     if (!Array.isArray(p.tags)) return;
-    p.tags.forEach((tag) => {
+    p.tags.forEach((tag: string) => {
       freq[tag] = (freq[tag] || 0) + 1;
     });
   });
@@ -168,11 +171,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                       <span
                         className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-transform duration-300 group-hover:scale-110 group-focus:scale-110"
                       >
-                        {new Date(project.date).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {formatDate(project.date)}
                       </span>
                     ) : (
                       <div className="flex justify-end relative w-full">
@@ -184,10 +183,13 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <img
+                            <Image
                               src={project.images[0] || "/file.svg"}
                               alt={project.title}
+                              width={320}
+                              height={180}
                               className="w-[320px] h-[180px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10"
+                              priority={idx < 2}
                             />
                           </a>
                           {/* Expanding Popup (expands outwards, not stacked) */}
@@ -197,13 +199,8 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           >
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              {project.tags.map((tag, i) => (
-                                <Tag
-                                  key={i}
-                                  label={tag}
-                                  colorClass={popupAccentClasses[i % popupAccentClasses.length]}
-                                />
-                              ))}
+                              {/* Restored tag display using TagList */}
+                              <TagList tags={project.tags} className="mb-2 justify-center" colorClassList={popupAccentClasses} />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
@@ -223,23 +220,21 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <img
+                            <Image
                               src={project.images[0] || "/file.svg"}
                               alt={project.title}
+                              width={320}
+                              height={180}
                               className="w-[320px] h-[180px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10"
+                              priority={idx < 2}
                             />
                           </a>
                           {/* Expanding Popup (expands outwards, not stacked) */}
                           <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              {project.tags.map((tag, i) => (
-                                <Tag
-                                  key={i}
-                                  label={tag}
-                                  colorClass={popupAccentClasses[i % popupAccentClasses.length]}
-                                />
-                              ))}
+                              {/* Restored tag display using TagList */}
+                              <TagList tags={project.tags} className="mb-2 justify-center" colorClassList={popupAccentClasses} />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
@@ -249,11 +244,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                       <span className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-transform duration-300 group-hover:scale-110 group-focus:scale-110"
                         tabIndex={0}
                       >
-                        {new Date(project.date).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {formatDate(project.date)}
                       </span>
                     )}
                   </div>

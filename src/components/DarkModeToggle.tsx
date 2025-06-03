@@ -53,15 +53,15 @@ const DarkModeToggle = () => {
           className={`absolute inset-0 transition-all duration-300 ease-in-out ${
             hovered
               ? isDarkMode
-                ? "translate-x-8 opacity-0 scale-90 blur-sm"
-                : "-translate-x-8 opacity-0 scale-90 blur-sm"
+                ? "-translate-x-8 opacity-0 scale-90 blur-sm"
+                : "translate-x-8 opacity-0 scale-90 blur-sm"
               : "translate-x-0 opacity-100 scale-100 blur-0"
           }`}
         >
           {isDarkMode ? (
-            <SunIcon className="w-6 h-6 text-accent-yellow" />
-          ) : (
             <MoonIcon className="w-6 h-6 text-accent-sage" />
+          ) : (
+            <SunIcon className="w-6 h-6 text-accent-yellow" />
           )}
         </span>
         {/* Opposite icon always slides in from right like a carousel */}
@@ -69,13 +69,13 @@ const DarkModeToggle = () => {
           className={`absolute inset-0 transition-all duration-300 ease-in-out ${
             hovered
               ? "translate-x-0 opacity-100 scale-100 blur-0"
-              : "translate-x-8 opacity-0 scale-90 blur-sm pointer-events-none"
+              : "-translate-x-8 opacity-0 scale-90 blur-sm pointer-events-none"
           }`}
         >
           {isDarkMode ? (
-            <MoonIcon className="w-6 h-6 text-accent-sage" />
-          ) : (
             <SunIcon className="w-6 h-6 text-accent-yellow" />
+          ) : (
+            <MoonIcon className="w-6 h-6 text-accent-sage" />
           )}
         </span>
       </span>

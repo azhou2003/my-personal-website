@@ -3,18 +3,10 @@ import { remark } from "remark";
 import html from "remark-html";
 import path from "path";
 import fs from "fs";
-
-export interface BlogMeta {
-  slug: string;
-  title: string;
-  date: string;
-  tags: string[];
-  summary: string;
-  image?: string;
-}
+import type { BlogMeta } from "./types";
 
 export async function getBlogPostBySlug(slug: string) {
-  const postPath = path.join(process.cwd(), "src/posts", `${slug}.md`);
+  const postPath = path.join(process.cwd(), "src/content/posts", `${slug}.md`);
   if (!fs.existsSync(postPath)) return null;
 
   const file = fs.readFileSync(postPath, "utf8");
@@ -28,7 +20,7 @@ export async function getBlogPostBySlug(slug: string) {
 }
 
 export function getAllBlogPosts(): BlogMeta[] {
-  const postsDir = path.join(process.cwd(), "src/posts");
+  const postsDir = path.join(process.cwd(), "src/content/posts");
   const files = fs.readdirSync(postsDir);
   return files
     .filter((file) => file.endsWith(".md"))

@@ -1,12 +1,10 @@
 import PageLayout from "../../components/PageLayout";
 import { getAllProjects } from "../../lib/portfolio";
-import type { PortfolioProject } from "../../lib/portfolio";
+import type { PortfolioProject } from "../../lib/types";
 import PortfolioClient from "./PortfolioClient";
+import { portfolioMetadata } from "../../lib/metadata";
 
-export const metadata = {
-  title: "Portfolio | Anjie Zhou",
-  description: "View Anjie Zhou's Projects",
-};
+export const metadata = portfolioMetadata;
 
 export default async function PortfolioPage() {
   let projects: PortfolioProject[] = [];

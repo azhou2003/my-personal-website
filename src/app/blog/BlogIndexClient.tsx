@@ -2,18 +2,12 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Tag from "../../components/Tag";
+import TagList from "../../components/TagList";
 import { accentClasses } from "../../components/styles/tagColors";
 import SearchBar from "../../components/SearchBar";
-
-interface BlogMeta {
-  slug: string;
-  title: string;
-  date: string;
-  tags: string[];
-  summary: string;
-  image?: string;
-}
+import { formatDate } from "../../lib/formatDate";
+import type { BlogMeta } from "../../lib/types";
+import Tag from "../../components/Tag";
 
 function FadeInSection({ children, delay = 0, isInitial = false }: { children: React.ReactNode; delay?: number; isInitial?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -167,20 +161,10 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                   {post.title}
                 </h2>
                 <div className="flex flex-wrap gap-2 mb-1">
-                  {post.tags.map((tag, i) => (
-                    <Tag
-                      key={i}
-                      label={tag}
-                      colorClass={accentClasses[i % accentClasses.length]}
-                    />
-                  ))}
+                  <TagList tags={post.tags} className="mb-1" colorClassList={accentClasses} />
                 </div>
                 <span className="text-xs text-border-light dark:text-border-dark mb-1">
-                  {new Date(post.date).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {formatDate(post.date)}
                 </span>
                 <div className="relative flex-1 overflow-hidden">
                   <p className="text-sm text-foreground-light dark:text-foreground-dark mb-2">

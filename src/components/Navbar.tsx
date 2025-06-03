@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import DarkModeToggle from './DarkModeToggle';
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const Navbar = () => {
   const [show, setShow] = useState(true);
@@ -32,11 +33,14 @@ const Navbar = () => {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
           <Link href="/" className="flex items-center justify-center group">
             <span className="inline-block rounded-full overflow-visible transition-transform duration-200 group-hover:scale-125">
-              <img
+              <Image
                 src="/anjie-zhou-logo.svg"
                 alt="Anjie Zhou Logo"
+                width={40}
+                height={40}
                 className="h-10 w-10 object-contain"
                 style={{ display: 'inline-block' }}
+                priority
               />
             </span>
             <span className="sr-only">Home</span>

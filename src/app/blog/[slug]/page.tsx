@@ -5,6 +5,7 @@ import { getBlogPostBySlug } from "../../../lib/markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
@@ -27,23 +28,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const { metadata: data, contentHtml: content } = post;
 
   // Get all blog post slugs for prev/next navigation
-  const postsDir = path.join(process.cwd(), "src/posts");
-  const postFiles = fs.readdirSync(postsDir).filter((f) => f.endsWith(".md"));
-  const posts = postFiles
-    .map((filename) => {
-      const file = fs.readFileSync(path.join(postsDir, filename), "utf8");
-      const { data } = matter(file);
-      return {
-        slug: filename.replace(/\.md$/, ""),
-        date: data.date,
-        title: data.title || filename,
-      };
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  const currentIdx = posts.findIndex((p) => p.slug === params.slug);
-  const prevPost = currentIdx > 0 ? posts[currentIdx - 1] : null;
-  const nextPost = currentIdx < posts.length - 1 ? posts[currentIdx + 1] : null;
+  const postsDir = path.join(process.cwd(), "src/content/posts");
+  const posts = getSortedBlogPosts(postsDir);
+  const { prevPost, nextPost } = getPrevNextPosts(posts, params.slug);
 
   return (
     <main className="max-w-2xl mx-auto py-16 px-4">
