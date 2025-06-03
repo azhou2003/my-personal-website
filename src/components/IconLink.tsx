@@ -12,7 +12,11 @@ interface IconLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
  */
 const IconLink: React.FC<IconLinkProps> = ({ icon, className = "", ...props }) => (
   <a className={className} {...props}>
-    {React.cloneElement(icon as React.ReactElement, { className: iconLinkClasses })}
+    {React.isValidElement(icon)
+      ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
+          className: [iconLinkClasses, (icon as React.ReactElement<{ className?: string }>).props.className].filter(Boolean).join(" ")
+        })
+      : icon}
   </a>
 );
 

@@ -18,7 +18,7 @@ export function getSortedBlogPosts(postsDir: string) {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-export function getPrevNextPosts(posts: any[], currentSlug: string) {
+export function getPrevNextPosts<T extends { slug: string }>(posts: T[], currentSlug: string) {
   const currentIdx = posts.findIndex((p) => p.slug === currentSlug);
   const prevPost = currentIdx > 0 ? posts[currentIdx - 1] : null;
   const nextPost = currentIdx < posts.length - 1 ? posts[currentIdx + 1] : null;

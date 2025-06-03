@@ -6,12 +6,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
-import { accentClassesLight, accentClassesDark } from "../../../components/styles/tagColors";
-import { useIsDarkMode } from "../../../hooks/useIsDarkMode";
-import TagList from "../../../components/TagList";
 import BlogPostTags from "./BlogPostTags";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+// TODO: Restore correct type for params when Next.js typegen bug is fixed
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateMetadata({ params }: any): Promise<Metadata> {
   const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
   try {
     const file = fs.readFileSync(postPath, "utf8");
@@ -26,14 +25,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export async function generateStaticParams() {
-  const fs = await import("fs");
-  const path = await import("path");
   const postsDir = path.join(process.cwd(), "src/content/posts");
   const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".md"));
   return files.map((file) => ({ slug: file.replace(/\.md$/, "") }));
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+// TODO: Restore correct type for params when Next.js typegen bug is fixed
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function BlogPostPage({ params }: { params: any }) {
   const post = await getBlogPostBySlug(params.slug);
   if (!post) return notFound();
 

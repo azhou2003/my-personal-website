@@ -1,13 +1,14 @@
 "use client";
-import { PortfolioProject } from "../../lib/portfolio";
+import type { PortfolioProject } from "../../lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
 import PortfolioTags from "./PortfolioTags";
-import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
-import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
 import { formatDate } from "../../lib/formatDate";
 import Image from "next/image";
 import SortSwitch from "../../components/SortSwitch";
+import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
+import { useIsDarkMode } from "../../hooks/useIsDarkMode";
+import Tag from "../../components/Tag";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -82,21 +83,26 @@ function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; del
 
 export default function PortfolioClient({ projects }: { projects: PortfolioProject[] }) {
   const [search, setSearch] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [triggerKey, setTriggerKey] = useState(0); // For triggering animation on search/tag change
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const isDarkMode = useIsDarkMode();
 
+  const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
+
   const allTags = useMemo(() => {
-    const freq = getTagFrequency(projects);
     return Array.from(new Set(projects.flatMap((p) => p.tags)))
       .sort((a, b) => {
-        if (freq[b] !== freq[a]) return freq[b] - freq[a];
+        if (tagFrequency[b] !== tagFrequency[a]) return tagFrequency[b] - tagFrequency[a];
         return a.localeCompare(b);
       });
-  }, [projects]);
+  }, [projects, tagFrequency]);
 
-  const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
+  const handleTagClick = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   const filtered = useMemo(
     () =>
@@ -118,12 +124,6 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         }),
     [search, selectedTags, projects, sortOrder]
   );
-
-  const handleTagClick = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
 
   // When search or selectedTags change, update triggerKey to force re-mount FadeInSection
   useEffect(() => {
@@ -149,7 +149,17 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       {/* Frequency Widget (now used for tag filtering) */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
-          <PortfolioTags tags={allTags} className="mb-2 justify-center" />
+          {allTags.map((tag, i) => (
+            <Tag
+              key={tag}
+              label={tag}
+              colorClass={(isDarkMode ? accentClassesDark : accentClassesLight)[i % accentClassesLight.length]}
+              onClick={() => handleTagClick(tag)}
+              className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
+            >
+              {`${tag}: ${tagFrequency[tag]}`}
+            </Tag>
+          ))}
         </div>
       </div>
       {/* Project Timeline */}

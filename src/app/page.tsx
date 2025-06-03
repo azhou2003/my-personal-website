@@ -20,11 +20,11 @@ export default function Home() {
           </span>
         </div>
         <Image
-          src="/next.svg"
+          src="/anjie-zhou-logo.svg"
           alt="Profile picture"
           width={120}
           height={120}
-          className="rounded-full border border-border-light dark:border-border-dark mb-4"
+          className="border border-border-light dark:border-border-dark mb-4"
           priority
         />
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 font-sans">
