@@ -1,6 +1,8 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Image from "next/image";
+import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import IconLink from "../components/IconLink";
 
 export const metadata = {
   title: "Home | Anjie Zhou",
@@ -12,6 +14,11 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors">
       <Navbar />
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 gap-8">
+        <div className="w-full flex justify-center mb-4">
+          <span className="text-5xl sm:text-6xl font-extrabold text-accent-yellow drop-shadow-lg uppercase tracking-widest text-center">
+            Work in Progress
+          </span>
+        </div>
         <Image
           src="/next.svg"
           alt="Profile picture"
@@ -31,7 +38,7 @@ export default function Home() {
         </p>
         <a
           href="/portfolio"
-          className="mt-2 px-6 py-2 rounded-full bg-accent-sage text-foreground-light dark:text-foreground-dark font-semibold shadow hover:bg-accent-yellow transition-colors"
+          className="mt-2 px-6 py-2 rounded-full bg-accent-sage text-foreground-light dark:text-foreground-dark font-semibold shadow hover:bg-accent-yellow transition-colors transform hover:scale-110 focus:scale-110 duration-200"
         >
           View My Work
         </a>
@@ -39,35 +46,26 @@ export default function Home() {
           <span className="text-sm text-foreground-light/70 dark:text-foreground-dark/70">
             Contact & Socials
           </span>
-          <div className="flex gap-4">
-            <a
-              href="mailto:your@email.com"
+          <div className="flex gap-6">
+            <IconLink
+              href="mailto:anjie.zhou2003@gmail.com"
+              aria-label="Email"
+              icon={<FaEnvelope />}
+            />
+            <IconLink
+              href="https://github.com/azhou2003"
               target="_blank"
               rel="noopener noreferrer"
-            >
-              Email
-            </a>
-            <a
-              href="https://linkedin.com/in/yourprofile"
+              aria-label="GitHub"
+              icon={<FaGithub />}
+            />
+            <IconLink
+              href="https://www.linkedin.com/in/anjiezhouhtx/"
               target="_blank"
               rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://github.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://www.faceit.com/en/players/yourfaceit"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Faceit
-            </a>
+              aria-label="LinkedIn"
+              icon={<FaLinkedin />}
+            />
           </div>
         </div>
       </main>

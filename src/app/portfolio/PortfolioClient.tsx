@@ -133,7 +133,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
       <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
-        Portfolio
+        My Portfolio
       </h1>
       {/* Centered Search */}
       <div className="flex justify-center mb-4 w-full">
