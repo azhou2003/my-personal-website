@@ -1,12 +1,13 @@
 "use client";
 import { PortfolioProject } from "../../lib/portfolio";
 import { useState, useMemo, useRef, useEffect } from "react";
-import Tag from "../../components/Tag";
-import TagList from "../../components/TagList";
-import { accentClasses, popupAccentClasses } from "../../components/styles/tagColors";
+import PortfolioTags from "./PortfolioTags";
+import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
+import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
 import { formatDate } from "../../lib/formatDate";
 import Image from "next/image";
+import SortSwitch from "../../components/SortSwitch";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -83,6 +84,8 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [triggerKey, setTriggerKey] = useState(0); // For triggering animation on search/tag change
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const isDarkMode = useIsDarkMode();
 
   const allTags = useMemo(() => {
     const freq = getTagFrequency(projects);
@@ -97,15 +100,23 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
   const filtered = useMemo(
     () =>
-      projects.filter((p) => {
-        const matchesSearch =
-          typeof p.title === 'string' && p.title.toLowerCase().includes(search.toLowerCase()) ||
-          typeof p.description === 'string' && p.description.toLowerCase().includes(search.toLowerCase());
-        const matchesTags =
-          Array.isArray(p.tags) && (selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag)));
-        return matchesSearch && matchesTags;
-      }),
-    [search, selectedTags, projects]
+      projects
+        .filter((p) => {
+          const matchesSearch =
+            typeof p.title === 'string' && p.title.toLowerCase().includes(search.toLowerCase()) ||
+            typeof p.description === 'string' && p.description.toLowerCase().includes(search.toLowerCase());
+          const matchesTags =
+            Array.isArray(p.tags) && (selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag)));
+          return matchesSearch && matchesTags;
+        })
+        .sort((a, b) => {
+          if (sortOrder === "desc") {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          } else {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          }
+        }),
+    [search, selectedTags, projects, sortOrder]
   );
 
   const handleTagClick = (tag: string) => {
@@ -125,6 +136,9 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         Portfolio
       </h1>
       {/* Centered Search */}
+      <div className="flex justify-center mb-4 w-full">
+        <SortSwitch value={sortOrder} onChange={setSortOrder} />
+      </div>
       <div className="flex justify-center mb-8 w-full">
         <SearchBar
           value={search}
@@ -135,15 +149,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       {/* Frequency Widget (now used for tag filtering) */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
-          {allTags.map((tag, i) => (
-            <Tag
-              key={tag + '-' + i}
-              label={`${tag}: ${tagFrequency[tag]}`}
-              colorClass={accentClasses[i % accentClasses.length]}
-              onClick={() => handleTagClick(tag)}
-              className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
-            />
-          ))}
+          <PortfolioTags tags={allTags} className="mb-2 justify-center" />
         </div>
       </div>
       {/* Project Timeline */}
@@ -199,8 +205,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           >
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              {/* Restored tag display using TagList */}
-                              <TagList tags={project.tags} className="mb-2 justify-center" colorClassList={popupAccentClasses} />
+                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
@@ -233,8 +238,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              {/* Restored tag display using TagList */}
-                              <TagList tags={project.tags} className="mb-2 justify-center" colorClassList={popupAccentClasses} />
+                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>

@@ -4,7 +4,11 @@ import IconLink from "./IconLink";
 const Footer = () => (
   <footer className="w-full flex flex-col items-center justify-center py-6 border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-xs gap-2">
     <div className="flex gap-6 mb-1">
-      <IconLink href="mailto:anjie.zhou2003@gmail.com" aria-label="Email" icon={<FaEnvelope />} />
+      <IconLink
+        href="mailto:anjie.zhou2003@gmail.com"
+        aria-label="Email"
+        icon={<FaEnvelope />}
+      />
       <IconLink
         href="https://github.com/azhou2003"
         target="_blank"

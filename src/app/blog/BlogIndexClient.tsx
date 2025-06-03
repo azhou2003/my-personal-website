@@ -3,8 +3,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TagList from "../../components/TagList";
-import { accentClasses } from "../../components/styles/tagColors";
+import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
+import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
+import SortSwitch from "../../components/SortSwitch";
 import { formatDate } from "../../lib/formatDate";
 import type { BlogMeta } from "../../lib/types";
 import Tag from "../../components/Tag";
@@ -77,6 +79,9 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [triggerKey, setTriggerKey] = useState(0);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+
+  const isDarkMode = useIsDarkMode();
 
   const allTags = useMemo(
     () => Array.from(new Set(posts.flatMap((p) => p.tags))).sort(),
@@ -85,15 +90,23 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
 
   const filtered = useMemo(
     () =>
-      posts.filter((p) => {
-        const matchesSearch =
-          p.title.toLowerCase().includes(search.toLowerCase()) ||
-          p.summary.toLowerCase().includes(search.toLowerCase());
-        const matchesTags =
-          selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag));
-        return matchesSearch && matchesTags;
-      }),
-    [search, selectedTags, posts]
+      posts
+        .filter((p) => {
+          const matchesSearch =
+            p.title.toLowerCase().includes(search.toLowerCase()) ||
+            p.summary.toLowerCase().includes(search.toLowerCase());
+          const matchesTags =
+            selectedTags.length === 0 || selectedTags.every((tag) => p.tags.includes(tag));
+          return matchesSearch && matchesTags;
+        })
+        .sort((a, b) => {
+          if (sortOrder === "desc") {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          } else {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          }
+        }),
+    [search, selectedTags, posts, sortOrder]
   );
 
   const handleTagClick = (tag: string) => {
@@ -112,13 +125,18 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
         Blog
       </h1>
-      {/* Centered Search Bar */}
-      <div className="flex justify-center mb-8 w-full">
-        <SearchBar
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-          placeholder="Search by title or summary..."
-        />
+      {/* Sort and Search Bar */}
+      <div className="flex flex-col items-center mb-8 w-full">
+        <div className="flex justify-center mb-4 w-full">
+          <SortSwitch value={sortOrder} onChange={setSortOrder} />
+        </div>
+        <div className="flex justify-center mb-8 w-full">
+          <SearchBar
+            value={search}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+            placeholder="Search by title or summary..."
+          />
+        </div>
       </div>
       {/* Tag Filter */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
@@ -127,7 +145,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
             <Tag
               key={tag}
               label={tag}
-              colorClass={accentClasses[i % accentClasses.length]}
+              colorClass={(isDarkMode ? accentClassesDark : accentClassesLight)[i % accentClassesLight.length]}
               onClick={() => handleTagClick(tag)}
               className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
             />
@@ -152,7 +170,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                     src={post.image}
                     alt={post.title}
                     fill
-                    className="object-contain object-center"
+                    className="object-cover object-center"
                   />
                 )}
               </div>
@@ -160,9 +178,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                 <h2 className="text-xl font-bold font-sans group-hover:text-accent-yellow transition-colors text-foreground-light dark:text-foreground-dark">
                   {post.title}
                 </h2>
-                <div className="flex flex-wrap gap-2 mb-1">
-                  <TagList tags={post.tags} className="mb-1" colorClassList={accentClasses} />
-                </div>
+                <TagList tags={post.tags} className="mb-1" colorClassList={isDarkMode ? accentClassesDark : accentClassesLight} />
                 <span className="text-xs text-border-light dark:text-border-dark mb-1">
                   {formatDate(post.date)}
                 </span>

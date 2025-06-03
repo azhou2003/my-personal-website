@@ -6,6 +6,10 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
+import { accentClassesLight, accentClassesDark } from "../../../components/styles/tagColors";
+import { useIsDarkMode } from "../../../hooks/useIsDarkMode";
+import TagList from "../../../components/TagList";
+import BlogPostTags from "./BlogPostTags";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
@@ -47,19 +51,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       </Link>
       <h1 className="text-3xl font-bold mb-2">{data.title || params.slug}</h1>
       {data.date && <p className="text-muted text-sm mb-6">{data.date}</p>}
-      {data.tags && Array.isArray(data.tags) && (
-        <div className="flex flex-wrap gap-2 mb-8">
-          {data.tags.map((tag: string) => (
-            <span
-              key={tag}
-              className={`px-2 py-1 rounded text-xs font-medium border transition-all cursor-pointer hover:scale-110 hover:shadow-md 
-                bg-[#b7c7a3]/70 text-[#4b5d3a] border-[#b7c7a3] dark:bg-[#3f4a36] dark:text-[#e6e4d9] dark:border-[#b7c7a3]`}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
+      {data.tags && Array.isArray(data.tags) && <BlogPostTags tags={data.tags} />}
       <article
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: content }}
