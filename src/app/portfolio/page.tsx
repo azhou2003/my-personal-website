@@ -6,6 +6,8 @@ import { portfolioMetadata } from "../../lib/metadata";
 
 export const metadata = portfolioMetadata;
 
+export { generateStaticParams } from "./generateStaticParams";
+
 export default async function PortfolioPage() {
   let projects: PortfolioProject[] = [];
 

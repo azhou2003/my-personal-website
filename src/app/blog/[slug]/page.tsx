@@ -21,6 +21,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
+export async function generateStaticParams() {
+  const fs = await import("fs");
+  const path = await import("path");
+  const postsDir = path.join(process.cwd(), "src/content/posts");
+  const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".md"));
+  return files.map((file) => ({ slug: file.replace(/\.md$/, "") }));
+}
+
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getBlogPostBySlug(params.slug);
   if (!post) return notFound();
