@@ -65,16 +65,15 @@ function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; del
           }
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
     observer.observe(node);
     return () => observer.disconnect();
   }, [scrollDir, delay, hasLoaded]);
-
   return (
     <div
       ref={ref}
-      className="opacity-0 translate-y-8 transition-all duration-700 will-change-transform"
+      className="opacity-0 translate-y-8 transition-all duration-300 will-change-transform"
     >
       {children}
     </div>
@@ -131,14 +130,10 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   }, [search, selectedTags]);
 
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
-      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
         My Portfolio
       </h1>
-      {/* Centered Search */}
-      <div className="flex justify-center mb-4 w-full">
-        <SortSwitch value={sortOrder} onChange={setSortOrder} />
-      </div>
+      {/* Search Bar */}
       <div className="flex justify-center mb-8 w-full">
         <SearchBar
           value={search}
@@ -146,7 +141,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           placeholder="Search by title or description..."
         />
       </div>
-      {/* Frequency Widget (now used for tag filtering) */}
+      {/* Tag Filter */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
           {allTags.map((tag, i) => (
@@ -162,6 +157,10 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           ))}
         </div>
       </div>
+      {/* Sort Controls */}
+      <div className="flex justify-center mb-8 w-full">
+        <SortSwitch value={sortOrder} onChange={setSortOrder} />
+      </div>
       {/* Project Timeline */}
       <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
         {/* Full-height vertical timeline line */}
@@ -175,7 +174,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           {filtered.map((project, idx) => {
             const isLeft = idx % 2 === 0;
             return (
-              <FadeInSection key={triggerKey + '-' + idx} delay={idx * 100}>
+              <FadeInSection key={triggerKey + '-' + idx} delay={idx * 40}>
                 <div className="relative flex items-center min-h-[180px] group">
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">

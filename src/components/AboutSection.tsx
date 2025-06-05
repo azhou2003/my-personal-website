@@ -12,15 +12,19 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded }) => {  if (!is
     return (      <div
         className="w-full flex justify-center py-4"
         style={{ bottom: '3.5rem' }}
-      >
-        <div className="bg-background-light dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-full px-6 py-3 shadow-lg">
+      >        <div className="bg-background-light dark:bg-background-dark border-2 border-foreground-light dark:border-foreground-dark rounded-full px-6 py-3 shadow-lg">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 text-xs font-medium select-none">
-              AZ
+            <div className="w-10 h-10 rounded-full overflow-hidden select-none">
+              <img 
+                src="/flat-cartoon-earth.jpg" 
+                alt="Earth" 
+                className="w-full h-full object-cover"
+                draggable="false"
+              />
             </div>
             <div>
               <h3 className="text-base font-semibold text-foreground-light dark:text-foreground-dark">
-                Hey, I'm Anjie!
+                Get to know me!
               </h3>
             </div>
             <div className="text-accent-yellow text-2xl ml-2 font-extrabold drop-shadow-md animate-bounce-slow">
@@ -59,14 +63,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded }) => {  if (!is
             <div className="w-24 h-1 bg-accent-yellow rounded-full mb-6"></div>
           </div>          <div className="space-y-6 text-lg leading-relaxed text-foreground-light dark:text-foreground-dark">
             <p>
-              Hi! I'm <span className="font-semibold text-accent-yellow">Anjie Zhou</span>, 
-              a recent Computer Science graduate from Texas A&M looking for a career in 
-              Software Development. 
+                Hi! I'm <span className="font-semibold text-accent-yellow">Anjie Zhou</span>, 
+                a recent Computer Science graduate from Texas A&M, originally from Houston. 
             </p>
-              I'm most interested in back-end development, cryptography, and 
-              artificial intelligence. Regardless, I am open to all types of opportunities so feel free to
-              contact me through any of my links if you think you have something for me!
             <p>
+                I'm pursuing a career in software development, especially in full-stack, cybersecurity/cryptography, 
+                or AI, but I'm open to any role where I get to build impactful software.
             </p>
           </div>
           <div className="w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600"></div>  
