@@ -59,16 +59,15 @@ function FadeInSection({ children, delay = 0, isInitial = false }: { children: R
           }
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
     observer.observe(node);
     return () => observer.disconnect();
   }, [scrollDir, delay, hasLoaded]);
-
   return (
     <div
       ref={ref}
-      className={`opacity-0 translate-y-8 transition-all will-change-transform ${isInitial ? 'duration-700' : 'duration-500'}`}
+      className={`opacity-0 translate-y-8 transition-all will-change-transform ${isInitial ? 'duration-300' : 'duration-500'}`}
     >
       {children}
     </div>
@@ -152,10 +151,9 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       </div>
       {/* Blog Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-        {filtered.map((post, idx) => (
-          <FadeInSection
+        {filtered.map((post, idx) => (          <FadeInSection
             key={triggerKey + '-' + post.slug}
-            delay={idx * 40}
+            delay={idx * 25}
             isInitial={true}
           >
             <Link
