@@ -30,8 +30,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ title, url, className = "" })
           setIsExiting(true);
           setTimeout(() => setShowNotification(false), 300); // Wait for exit animation
         }, 1000);
-      }
-    } catch (error) {
+      }    } catch {
       // Fallback: copy to clipboard on error
       try {
         await navigator.clipboard.writeText(shareUrl);

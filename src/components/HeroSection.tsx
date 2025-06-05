@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
 // Type definitions
 interface Position3D {
@@ -10,11 +11,6 @@ interface Position3D {
 interface Position2D {
   x: number;
   y: number;
-}
-
-interface OrbitingBallProps {
-  pos: Position3D;
-  gradient: string;
 }
 
 const ORBIT_RADIUS_X = 450;
@@ -35,18 +31,17 @@ function getOrbit3DPosition(
   angleDeg: number, 
   thetaDeg: number, 
   phiDeg: number
-): Position3D {
-  const angleRad = (angleDeg * Math.PI) / 180;
+): Position3D {  const angleRad = (angleDeg * Math.PI) / 180;
   const thetaRad = (thetaDeg * Math.PI) / 180;
   const phiRad = (phiDeg * Math.PI) / 180;
 
-  let x0 = rx * Math.cos(angleRad);
-  let y0 = ry * Math.sin(angleRad);
-  let z0 = 0;
+  const x0 = rx * Math.cos(angleRad);
+  const y0 = ry * Math.sin(angleRad);
+  const z0 = 0;
 
-  let y1 = y0 * Math.cos(phiRad) - z0 * Math.sin(phiRad);
-  let z1 = y0 * Math.sin(phiRad) + z0 * Math.cos(phiRad);
-  let x1 = x0;
+  const y1 = y0 * Math.cos(phiRad) - z0 * Math.sin(phiRad);
+  const z1 = y0 * Math.sin(phiRad) + z0 * Math.cos(phiRad);
+  const x1 = x0;
 
   const xFinal = x1 * Math.cos(thetaRad) - y1 * Math.sin(thetaRad);
   const yFinal = x1 * Math.sin(thetaRad) + y1 * Math.cos(thetaRad);
@@ -167,19 +162,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           height: `${CENTRAL_RADIUS * 2}px`,
           transform: 'translate(-50%, -50%)',
         }}
-      >
-        <div className="w-full h-full rounded-full bg-[#ff9f80] border-8 border-[#d4501f] shadow-2xl flex items-end justify-center relative" style={{ overflow: 'visible' }}>
+      >        <div className="w-full h-full rounded-full bg-[#ff9f80] border-8 border-[#d4501f] shadow-2xl flex items-end justify-center relative" style={{ overflow: 'visible' }}>
           <div className="absolute left-0 top-0 w-full h-full rounded-full overflow-hidden" style={{ zIndex: 1 }}>
-            <img
+            <Image
               src="/portrait1.png"
               alt="Anjie Zhou headshot"
+              width={600}
+              height={600}
               className="w-[150%] h-[150%] object-cover object-center select-none -mt-40"
               style={{ minWidth: '100%', minHeight: '100%' }}
             />
           </div>
-          <img
+          <Image
             src="/portrait1.png"
             alt="Anjie Zhou headshot"
+            width={600}
+            height={600}
             className="w-[150%] h-[150%] object-cover object-center select-none -mt-40 absolute left-1/2 top-0"
             style={{ minWidth: '100%', minHeight: '100%', transform: 'translateX(-50%)', clipPath: 'inset(-9999px -9999px 50% -9999px)' }}
           />
