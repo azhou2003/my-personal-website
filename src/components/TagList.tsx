@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Tag from "./Tag";
 import { accentClassesLight, accentClassesDark } from "./styles/tagColors";
@@ -9,7 +10,7 @@ interface TagListProps {
 }
 
 const TagList: React.FC<TagListProps> = ({ tags, className = "" }) => {
-  const isDarkMode = useIsDarkMode ? useIsDarkMode() : false;
+  const isDarkMode = useIsDarkMode();
   const colorClassList = isDarkMode ? accentClassesDark : accentClassesLight;
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>

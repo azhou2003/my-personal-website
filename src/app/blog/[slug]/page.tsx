@@ -6,7 +6,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
-import BlogPostTags from "./BlogPostTags";
+import { formatDate } from "../../../lib/formatDate";
+import TagList from "../../../components/TagList";
+import ShareButton from "../../../components/ShareButton";
 
 // TODO: Restore correct type for params when Next.js typegen bug is fixed
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,10 +49,14 @@ export default async function BlogPostPage({ params }: { params: any }) {
     <main className="max-w-2xl mx-auto py-16 px-4">
       <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
         ← Back to Blog
-      </Link>
-      <h1 className="text-3xl font-bold mb-2">{data.title || params.slug}</h1>
-      {data.date && <p className="text-muted text-sm mb-6">{data.date}</p>}
-      {data.tags && Array.isArray(data.tags) && <BlogPostTags tags={data.tags} />}
+      </Link>      <h1 className="text-3xl font-bold mb-2">{data.title || params.slug}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          {data.date && <p className="text-muted text-sm">{formatDate(data.date)}</p>}
+          <ShareButton title={data.title || params.slug} />
+        </div>
+      </div>
+      {data.tags && Array.isArray(data.tags) && <TagList tags={data.tags} className="mb-8" />}
       <article
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: content }}
