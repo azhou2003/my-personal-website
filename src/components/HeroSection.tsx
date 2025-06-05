@@ -168,7 +168,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <div className="w-full h-full rounded-full bg-[#f9c7a1] border-8 border-[#b85c2b] shadow-2xl flex items-end justify-center relative" style={{ overflow: 'visible' }}>
+        <div className="w-full h-full rounded-full bg-[#ff9f80] border-8 border-[#d4501f] shadow-2xl flex items-end justify-center relative" style={{ overflow: 'visible' }}>
           <div className="absolute left-0 top-0 w-full h-full rounded-full overflow-hidden" style={{ zIndex: 1 }}>
             <img
               src="/portrait1.png"
@@ -197,12 +197,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             strokeDasharray="2 6"
             strokeLinecap="round"
             strokeWidth="1.5"
-          />
-        </svg>
-      )}      {/* Front orbiting balls (z >= 0) - in front of central circle, above front orbit path */}
-      <div className="absolute z-35 w-full h-full top-0 left-0 pointer-events-none">
-        {/* Mars is now handled by its own persistent container above */}
-      </div>
+          />        </svg>
+      )}
     </section>
   );
 };
