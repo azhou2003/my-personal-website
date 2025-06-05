@@ -1,73 +1,45 @@
+"use client";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Image from "next/image";
-import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
-import IconLink from "../components/IconLink";
-
-export const metadata = {
-  title: "Home | Anjie Zhou",
-  description: "Get to know Anjie Zhou",
-};
+import HeroSection from "../components/HeroSection";
+import AboutSection from "../components/AboutSection";
+import NavButtons from "../components/NavButtons";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
+  const [showAbout, setShowAbout] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!heroRef.current) return;
+      const rect = heroRef.current.getBoundingClientRect();
+      // Lower threshold: show about section when bottom of hero is above half the viewport height
+      setShowAbout(rect.bottom < window.innerHeight / 2);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors">
       <Navbar />
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 gap-8">
-        <div className="w-full flex justify-center mb-4">
-          <span className="text-5xl sm:text-6xl font-extrabold text-accent-yellow drop-shadow-lg uppercase tracking-widest text-center">
-            Work in Progress
-          </span>
+      <main className="flex flex-1 flex-col items-center w-full px-4">
+        <div ref={heroRef} className="w-full min-h-[90vh]">
+          <HeroSection />
         </div>
-        <Image
-          src="/anjie-zhou-logo.svg"
-          alt="Profile picture"
-          width={120}
-          height={120}
-          className="border border-border-light dark:border-border-dark mb-4"
-          priority
-        />
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 font-sans">
-          Anjie
-        </h1>
-        <h2 className="text-lg sm:text-xl font-medium text-center mb-4 font-sans">
-          Computer Science, Cybersecurity, and Counter-Strike
-        </h2>
-        <p className="max-w-xl text-center text-base sm:text-lg font-sans mb-4">
-          I do software development. Welcome to my minimalist portfolio and blog.
-        </p>
-        <a
-          href="/portfolio"
-          className="mt-2 px-6 py-2 rounded-full bg-accent-sage text-foreground-light dark:text-foreground-dark font-semibold shadow hover:bg-accent-yellow transition-colors transform hover:scale-110 focus:scale-110 duration-200"
+        {/* Second section: About + Nav Buttons, hidden until scroll */}
+        <section
+          className={`w-full flex flex-col items-center justify-center transition-opacity duration-700 ${showAbout ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+          aria-hidden={!showAbout}
         >
-          View My Work
-        </a>
-        <div className="flex flex-col items-center gap-2 mt-8">
-          <span className="text-sm text-foreground-light/70 dark:text-foreground-dark/70">
-            Contact & Socials
-          </span>
-          <div className="flex gap-6">
-            <IconLink
-              href="mailto:anjie.zhou2003@gmail.com"
-              aria-label="Email"
-              icon={<FaEnvelope />}
-            />
-            <IconLink
-              href="https://github.com/azhou2003"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              icon={<FaGithub />}
-            />
-            <IconLink
-              href="https://www.linkedin.com/in/anjiezhouhtx/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              icon={<FaLinkedin />}
-            />
+          <AboutSection />
+          <div className="mt-4 mb-12">
+            <NavButtons />
           </div>
-        </div>
+        </section>
       </main>
       <Footer />
     </div>

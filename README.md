@@ -1,4 +1,4 @@
-[Live Site → https://www.anjiezhou.dev/](https://www.anjiezhou.dev/)
+[Live Site](https://www.anjiezhou.dev/)
 
 # My Personal Website
 
