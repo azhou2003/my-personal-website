@@ -5,7 +5,7 @@ import DarkModeToggle from './DarkModeToggle';
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {

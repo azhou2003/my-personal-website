@@ -1,7 +1,6 @@
 "use client";
 import type { PortfolioProject } from "../../lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
-import PortfolioTags from "./PortfolioTags";
 import SearchBar from "../../components/SearchBar";
 import { formatDate } from "../../lib/formatDate";
 import Image from "next/image";
@@ -9,6 +8,7 @@ import SortSwitch from "../../components/SortSwitch";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import Tag from "../../components/Tag";
+import TagList from "../../components/TagList";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -215,7 +215,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           >
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
+                              <TagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
@@ -248,7 +248,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
+                              <TagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>

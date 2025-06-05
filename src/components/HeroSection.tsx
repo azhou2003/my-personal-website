@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from "react";
-import ScrollAnimationManager from "./ScrollAnimationManager";
 
-// === ORBIT CONFIGURATION ===
+// Type definitions
+interface Position3D {
+  x: number;
+  y: number;
+  z: number;
+}
 
-// Horizontal orbit radius (X-axis stretch of ellipse)
+interface Position2D {
+  x: number;
+  y: number;
+}
+
+interface OrbitingBallProps {
+  pos: Position3D;
+  gradient: string;
+}
+
 const ORBIT_RADIUS_X = 450;
-
-// Vertical orbit radius (Y-axis stretch of ellipse)
 const ORBIT_RADIUS_Y = 450;
-
-// Rotation around Z-axis (yaw), in degrees — rotates the orbit flat on the screen
-const ORBIT_ROTATION = 150;
-
-// Rotation around X-axis (pitch), in degrees — changes vertical inclination (0 = flat, 90 = line)
-const ORBIT_INCLINATION = 60;
-
-// Radius of central object (used for visual size of central circle)
-const CENTRAL_RADIUS = 250;
-
-// Y-offset to center the orbit slightly below true center of screen
-const ORBIT_CENTER_OFFSET_Y = 40;
-const ORBIT_CENTER = { x: 0, y: ORBIT_CENTER_OFFSET_Y };
-
-// Angle positions (in degrees) for orbiting elements
+const ORBIT_ROTATION = 160;
+const ORBIT_INCLINATION = -70;
+const CENTRAL_RADIUS = 200;
+const ORBIT_CENTER = { x: 0, y: 0 };
 const ORBIT_ANGLES = {
-  upperRight: 205,
-  lowerLeft: 25,
+  upperRight: 0,
+  lowerLeft: 180,
 };
 
-// === ELLIPSE MATH WITH 3D-LIKE ROTATION ===
-function getOrbit3DPosition(center, rx, ry, angleDeg, thetaDeg, phiDeg) {
+function getOrbit3DPosition(
+  center: Position2D, 
+  rx: number, 
+  ry: number, 
+  angleDeg: number, 
+  thetaDeg: number, 
+  phiDeg: number
+): Position3D {
   const angleRad = (angleDeg * Math.PI) / 180;
   const thetaRad = (thetaDeg * Math.PI) / 180;
   const phiRad = (phiDeg * Math.PI) / 180;
@@ -48,10 +54,11 @@ function getOrbit3DPosition(center, rx, ry, angleDeg, thetaDeg, phiDeg) {
   return {
     x: center.x + xFinal,
     y: center.y + yFinal,
+    z: z1,
   };
 }
 
-function generateOrbitPath(startAngle, endAngle, steps = 100) {
+function generateOrbitPath(startAngle: number, endAngle: number, steps: number = 100): string {
   const points = [];
   for (let i = 0; i <= steps; i++) {
     const angle = startAngle + ((endAngle - startAngle) * i) / steps;
@@ -68,9 +75,21 @@ function generateOrbitPath(startAngle, endAngle, steps = 100) {
   return points.join(" ");
 }
 
-const HeroSection = () => {
-  const [animateOrbit, setAnimateOrbit] = useState(false);
+const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
   const [testAngle, setTestAngle] = useState(0);
+  const [orbitPathFront, setOrbitPathFront] = useState<string>("");
+  const [orbitPathBack, setOrbitPathBack] = useState<string>("");
+  const [isClient, setIsClient] = useState(false);
+  const [earthAnimationKey, setEarthAnimationKey] = useState(0);
+
+  // Initialize orbit paths on client only to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    setOrbitPathFront(generateOrbitPath(180, 360)); // Front half when z >= 0
+    setOrbitPathBack(generateOrbitPath(0, 180));   // Back half when z < 0
+    // Start earth animation immediately
+    setEarthAnimationKey(Date.now());
+  }, []);
 
   useEffect(() => {
     if (!animateOrbit) return;
@@ -79,7 +98,6 @@ const HeroSection = () => {
     }, 16);
     return () => clearInterval(interval);
   }, [animateOrbit]);
-
   const upperRightPos = getOrbit3DPosition(
     ORBIT_CENTER,
     ORBIT_RADIUS_X,
@@ -95,88 +113,96 @@ const HeroSection = () => {
     animateOrbit ? ((testAngle + 180) % 360) : ORBIT_ANGLES.lowerLeft,
     ORBIT_ROTATION,
     ORBIT_INCLINATION
-  );
-
-  const orbitPathFront = generateOrbitPath(0, 180);
-  const orbitPathBack = generateOrbitPath(180, 360);
-
-  return (
-    <section className="relative flex flex-col items-center justify-center min-h-[100vh] w-full py-20 overflow-x-clip">
-      {/* Orbit Path - Back Half */}
-      <svg
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100vw,1600px)] h-[800px] pointer-events-none"
-        viewBox="-800 -400 1600 800"
-      >
-        <polyline
-          points={orbitPathBack}
-          fill="none"
-          stroke="#99999955"
-          strokeDasharray="2 6"
-          strokeLinecap="round"
-          strokeWidth="1.5"
-        />
-      </svg>
-
-      {/* Central Circle + Headshot */}
-      <div className="relative z-20 flex items-center justify-center w-full" style={{ minHeight: 480 }}>
-        <div
-          className="relative flex items-end justify-center"
-          style={{
-            top: 40,
-            width: `${CENTRAL_RADIUS * 2}px`,
-            height: `${CENTRAL_RADIUS * 2}px`,
-          }}
-          onMouseEnter={() => setAnimateOrbit(true)}
-          onMouseLeave={() => setAnimateOrbit(false)}
+  );  const renderPlanet = (pos: Position3D, planetTexture: string) => (
+    <div
+      className="absolute"
+      style={{
+        left: `calc(50% + ${pos.x}px)`,
+        top: `calc(50% + ${pos.y}px)`,
+        transform: "translate(-50%, -50%)",
+        zIndex: pos.z >= 0 ? 35 : 15, // Dynamic z-index based on position
+      }}
+    >
+      <div 
+        key={earthAnimationKey} // Shared animation key for consistency
+        className="w-16 h-16 rounded-full shadow-xl bg-cover bg-center"
+        style={{
+          backgroundImage: `url('${planetTexture}')`,
+          backgroundSize: "300% 100%",
+          animation: "earthSpin 8s linear infinite"
+        }}
+      />
+    </div>
+  );return (
+    <section className="relative flex items-center justify-center w-full h-full min-h-0 p-0 m-0 overflow-x-clip">      {/* Back orbit path (z < 0) - behind central circle */}
+      {isClient && (
+        <svg
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100vw,1600px)] h-[800px] pointer-events-none z-10"
+          viewBox="-800 -400 1600 800"
         >
-          <div className="w-full h-full rounded-full bg-accent-sage/80 border-8 border-accent-yellow shadow-2xl flex items-end justify-center">
-            <div className="w-72 h-72 bg-gray-300 rounded-full mt-[-64px] border-4 border-white shadow-xl flex items-center justify-center text-3xl text-gray-500 select-none">
-              Headshot
-            </div>
-          </div>
-        </div>
-
-        {/* Upper Right Ball */}
-        <div
-          className="absolute"
-          style={{
-            left: `calc(50% + ${upperRightPos.x}px)`,
-            top: `calc(50% + ${upperRightPos.y}px)`,
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 via-green-300 to-blue-600 border-2 border-blue-500 shadow-xl" />
-        </div>
-
-        {/* Lower Left Ball */}
-        <div
-          className="absolute"
-          style={{
-            left: `calc(50% + ${lowerLeftPos.x}px)`,
-            top: `calc(50% + ${lowerLeftPos.y}px)`,
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-200 via-pink-200 to-yellow-100 border-2 border-orange-300 shadow-xl" />
-        </div>
+          <polyline
+            points={orbitPathBack}
+            fill="none"
+            stroke="#99999955"
+            strokeDasharray="2 6"
+            strokeLinecap="round"
+            strokeWidth="1.5"
+          />
+        </svg>
+      )}      {/* Earth orbiting ball - persists in DOM, z-index changes dynamically */}
+      <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
+        {renderPlanet(upperRightPos, '/flat-cartoon-earth.jpg')}
       </div>
 
-      {/* Orbit Path - Front Half */}
-      <svg
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100vw,1600px)] h-[800px] pointer-events-none z-30"
-        viewBox="-800 -400 1600 800"
-      >
-        <polyline
-          points={orbitPathFront}
-          fill="none"
-          stroke="#99999955"
-          strokeDasharray="2 6"
-          strokeLinecap="round"
-          strokeWidth="1.5"
-        />
-      </svg>
+      {/* Mars orbiting ball - persists in DOM, z-index changes dynamically */}
+      <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
+        {renderPlanet(lowerLeftPos, '/flat-cartoon-mars.jpg')}
+      </div>
 
-      <ScrollAnimationManager />
+      {/* Central Circle - centered in viewport */}
+      <div
+        className="absolute left-1/2 top-1/2 z-20"
+        style={{
+          width: `${CENTRAL_RADIUS * 2}px`,
+          height: `${CENTRAL_RADIUS * 2}px`,
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <div className="w-full h-full rounded-full bg-[#f9c7a1] border-8 border-[#b85c2b] shadow-2xl flex items-end justify-center relative" style={{ overflow: 'visible' }}>
+          <div className="absolute left-0 top-0 w-full h-full rounded-full overflow-hidden" style={{ zIndex: 1 }}>
+            <img
+              src="/portrait1.png"
+              alt="Anjie Zhou headshot"
+              className="w-[150%] h-[150%] object-cover object-center select-none -mt-40"
+              style={{ minWidth: '100%', minHeight: '100%' }}
+            />
+          </div>
+          <img
+            src="/portrait1.png"
+            alt="Anjie Zhou headshot"
+            className="w-[150%] h-[150%] object-cover object-center select-none -mt-40 absolute left-1/2 top-0"
+            style={{ minWidth: '100%', minHeight: '100%', transform: 'translateX(-50%)', clipPath: 'inset(-9999px -9999px 50% -9999px)' }}
+          />
+        </div>
+      </div>      {/* Front orbit path (z >= 0) - in front of central circle */}
+      {isClient && (
+        <svg
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100vw,1600px)] h-[800px] pointer-events-none z-30"
+          viewBox="-800 -400 1600 800"
+        >
+          <polyline
+            points={orbitPathFront}
+            fill="none"
+            stroke="#99999955"
+            strokeDasharray="2 6"
+            strokeLinecap="round"
+            strokeWidth="1.5"
+          />
+        </svg>
+      )}      {/* Front orbiting balls (z >= 0) - in front of central circle, above front orbit path */}
+      <div className="absolute z-35 w-full h-full top-0 left-0 pointer-events-none">
+        {/* Mars is now handled by its own persistent container above */}
+      </div>
     </section>
   );
 };
