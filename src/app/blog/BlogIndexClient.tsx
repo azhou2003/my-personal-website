@@ -7,6 +7,7 @@ import { accentClassesLight, accentClassesDark } from "../../components/styles/t
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
 import SortSwitch from "../../components/SortSwitch";
+import TypingAnimation from "../../components/TypingAnimation";
 import { formatDate } from "../../lib/formatDate";
 import type { BlogMeta } from "../../lib/types";
 import Tag from "../../components/Tag";
@@ -118,10 +119,13 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   useEffect(() => {
     setTriggerKey((k) => k + 1);
   }, [search, selectedTags]);
-
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
-        Blog
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
+        <TypingAnimation 
+          text="Thinking Out Loud"
+          speed={120}
+          showCursor={true}
+        />
       </h1>
       {/* Search Bar */}
       <div className="flex justify-center mb-8 w-full">

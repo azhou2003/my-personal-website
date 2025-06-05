@@ -127,11 +127,66 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   // When search or selectedTags change, update triggerKey to force re-mount FadeInSection
   useEffect(() => {
     setTriggerKey((k) => k + 1);
-  }, [search, selectedTags]);
-
-  return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
-        My Portfolio
+  }, [search, selectedTags]);  return (
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
+        <span>From </span>
+        <span className="relative inline-block">
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+              sortOrder === "desc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 -translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "desc" ? "static" : "absolute",
+              left: sortOrder === "desc" ? "auto" : "0"
+            }}
+          >
+            Present
+          </span>
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+              sortOrder === "asc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "asc" ? "static" : "absolute",
+              left: sortOrder === "asc" ? "auto" : "0"
+            }}
+          >
+            Past
+          </span>
+        </span>
+        <span> to </span>
+        <span className="relative inline-block">
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+              sortOrder === "desc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "desc" ? "static" : "absolute",
+              left: sortOrder === "desc" ? "auto" : "0"
+            }}
+          >
+            Past
+          </span>
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+              sortOrder === "asc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 -translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "asc" ? "static" : "absolute",
+              left: sortOrder === "asc" ? "auto" : "0"
+            }}
+          >
+            Present
+          </span>
+        </span>
       </h1>
       {/* Search Bar */}
       <div className="flex justify-center mb-8 w-full">

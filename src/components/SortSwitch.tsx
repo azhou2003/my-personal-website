@@ -14,12 +14,10 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
   // Track colors: sage when active, neutral when inactive
   const trackOff = isDarkMode ? "#3f3b36" : "#e6e4d9"; // use dark sage instead of background in dark mode
   const trackOn = isDarkMode ? "#3f4a36" : "#b7c7a3"; // sage colors from your palette
-  
-  // Thumb colors: cream/beige that complements sage
+    // Thumb colors: cream/beige that complements sage
   const thumbColor = isDarkMode ? "#f5f5f5" : "#fefae0"; // your foreground/background colors
-
-  // Center labels with min-width for symmetry
-  const labelClass = "text-xs font-semibold transition-colors min-w-[70px] text-center";
+    // Center labels with equal width for perfect symmetry - using fixed width for precise control
+  const labelClass = "text-xs font-semibold transition-colors w-16 text-center flex-shrink-0";
 
   // Track color logic
   const getTrackColor = () => {
@@ -51,14 +49,12 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
     background: getThumbColor(),
     border: `1px solid ${isDarkMode ? '#3f3b36' : '#b7c7a3'}`, // border colors from your theme
     transform: baseTransform + activeScale,
-  };
-
-  return (
-    <div className={`flex items-center justify-center gap-3 w-full ${className}`}>
+  };  return (
+    <div className={`inline-flex items-center gap-4 ${className}`}>
       <span
         className={labelClass + (value === "desc" ? " text-foreground-light" : " text-border-light")}
       >
-        Most Recent
+        Newest
       </span>
       <button
         type="button"
