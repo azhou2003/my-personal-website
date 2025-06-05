@@ -1,7 +1,7 @@
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import IconLink from "./IconLink";
 
-const Footer = () => (
+const Footer: React.FC = () => (
   <footer className="w-full flex flex-col items-center justify-center py-6 border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-xs gap-2">
     <div className="flex gap-6 mb-1">
       <IconLink

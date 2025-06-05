@@ -1,7 +1,6 @@
 "use client";
 import type { PortfolioProject } from "../../lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
-import PortfolioTags from "./PortfolioTags";
 import SearchBar from "../../components/SearchBar";
 import { formatDate } from "../../lib/formatDate";
 import Image from "next/image";
@@ -9,6 +8,7 @@ import SortSwitch from "../../components/SortSwitch";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import Tag from "../../components/Tag";
+import TagList from "../../components/TagList";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -65,16 +65,15 @@ function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; del
           }
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
     observer.observe(node);
     return () => observer.disconnect();
   }, [scrollDir, delay, hasLoaded]);
-
   return (
     <div
       ref={ref}
-      className="opacity-0 translate-y-8 transition-all duration-700 will-change-transform"
+      className="opacity-0 translate-y-8 transition-all duration-300 will-change-transform"
     >
       {children}
     </div>
@@ -128,17 +127,68 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   // When search or selectedTags change, update triggerKey to force re-mount FadeInSection
   useEffect(() => {
     setTriggerKey((k) => k + 1);
-  }, [search, selectedTags]);
-
-  return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
-      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
-        My Portfolio
+  }, [search, selectedTags]);  return (
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
+        <span>From </span>
+        <span className="relative inline-block">
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+              sortOrder === "desc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 -translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "desc" ? "static" : "absolute",
+              left: sortOrder === "desc" ? "auto" : "0"
+            }}
+          >
+            Present
+          </span>
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+              sortOrder === "asc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "asc" ? "static" : "absolute",
+              left: sortOrder === "asc" ? "auto" : "0"
+            }}
+          >
+            Past
+          </span>
+        </span>
+        <span> to </span>
+        <span className="relative inline-block">
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+              sortOrder === "desc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "desc" ? "static" : "absolute",
+              left: sortOrder === "desc" ? "auto" : "0"
+            }}
+          >
+            Past
+          </span>
+          <span 
+            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+              sortOrder === "asc" 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 -translate-y-2"
+            }`}
+            style={{ 
+              position: sortOrder === "asc" ? "static" : "absolute",
+              left: sortOrder === "asc" ? "auto" : "0"
+            }}
+          >
+            Present
+          </span>
+        </span>
       </h1>
-      {/* Centered Search */}
-      <div className="flex justify-center mb-4 w-full">
-        <SortSwitch value={sortOrder} onChange={setSortOrder} />
-      </div>
+      {/* Search Bar */}
       <div className="flex justify-center mb-8 w-full">
         <SearchBar
           value={search}
@@ -146,7 +196,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           placeholder="Search by title or description..."
         />
       </div>
-      {/* Frequency Widget (now used for tag filtering) */}
+      {/* Tag Filter */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
           {allTags.map((tag, i) => (
@@ -162,6 +212,10 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           ))}
         </div>
       </div>
+      {/* Sort Controls */}
+      <div className="flex justify-center mb-8 w-full">
+        <SortSwitch value={sortOrder} onChange={setSortOrder} />
+      </div>
       {/* Project Timeline */}
       <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
         {/* Full-height vertical timeline line */}
@@ -175,7 +229,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           {filtered.map((project, idx) => {
             const isLeft = idx % 2 === 0;
             return (
-              <FadeInSection key={triggerKey + '-' + idx} delay={idx * 100}>
+              <FadeInSection key={triggerKey + '-' + idx} delay={idx * 40}>
                 <div className="relative flex items-center min-h-[180px] group">
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
@@ -215,7 +269,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           >
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
+                              <TagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
@@ -248,7 +302,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                           <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <PortfolioTags tags={project.tags} className="mb-2 justify-center" />
+                              <TagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>

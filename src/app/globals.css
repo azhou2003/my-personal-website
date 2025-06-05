@@ -50,3 +50,24 @@ body.dark input[type="text"] {
   transform: translateY(32px);
   transition: opacity 0.7s, transform 0.7s;
 }
+
+/* Earth spinning animation - moves background position to simulate rotation */
+@keyframes earthSpin {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 100% center;
+  }
+}
+
+@keyframes bounce-once {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-30%); }
+  40% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+.animate-bounce-once {
+  animation-name: bounce-once;
+  animation-timing-function: cubic-bezier(0.4,0,0.2,1);
+}

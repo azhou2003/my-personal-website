@@ -7,6 +7,7 @@ import { accentClassesLight, accentClassesDark } from "../../components/styles/t
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
 import SortSwitch from "../../components/SortSwitch";
+import TypingAnimation from "../../components/TypingAnimation";
 import { formatDate } from "../../lib/formatDate";
 import type { BlogMeta } from "../../lib/types";
 import Tag from "../../components/Tag";
@@ -59,16 +60,15 @@ function FadeInSection({ children, delay = 0, isInitial = false }: { children: R
           }
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
     observer.observe(node);
     return () => observer.disconnect();
   }, [scrollDir, delay, hasLoaded]);
-
   return (
     <div
       ref={ref}
-      className={`opacity-0 translate-y-8 transition-all will-change-transform ${isInitial ? 'duration-700' : 'duration-500'}`}
+      className={`opacity-0 translate-y-8 transition-all will-change-transform ${isInitial ? 'duration-300' : 'duration-500'}`}
     >
       {children}
     </div>
@@ -119,24 +119,21 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   useEffect(() => {
     setTriggerKey((k) => k + 1);
   }, [search, selectedTags]);
-
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
-      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8 font-sans">
-        Blog
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
+        <TypingAnimation 
+          text="Thinking Out Loud"
+          speed={120}
+          showCursor={true}
+        />
       </h1>
-      {/* Sort and Search Bar */}
-      <div className="flex flex-col items-center mb-8 w-full">
-        <div className="flex justify-center mb-4 w-full">
-          <SortSwitch value={sortOrder} onChange={setSortOrder} />
-        </div>
-        <div className="flex justify-center mb-8 w-full">
-          <SearchBar
-            value={search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-            placeholder="Search by title or summary..."
-          />
-        </div>
+      {/* Search Bar */}
+      <div className="flex justify-center mb-8 w-full">
+        <SearchBar
+          value={search}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          placeholder="Search by title or summary..."
+        />
       </div>
       {/* Tag Filter */}
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
@@ -152,12 +149,15 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
           ))}
         </div>
       </div>
+      {/* Sort Controls */}
+      <div className="flex justify-center mb-8 w-full">
+        <SortSwitch value={sortOrder} onChange={setSortOrder} />
+      </div>
       {/* Blog Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-        {filtered.map((post, idx) => (
-          <FadeInSection
+        {filtered.map((post, idx) => (          <FadeInSection
             key={triggerKey + '-' + post.slug}
-            delay={idx * 40}
+            delay={idx * 25}
             isInitial={true}
           >
             <Link
@@ -178,7 +178,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                 <h2 className="text-xl font-bold font-sans group-hover:text-accent-yellow transition-colors text-foreground-light dark:text-foreground-dark">
                   {post.title}
                 </h2>
-                <TagList tags={post.tags} className="mb-1" colorClassList={isDarkMode ? accentClassesDark : accentClassesLight} />
+                <TagList tags={post.tags} className="mb-1" />
                 <span className="text-xs text-border-light dark:text-border-dark mb-1">
                   {formatDate(post.date)}
                 </span>
