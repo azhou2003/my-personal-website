@@ -3,6 +3,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TagList from "../../components/TagList";
+import StaticTagList from "../../components/StaticTagList";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import SearchBar from "../../components/SearchBar";
@@ -178,7 +179,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                 <h2 className="text-xl font-bold font-sans group-hover:text-accent-yellow transition-colors text-foreground-light dark:text-foreground-dark">
                   {post.title}
                 </h2>
-                <TagList tags={post.tags} className="mb-1" />
+                <StaticTagList tags={post.tags} className="mb-1" />
                 <span className="text-xs text-border-light dark:text-border-dark mb-1">
                   {formatDate(post.date)}
                 </span>

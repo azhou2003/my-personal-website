@@ -67,7 +67,44 @@ body.dark input[type="text"] {
   40% { transform: translateY(0); }
   100% { transform: translateY(0); }
 }
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-25%); }
+}
+
 .animate-bounce-once {
-  animation-name: bounce-once;
-  animation-timing-function: cubic-bezier(0.4,0,0.2,1);
+  animation: bounce-once 2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* Responsive text scaling */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .hero-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

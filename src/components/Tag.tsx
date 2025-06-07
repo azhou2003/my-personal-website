@@ -1,21 +1,22 @@
 "use client";
 import React from "react";
+import TagBase, { TagBaseProps } from "./TagBase";
 
-interface TagProps {
-  label: string;
-  colorClass?: string; // Tailwind class for accent color
+interface TagProps extends TagBaseProps {
   onClick?: () => void;
-  className?: string;
-  children?: React.ReactNode; // Allow children for frequency or extra content
 }
 
-const Tag: React.FC<TagProps> = ({ label, colorClass = "", onClick, className = "", children }) => (
-  <span
+/**
+ * Clickable Tag component with hover effects.
+ * Used for interactive filtering in blog and portfolio sections.
+ */
+const Tag: React.FC<TagProps> = ({ onClick, ...props }) => (
+  <TagBase
+    {...props}
     onClick={onClick}
-    className={`inline-block px-3 py-1 rounded-full border text-xs font-semibold cursor-pointer transition-colors duration-200 select-none ${colorClass} ${className} hover:brightness-110 hover:scale-105`}
-  >
-    {children ? children : label}
-  </span>
+    cursor="pointer"
+    hoverEffects={true}
+  />
 );
 
 export default Tag;

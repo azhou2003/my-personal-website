@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
-import TagList from "../../../components/TagList";
+import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
 
 // TODO: Restore correct type for params when Next.js typegen bug is fixed
@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
           <ShareButton title={data.title || params.slug} />
         </div>
       </div>
-      {data.tags && Array.isArray(data.tags) && <TagList tags={data.tags} className="mb-8" />}
+      {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
       <article
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: content }}
