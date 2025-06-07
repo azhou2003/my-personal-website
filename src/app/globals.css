@@ -26,6 +26,13 @@ h1, h2, h3, h4 {
   line-height: 1.8;
 }
 
+/* Ensure br tags work properly in prose content */
+.prose br {
+  display: block;
+  margin: 0.5em 0;
+  content: "";
+}
+
 code, pre {
   font-family: var(--font-mono, 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace);
   font-size: 0.95em;

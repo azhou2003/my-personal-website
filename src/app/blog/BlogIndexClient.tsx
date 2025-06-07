@@ -2,7 +2,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import TagList from "../../components/TagList";
 import StaticTagList from "../../components/StaticTagList";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";

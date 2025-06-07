@@ -2,9 +2,8 @@
 import React from "react";
 import TagBase, { TagBaseProps } from "./TagBase";
 
-interface StaticTagProps extends TagBaseProps {
-  // No onClick handler - this tag is purely decorative
-}
+// StaticTag uses the same props as TagBase since it's purely decorative
+type StaticTagProps = TagBaseProps;
 
 /**
  * Non-clickable Tag component without hover effects.

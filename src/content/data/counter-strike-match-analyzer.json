@@ -1,8 +1,0 @@
-{
-  "title": "Counter-Strike Match Analyzer",
-  "description": "A tool for analyzing Counter-Strike match demos and generating player stats.",
-  "date": "2024-07-15",
-  "tags": ["Node.js", "Express", "CS:GO"],
-  "images": ["/file.svg"],
-  "link": "https://github.com/yourusername/csgo-analyzer"
-}

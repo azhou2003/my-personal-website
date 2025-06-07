@@ -1,8 +1,0 @@
-{
-  "title": "Blog Platform",
-  "description": "A markdown-based blog platform with static site generation and custom theming.",
-  "date": "2023-12-01",
-  "tags": ["Next.js", "Markdown", "Blog"],
-  "images": ["/vercel.svg"],
-  "link": "https://github.com/yourusername/blog-platform"
-}

@@ -8,7 +8,6 @@ import SortSwitch from "../../components/SortSwitch";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import Tag from "../../components/Tag";
-import TagList from "../../components/TagList";
 import StaticTagList from "../../components/StaticTagList";
 
 function getTagFrequency(projects: PortfolioProject[]) {
