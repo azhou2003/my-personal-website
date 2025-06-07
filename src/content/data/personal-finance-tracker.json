@@ -1,8 +1,0 @@
-{
-  "title": "Personal Finance Tracker",
-  "description": "Track expenses and visualize spending habits with charts and reports.",
-  "date": "2024-03-22",
-  "tags": ["Finance", "Charts", "React"],
-  "images": ["/globe.svg"],
-  "link": "https://github.com/yourusername/finance-tracker"
-}

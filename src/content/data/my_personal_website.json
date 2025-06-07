@@ -1,0 +1,8 @@
+{
+  "title": "My Personal Website",
+  "description": "A personal website to display my portfolio and blog.",
+  "date": "2025-06-07",
+  "tags": ["Next.js", "Tailwind"],
+  "images": ["/anjie-zhou-logo.svg"],
+  "link": "https://anjiezhou.dev"
+}

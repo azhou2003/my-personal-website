@@ -7,19 +7,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
-import TagList from "../../../components/TagList";
+import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
 
 // TODO: Restore correct type for params when Next.js typegen bug is fixed
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const postPath = path.join(process.cwd(), "src", "posts", `${params.slug}.md`);
+  const resolvedParams = await params;
+  const postPath = path.join(process.cwd(), "src", "content", "posts", `${resolvedParams.slug}.md`);
   try {
     const file = fs.readFileSync(postPath, "utf8");
     const { data } = matter(file);
     return {
-      title: data.title || params.slug,
-      description: data.description || "",
+      title: data.title || resolvedParams.slug,
+      description: data.summary || data.description || "",
     };
   } catch {
     return { title: "Post not found" };
@@ -35,7 +36,8 @@ export async function generateStaticParams() {
 // TODO: Restore correct type for params when Next.js typegen bug is fixed
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function BlogPostPage({ params }: { params: any }) {
-  const post = await getBlogPostBySlug(params.slug);
+  const resolvedParams = await params;
+  const post = await getBlogPostBySlug(resolvedParams.slug);
   if (!post) return notFound();
 
   const { metadata: data, contentHtml: content } = post;
@@ -43,20 +45,20 @@ export default async function BlogPostPage({ params }: { params: any }) {
   // Get all blog post slugs for prev/next navigation
   const postsDir = path.join(process.cwd(), "src/content/posts");
   const posts = getSortedBlogPosts(postsDir);
-  const { prevPost, nextPost } = getPrevNextPosts(posts, params.slug);
+  const { prevPost, nextPost } = getPrevNextPosts(posts, resolvedParams.slug);
 
   return (
     <main className="max-w-2xl mx-auto py-16 px-4">
       <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
         ← Back to Blog
-      </Link>      <h1 className="text-3xl font-bold mb-2">{data.title || params.slug}</h1>
+      </Link>      <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           {data.date && <p className="text-muted text-sm">{formatDate(data.date)}</p>}
-          <ShareButton title={data.title || params.slug} />
+          <ShareButton title={data.title || resolvedParams.slug} />
         </div>
       </div>
-      {data.tags && Array.isArray(data.tags) && <TagList tags={data.tags} className="mb-8" />}
+      {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
       <article
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: content }}

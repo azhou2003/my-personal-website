@@ -8,7 +8,7 @@ import SortSwitch from "../../components/SortSwitch";
 import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import Tag from "../../components/Tag";
-import TagList from "../../components/TagList";
+import StaticTagList from "../../components/StaticTagList";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -234,75 +234,65 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
                     <div className="w-6 h-6 rounded-full border-4 border-[#23201c] dark:border-[#ece7d5] shadow-lg bg-[#23201c] dark:bg-[#ece7d5] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
-                  </div>
-                  {/* Left side */}
-                  <div className="w-1/2 flex justify-end pr-10 pl-10">
+                  </div>                  {/* Left side */}
+                  <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
                     {isLeft ? (
                       <span
                         className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-transform duration-300 group-hover:scale-110 group-focus:scale-110"
                       >
                         {formatDate(project.date)}
                       </span>
-                    ) : (
-                      <div className="flex justify-end relative w-full">
+                    ) : (                      <div className="flex justify-end relative w-full">
                         <div className="group relative flex items-center justify-center">
                           <a
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="focus:outline-none"
-                            tabIndex={0}
-                          >
-                            <Image
-                              src={project.images[0] || "/file.svg"}
-                              alt={project.title}
-                              width={320}
-                              height={180}
-                              className="w-[320px] h-[180px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10"
-                              priority={idx < 2}
-                            />
+                            className="focus:outline-none"                            tabIndex={0}                          >                            <div className="relative w-44 sm:w-48 md:w-56 lg:w-64 xl:w-72 h-26 sm:h-28 md:h-32 lg:h-36 xl:h-40 mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                              <Image
+                                src={project.images[0] || "/file.svg"}
+                                alt={project.title}
+                                fill
+                                className="object-cover"
+                                priority={idx < 2}
+                              />
+                            </div>
                           </a>
-                          {/* Expanding Popup (expands outwards, not stacked) */}
-                          <div
+                          {/* Expanding Popup (expands outwards, not stacked) */}                          <div
                             className="absolute top-1/2 right-full mr-10 origin-right -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center"
                             tabIndex={-1}
                           >
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <TagList tags={project.tags} className="mb-2 justify-center" />
+                              <StaticTagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>
                         </div>
                       </div>
                     )}
-                  </div>
-                  {/* Right side */}
-                  <div className="w-1/2 flex justify-start pl-10 pr-10">
-                    {isLeft ? (
-                      <div className="flex justify-start relative w-full">
+                  </div>                  {/* Right side */}
+                  <div className="w-1/2 flex justify-start pl-4 sm:pl-6 md:pl-8 lg:pl-10 pr-4 sm:pr-6 md:pr-8 lg:pr-10">
+                    {isLeft ? (                      <div className="flex justify-start relative w-full">
                         <div className="group relative flex items-center justify-center">
                           <a
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="focus:outline-none"
-                            tabIndex={0}
-                          >
-                            <Image
-                              src={project.images[0] || "/file.svg"}
-                              alt={project.title}
-                              width={320}
-                              height={180}
-                              className="w-[320px] h-[180px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10"
-                              priority={idx < 2}
-                            />
-                          </a>
-                          {/* Expanding Popup (expands outwards, not stacked) */}
+                            className="focus:outline-none"                            tabIndex={0}                          >                            <div className="relative w-44 sm:w-48 md:w-56 lg:w-64 xl:w-72 h-26 sm:h-28 md:h-32 lg:h-36 xl:h-40 mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                              <Image
+                                src={project.images[0] || "/file.svg"}
+                                alt={project.title}
+                                fill
+                                className="object-cover"
+                                priority={idx < 2}
+                              />
+                            </div>
+                          </a>                          {/* Expanding Popup (expands outwards, not stacked) */}
                           <div className="absolute top-1/2 left-full ml-10 origin-left -translate-y-1/2 min-w-[280px] max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-6 opacity-0 scale-x-75 group-hover:opacity-100 group-hover:scale-x-100 group-focus-within:opacity-100 group-focus-within:scale-x-100 hovered:opacity-100 hovered:scale-x-100 pointer-events-auto transition-all duration-300 z-30 flex flex-col items-center">
                             <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
                             <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                              <TagList tags={project.tags} className="mb-2 justify-center" />
+                              <StaticTagList tags={project.tags} className="mb-2 justify-center" />
                             </div>
                             <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
                           </div>

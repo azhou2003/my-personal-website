@@ -1,8 +1,0 @@
-{
-  "title": "Task Manager",
-  "description": "A minimalist task manager with drag-and-drop and dark mode support.",
-  "date": "2024-08-05",
-  "tags": ["Next.js", "Tailwind", "Productivity"],
-  "images": ["/next.svg"],
-  "link": "https://github.com/yourusername/task-manager"
-}

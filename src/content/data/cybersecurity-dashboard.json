@@ -1,8 +1,0 @@
-{
-  "title": "Cybersecurity Dashboard",
-  "description": "A dashboard for monitoring security events and visualizing threat data.",
-  "date": "2024-11-10",
-  "tags": ["React", "D3.js", "Security"],
-  "images": ["/globe.svg"],
-  "link": "https://github.com/yourusername/cyber-dashboard"
-}
