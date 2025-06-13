@@ -124,8 +124,6 @@ export default function HomeClient() {
           aria-hidden={!showAbout}
         >
           <AboutSection isExpanded={true} />
-          <div className="mt-8 mb-12">
-          </div>
         </section>
       </main>
       <Footer />
