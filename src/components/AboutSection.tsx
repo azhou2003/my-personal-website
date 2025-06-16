@@ -60,18 +60,40 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded }) => {  if (!is
           </div>
         </div>
 
-        {/* Right: Content */}
-        <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
+        {/* Right: Content */}        <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
           <div>
+            <style jsx>{`
+              @keyframes gradient {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+              }
+              .gradient-text-light {
+                background: linear-gradient(90deg, #665c1d, #7a4a36, #3f4a36, #665c1d);
+                background-size: 300% 100%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradient 6s ease infinite;
+              }
+              .gradient-text-dark {
+                background: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
+                background-size: 300% 100%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradient 6s ease infinite;
+              }
+            `}</style>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground-light dark:text-foreground-dark">
-              About <span className="text-accent-yellow">Me</span>
+              Hello, I'm <span className="gradient-text-light dark:hidden">Anjie</span><span className="hidden dark:inline gradient-text-dark">Anjie</span>.
             </h2>
             <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-4 sm:mb-6"></div>
           </div>
 
           <div className="space-y-4 sm:space-y-6 text-base sm:text-lg leading-relaxed text-foreground-light dark:text-foreground-dark">
             <p>
-                Hi! I&apos;m <span className="font-semibold text-accent-yellow">Anjie Zhou</span>, 
+                Hey, I&apos;m <span className="font-semibold text-accent-yellow">Anjie Zhou</span>, 
                 a recent Computer Science graduate from Texas A&M, originally from Houston. 
             </p>
             <p>
