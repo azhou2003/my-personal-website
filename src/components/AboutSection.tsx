@@ -5,30 +5,80 @@ import IconLink from "./IconLink";
 
 interface AboutSectionProps {
   isExpanded: boolean;
+  animateIn?: boolean; // new prop for initial load animation
 }
 
-const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded }) => {  if (!isExpanded) {
+const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) => {  
+  const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
+
+  React.useEffect(() => {
+    if (!isExpanded && animateIn) {
+      // Only delay on initial load
+      const timer = setTimeout(() => setShowCompactText(true), 2000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowCompactText(!isExpanded);
+    }
+  }, [isExpanded, animateIn]);
+
+  if (!isExpanded) {
     // Compact tab view
     return (
       <div
-        className="w-full flex justify-center py-3 sm:py-4 px-4"
+        className={`w-full flex justify-center py-3 sm:py-4 px-4 transition-all ${animateIn ? 'duration-1000' : 'duration-200'} ease-out ${showCompactText ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
         style={{ bottom: '3.5rem' }}
       >
-        <div className="bg-background-light dark:bg-background-dark border-2 border-foreground-light dark:border-foreground-dark rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-lg max-w-sm">
+        <div className="bg-background-light dark:bg-background-dark border-2 border-foreground-light dark:border-foreground-dark rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-xl max-w-sm">
+          <style jsx>{`
+            .gradient-text-light {
+              background: linear-gradient(90deg, #665c1d, #7a4a36, #3f4a36, #665c1d);
+              background-size: 300% 100%;
+              -webkit-background-clip: text;
+              background-clip: text;
+              -webkit-text-fill-color: transparent;
+              animation: gradient 6s ease infinite;
+            }
+            .gradient-text-dark {
+              background: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
+              background-size: 300% 100%;
+              -webkit-background-clip: text;
+              background-clip: text;
+              -webkit-text-fill-color: transparent;
+              animation: gradient 6s ease infinite;
+            }
+            @keyframes gradient {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+          `}</style>
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full overflow-hidden select-none flex-shrink-0">
-              <Image 
-                src="/flat-cartoon-earth.jpg" 
-                alt="Earth" 
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-                draggable="false"
+            {/* Icon links on the left in compact version */}
+            <div className="flex gap-2 sm:gap-3 flex-shrink-0">
+              <IconLink
+                href="mailto:anjie.zhou2003@gmail.com"
+                aria-label="Email"
+                icon={<FaEnvelope />}
+              />
+              <IconLink
+                href="https://github.com/azhou2003"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                icon={<FaGithub />}
+              />
+              <IconLink
+                href="https://www.linkedin.com/in/anjiezhouhtx/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                icon={<FaLinkedin />}
               />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm sm:text-base font-semibold text-foreground-light dark:text-foreground-dark truncate">
-                Get to know me!
+              <h3 className="text-sm sm:text-base font-semibold truncate">
+                <span className="gradient-text-light dark:hidden">Get to know me!</span>
+                <span className="hidden dark:inline gradient-text-dark">Get to know me!</span>
               </h3>
             </div>
             <div className="text-accent-yellow text-xl sm:text-2xl font-extrabold drop-shadow-md animate-bounce-slow flex-shrink-0">
