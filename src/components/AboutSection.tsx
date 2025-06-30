@@ -75,10 +75,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 icon={<FaLinkedin />}
               />
             </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm sm:text-base font-semibold truncate">
+            <div className="flex-1">
+              <h3 className="text-sm sm:text-base font-semibold text-center">
                 <span className="gradient-text-light dark:hidden">Get to know me!</span>
-                <span className="hidden dark:inline gradient-text-dark">Get to know me!</span>
+                <span className="hidden dark:inline gradient-text-dark">Get To Know Me!</span>
               </h3>
             </div>
             <div className="text-accent-yellow text-xl sm:text-2xl font-extrabold drop-shadow-md animate-bounce-slow flex-shrink-0">
@@ -88,7 +88,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
         </div>
       </div>
     );
-  }  // Expanded full view
+  }  
+  // Expanded full view
   return (
     <section className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 pb-24 sm:pb-32 lg:pb-48">
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">

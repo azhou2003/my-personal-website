@@ -206,7 +206,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const halfSvgSize = svgSize / 2;
 
   return (
-    <section className="relative flex items-center justify-center w-full h-full min-h-0 p-4 m-0 overflow-hidden">      {/* Back orbit path (z < 0) - behind central circle */}
+    <section key={isClient ? 'client' : 'server'} className="relative flex items-center justify-center w-full h-full min-h-0 p-4 m-0 overflow-hidden">      {/* Back orbit path (z < 0) - behind central circle */}
       {orbitPathBack && (
         <svg
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"

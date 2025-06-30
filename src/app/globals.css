@@ -104,7 +104,6 @@ body.dark input[type="text"] {
 
 /* Prevent horizontal scroll on mobile */
 html, body {
-  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
