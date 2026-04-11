@@ -16,16 +16,41 @@ export default function HomeClient() {
 
   const aboutSectionRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const scrollRoot = scrollContainerRef.current;
+    if (!scrollRoot) return;
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    const resetScroll = () => {
+      scrollRoot.scrollTop = 0;
+      window.scrollTo(0, 0);
+    };
+
+    resetScroll();
+    const rafId = window.requestAnimationFrame(resetScroll);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    const scrollRoot = scrollContainerRef.current;
+    const isSmallViewport = window.innerHeight < 800;
+
     const aboutObserver = new IntersectionObserver(
       ([entry]) => {
         setIsAboutVisible(entry.isIntersecting);
       },
       {
-        root: null,
+        root: scrollRoot,
         rootMargin: "0px",
-        threshold: 0.5, // 50% of the section must be visible
+        threshold: isSmallViewport ? 0.3 : 0.5,
       }
     );
 
@@ -34,9 +59,9 @@ export default function HomeClient() {
         setIsFooterVisible(entry.isIntersecting);
       },
       {
-        root: null,
+        root: scrollRoot,
         rootMargin: "0px",
-        threshold: 0.8, // 80% of the footer must be visible
+        threshold: 0.3,
       }
     );
 
@@ -51,10 +76,11 @@ export default function HomeClient() {
     }
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled((scrollRoot?.scrollTop ?? window.scrollY) > 50);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    scrollRoot?.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
       if (currentAboutRef) {
@@ -63,7 +89,7 @@ export default function HomeClient() {
       if (currentFooterRef) {
         footerObserver.unobserve(currentFooterRef);
       }
-      window.removeEventListener("scroll", handleScroll);
+      scrollRoot?.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -80,82 +106,62 @@ export default function HomeClient() {
   }, []);
 
   return (
-    <div className="h-screen overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors">
+    <div
+      ref={scrollContainerRef}
+      className="h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
+    >
       <Navbar />
       <main className="flex-1">
         {/* Hero section with integrated heading - takes full viewport minus navbar */}
         <section
           id="hero"
-          className={`w-full relative transition-all duration-1000 ease-in-out h-screen ${
+          className={`w-full relative transition-all duration-800 ease-out h-[calc(100svh-72px)] min-h-[30rem] ${
             isAboutVisible
-              ? "opacity-0 -translate-y-16 pointer-events-none"
+              ? "opacity-0 -translate-y-10 pointer-events-none"
               : "opacity-100 translate-y-0"
           }`}
         >
           <HeroSection animateOrbit={startOrbit} />
-          <div className="hero-title-container absolute inset-0 flex items-start justify-center pointer-events-none z-50 pt-8 sm:pt-12 md:pt-16 lg:pt-20">
-            <div className="text-center px-4 sm:px-6 max-w-4xl">
-              <h1 className="hero-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold text-foreground-light dark:text-foreground-dark drop-shadow-lg select-none leading-tight">
-                <span className="inline-block">
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-background-light/45 dark:to-background-dark/55 z-30" />
+          <div className="hero-title-container absolute inset-0 flex items-start justify-center pointer-events-none z-50 pt-[clamp(0.75rem,4.5vh,3.5rem)]">
+            <div className="text-center px-4 sm:px-6 max-w-3xl lg:max-w-none">
+              <p className={`uppercase tracking-[0.18em] text-[0.62rem] sm:text-[0.72rem] text-[#4b3b22] dark:text-[#d8c7ab] mb-2 sm:mb-3 transition-all duration-700 ${showWelcome ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+                Anjie Zhou
+              </p>
+              <h1 className="hero-title font-extrabold text-foreground-light dark:text-foreground-dark drop-shadow-[0_6px_24px_rgba(0,0,0,0.22)] select-none leading-[1.1] tracking-[-0.02em] lg:whitespace-nowrap">
+                <span className="block lg:inline">
                   {Array.from("Welcome...").map((char, i) => (
                     <span
                       key={i}
-                      className={`inline-block transition-all duration-1000 ease-out ${
+                      className={`inline-block transition-all duration-900 ease-out ${
                         showWelcome
                           ? "opacity-100 translate-y-0"
-                          : "opacity-0 translate-y-8"
+                          : "opacity-0 translate-y-6"
                       }`}
                     >
                       {char}
                     </span>
                   ))}
                 </span>
-                <span className="inline-block">{'\u00A0'}</span>
-                <span className="inline-block">
-                  {Array.from("To").map((char, i) => (
-                    <span
-                      key={`to-${i}`}
-                      className={`inline-block transition-all duration-1000 ease-out ${
-                        showToMyWorld
-                          ? "opacity-100 translate-y-0"
-                          : "opacity-0 translate-y-8"
-                      }`}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </span>
-                <span className="inline-block">{'\u00A0'}</span>
-                <span className="inline-block">
-                  {Array.from("My").map((char, i) => (
-                    <span
-                      key={`my-${i}`}
-                      className={`inline-block transition-all duration-1000 ease-out ${
-                        showToMyWorld
-                          ? "opacity-100 translate-y-0"
-                          : "opacity-0 translate-y-8"
-                      }`}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </span>
-                <span className="inline-block">{'\u00A0'}</span>
-                <span className="inline-block whitespace-nowrap">
-                  {Array.from("World.").map((char, i) => (
+                <span className="hidden lg:inline">{'\u00A0'}</span>
+                <span className="block lg:inline whitespace-nowrap">
+                  {Array.from("To My World.").map((char, i) => (
                     <span
                       key={`world-${i}`}
-                      className={`inline-block transition-all duration-1000 ease-out ${
+                      className={`inline-block transition-all duration-900 ease-out ${
                         showToMyWorld
                           ? "opacity-100 translate-y-0"
-                          : "opacity-0 translate-y-8"
+                          : "opacity-0 translate-y-6"
                       }`}
                     >
-                      {char}
+                      {char === " " ? '\u00A0' : char}
                     </span>
                   ))}
                 </span>
               </h1>
+              <p className={`mt-2 sm:mt-3 text-[0.78rem] sm:text-sm text-[#3f3221] dark:text-[#d9c8ad] transition-all duration-700 ${showToMyWorld ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+                Software Engineer | Financial Miser
+              </p>
             </div>
           </div>
         </section>
@@ -167,6 +173,7 @@ export default function HomeClient() {
               ? "opacity-0 translate-y-full pointer-events-none"
               : "opacity-100 translate-y-0"
           }`}
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
         >
           <AboutSection isExpanded={false} animateIn={true} />
         </div>
@@ -174,8 +181,8 @@ export default function HomeClient() {
         {/* About Me Expanded Section - Shows on scroll */}
         <section
           ref={aboutSectionRef}
-          className={`w-full flex items-center justify-center transition-all duration-1000 ease-in-out h-screen ${
-            isAboutVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
+          className={`w-full flex items-center justify-center transition-all duration-900 max-[640px]:duration-700 ease-out min-h-[calc(100svh-72px)] ${
+            isAboutVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
           }`}
         >
           <AboutSection isExpanded={true} />

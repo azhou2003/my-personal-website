@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
 
   // Helper function to get link classes based on active state
   const getLinkClasses = (href: string) => {
-    const baseClasses = "whitespace-nowrap transition-colors duration-200";
+    const baseClasses = "inline-flex h-10 items-center justify-center whitespace-nowrap leading-none transition-colors duration-200";
     const isActive = isActivePage(href);
     
     if (isActive) {
@@ -46,11 +46,10 @@ const Navbar: React.FC = () => {
   }, []);
   return (
     <nav
-      className={`w-full flex items-center justify-between px-6 py-4 bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark shadow-md z-50 transition-transform duration-300 ${show ? "translate-y-0" : "-translate-y-full"}`}
+      className={`w-full px-4 sm:px-6 py-2.5 sm:py-4 bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark shadow-md z-50 transition-transform duration-300 ${show ? "translate-y-0" : "-translate-y-full"}`}
     >
-      {/* Logo on the left */}
-      <div className="flex items-center">
-        <Link href="/" className="flex items-center justify-center group">
+      <div className="sm:hidden grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-1">
+        <Link href="/" className="flex h-10 w-10 items-center justify-center justify-self-start group">
           <span className="inline-block rounded-full overflow-visible transition-transform duration-200 group-hover:scale-125">
             <Image
               src="/anjie-zhou-logo.svg"
@@ -64,18 +63,51 @@ const Navbar: React.FC = () => {
           </span>
           <span className="sr-only">Home</span>
         </Link>
-      </div>      {/* Navigation links on the right */}
-      <div className="flex items-center space-x-6">
-        <Link href="/" className={getLinkClasses('/')}>
-          Home
-        </Link>
-        <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
-          Portfolio
-        </Link>
-        <Link href="/blog" className={getLinkClasses('/blog')}>
-          Blog
-        </Link>
-        <DarkModeToggle />
+        <div className="flex h-10 items-center justify-center space-x-4">
+          <Link href="/" className={getLinkClasses('/')}>
+            Home
+          </Link>
+          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+            Portfolio
+          </Link>
+          <Link href="/blog" className={getLinkClasses('/blog')}>
+            Blog
+          </Link>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center justify-self-end">
+          <DarkModeToggle />
+        </div>
+      </div>
+
+      <div className="hidden sm:flex items-center justify-between">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center justify-center group">
+            <span className="inline-block rounded-full overflow-visible transition-transform duration-200 group-hover:scale-125">
+              <Image
+                src="/anjie-zhou-logo.svg"
+                alt="Anjie Zhou Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
+                style={{ display: 'inline-block' }}
+                priority
+              />
+            </span>
+            <span className="sr-only">Home</span>
+          </Link>
+        </div>
+        <div className="flex h-10 items-center space-x-6">
+          <Link href="/" className={getLinkClasses('/')}>
+            Home
+          </Link>
+          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+            Portfolio
+          </Link>
+          <Link href="/blog" className={getLinkClasses('/blog')}>
+            Blog
+          </Link>
+          <DarkModeToggle />
+        </div>
       </div>
     </nav>
   );

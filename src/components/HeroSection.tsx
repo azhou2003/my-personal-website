@@ -30,10 +30,10 @@ const ORBIT_ANGLES = {
 
 // Default dimensions for SSR
 const getDefaultOrbitDimensions = (): OrbitDimensions => ({
-  radiusX: 280,
-  radiusY: 280,
-  centralRadius: 150, // 50% bigger (100 * 1.5)
-  planetSize: 48,
+  radiusX: 260,
+  radiusY: 260,
+  centralRadius: 142,
+  planetSize: 44,
 });
 
 // Responsive orbit dimensions based on viewport
@@ -46,26 +46,26 @@ const getResponsiveOrbitDimensions = (): OrbitDimensions => {
   const vh = window.innerHeight;
   const minDimension = Math.min(vw, vh);
   
-  // Improved scaling with better mobile support
   let scale: number;
-  if (minDimension < 480) {
-    // Mobile phones
-    scale = 0.5;
+  if (minDimension < 380) {
+    scale = 0.55;
+  } else if (minDimension < 480) {
+    scale = 0.66;
+  } else if (minDimension < 640) {
+    scale = 0.76;
   } else if (minDimension < 768) {
-    // Tablets
-    scale = 0.7;
+    scale = 0.82;
   } else if (minDimension < 1024) {
-    // Small desktops
-    scale = 0.9;
+    scale = 0.96;
   } else {
-    // Large screens
-    scale = Math.min(1.2, minDimension / 1000);
+    scale = Math.min(1.4, minDimension / 820);
   }
-    return {
-    radiusX: Math.floor(280 * scale),
-    radiusY: Math.floor(280 * scale),
-    centralRadius: Math.floor(150 * scale), // 50% bigger (100 * 1.5)
-    planetSize: Math.floor(48 * scale),
+
+  return {
+    radiusX: Math.max(130, Math.floor(260 * scale)),
+    radiusY: Math.max(130, Math.floor(260 * scale)),
+    centralRadius: Math.max(86, Math.floor(142 * scale)),
+    planetSize: Math.max(28, Math.floor(44 * scale)),
   };
 };
 
@@ -183,7 +183,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       className="absolute"
       style={{
         left: `calc(50% + ${pos.x}px)`,
-        top: `calc(50% + ${pos.y}px)`,
+        top: `calc(${sceneCenterY} + ${pos.y}px)`,
         transform: "translate(-50%, -50%)",
         zIndex: pos.z >= 0 ? 25 : 5, // Dynamic z-index based on position
       }}
@@ -201,44 +201,62 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       />
     </div>
   );
-  // Calculate responsive SVG viewBox that matches planet positioning
-  const svgSize = Math.max(dimensions.radiusX * 3, 600);
+  const svgSize = Math.max(Math.floor(dimensions.radiusX * 2.75), 420);
   const halfSvgSize = svgSize / 2;
+  const sceneCenterY =
+    dimensions.centralRadius >= 150
+      ? "50%"
+      : dimensions.centralRadius < 100
+        ? "58%"
+        : dimensions.centralRadius < 125
+          ? "55%"
+          : "53%";
 
   return (
-    <section key={isClient ? 'client' : 'server'} className="relative flex items-center justify-center w-full h-full min-h-0 p-4 m-0 overflow-hidden">      {/* Back orbit path (z < 0) - behind central circle */}
+    <section key={isClient ? 'client' : 'server'} className="relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden">
       {orbitPathBack && (
         <svg
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
           style={{
             width: `${svgSize}px`,
             height: `${svgSize}px`,
+            top: sceneCenterY,
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
           <polyline
             points={orbitPathBack}
             fill="none"
-            stroke="#99999955"
-            strokeDasharray="2 6"
+            stroke="#7f746455"
+            strokeDasharray="2 7"
             strokeLinecap="round"
             strokeWidth="1.5"
           />
         </svg>
       )}
 
-      {/* Earth orbiting ball - persists in DOM, z-index changes dynamically */}
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
         {renderPlanet(upperRightPos, '/flat-cartoon-earth.jpg')}
       </div>
 
-      {/* Mars orbiting ball - persists in DOM, z-index changes dynamically */}
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
         {renderPlanet(lowerLeftPos, '/flat-cartoon-mars.jpg')}
-      </div>      {/* Central Circle - centered in viewport */}
+      </div>
       <div
-        className="absolute left-1/2 top-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
         style={{
+          top: sceneCenterY,
+          width: `${Math.floor(dimensions.centralRadius * 2.7)}px`,
+          height: `${Math.floor(dimensions.centralRadius * 2.7)}px`,
+          background:
+            "radial-gradient(circle, rgba(255, 214, 157, 0.28) 0%, rgba(255, 214, 157, 0.12) 38%, rgba(255, 214, 157, 0) 72%)",
+          filter: "blur(2px)",
+        }}
+      />
+      <div
+        className="absolute left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2"
+        style={{
+          top: sceneCenterY,
           width: `${dimensions.centralRadius * 2}px`,
           height: `${dimensions.centralRadius * 2}px`,
         }}
@@ -259,26 +277,28 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             }}
           />
         </div>
-      </div>{/* Front orbit path (z >= 0) - in front of central circle */}
+      </div>
       {isClient && (
         <svg
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
           style={{
             width: `${svgSize}px`,
             height: `${svgSize}px`,
+            top: sceneCenterY,
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
           <polyline
             points={orbitPathFront}
             fill="none"
-            stroke="#99999955"
-            strokeDasharray="2 6"
+            stroke="#9b8d796e"
+            strokeDasharray="2 7"
             strokeLinecap="round"
-            strokeWidth="1.5"
+            strokeWidth="1.7"
           />
         </svg>
-      )}</section>
+      )}
+    </section>
   );
 };
 

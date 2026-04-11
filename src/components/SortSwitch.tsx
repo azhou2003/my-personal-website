@@ -10,14 +10,10 @@ interface SortSwitchProps {
 
 export default function SortSwitch({ value, onChange, className = "" }: SortSwitchProps) {
   const isDarkMode = useIsDarkMode();
-    // Using your site's sage accent colors for a cohesive look
-  // Track colors: sage when active, neutral when inactive
   const trackOff = isDarkMode ? "#3f3b36" : "#e6e4d9"; // use dark sage instead of background in dark mode
   const trackOn = isDarkMode ? "#3f4a36" : "#b7c7a3"; // sage colors from your palette
-    // Thumb colors: cream/beige that complements sage
   const thumbColor = isDarkMode ? "#f5f5f5" : "#fefae0"; // your foreground/background colors
-    // Center labels with equal width for perfect symmetry - using fixed width for precise control
-  const labelClass = "text-xs font-semibold transition-colors w-16 text-center flex-shrink-0";
+  const labelClass = "text-[11px] sm:text-xs font-semibold transition-colors w-14 sm:w-16 text-center flex-shrink-0";
 
   // Track color logic
   const getTrackColor = () => {
@@ -28,29 +24,38 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
     return thumbColor;
   };
 
-  // Focus/hover ring using sage accent
   const [isActive, setIsActive] = React.useState(false);
   const ringColor = isDarkMode ? '0 0 0 4px rgba(63, 74, 54, 0.3)' : '0 0 0 4px rgba(183, 199, 163, 0.3)';
 
-  // Knob style
-  const baseTransform = value === "asc" ? 'translateX(28px)' : 'translateX(0)';
-  const activeScale = isActive ? ' scale(1.08)' : '';
+  const switchStyle = {
+    width: "var(--switch-w)",
+    height: "var(--switch-h)",
+    "--switch-p": "2px",
+  } as React.CSSProperties;
+
+  const baseTransform =
+    value === "asc"
+      ? "translate(calc(var(--switch-w) - var(--switch-h)), -50%)"
+      : "translate(0, -50%)";
+  const activeScale = isActive ? " scale(1.08)" : "";
   const knobStyle = {
     boxShadow: isActive
       ? `0 2px 8px rgba(0,0,0,0.15), ${ringColor}`
       : '0 1px 4px rgba(0,0,0,0.10)',
     transition: 'transform 0.2s, box-shadow 0.2s',
-    top: '2px',
-    left: '2px',
-    width: '22px',
-    height: '22px',
+    top: '50%',
+    left: 'var(--switch-p)',
+    width: 'calc(var(--switch-h) - (var(--switch-p) * 2))',
+    height: 'calc(var(--switch-h) - (var(--switch-p) * 2))',
     position: 'absolute' as const,
     display: 'block',
     background: getThumbColor(),
     border: `1px solid ${isDarkMode ? '#3f3b36' : '#b7c7a3'}`, // border colors from your theme
     transform: baseTransform + activeScale,
-  };  return (
-    <div className={`inline-flex items-center gap-4 ${className}`}>
+  };
+
+  return (
+    <div className={`inline-flex items-center gap-2 sm:gap-4 ${className}`}>
       <span
         className={labelClass + (value === "desc" ? " text-foreground-light" : " text-border-light")}
       >
@@ -58,13 +63,17 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
       </span>
       <button
         type="button"
-        className={`relative w-14 h-7 rounded-full border-2 shadow flex-shrink-0 transition-colors duration-200 focus:outline-none`}
+        className={`relative rounded-full border-2 shadow flex-shrink-0 transition-colors duration-200 focus:outline-none min-h-0 min-w-0 [--switch-w:3rem] [--switch-h:1.625rem] sm:[--switch-w:3.5rem] sm:[--switch-h:1.75rem]`}
         aria-pressed={value === "asc"}
         aria-label="Toggle sort order"
         onClick={() => onChange(value === "desc" ? "asc" : "desc")}
         style={{
+          ...switchStyle,
           background: getTrackColor(),
           borderColor: getTrackColor(),
+          minHeight: 0,
+          minWidth: 0,
+          lineHeight: 0,
         }}
         onFocus={() => setIsActive(true)}
         onBlur={() => setIsActive(false)}
