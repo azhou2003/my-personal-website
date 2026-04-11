@@ -29,6 +29,12 @@
   --color-about-gradient-light: linear-gradient(90deg, #5a4e1f, #8a4f31, #2f5a3f, #5a4e1f);
   --color-about-gradient-dark: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
   --color-about-gradient: var(--color-about-gradient-light);
+  --color-blog-panel-bg-editorial: rgba(254, 250, 224, 0.98);
+  --color-blog-panel-border-editorial: rgba(154, 141, 107, 0.55);
+  --color-blog-panel-shadow-editorial: 0 -10px 22px rgba(43, 34, 24, 0.16);
+  --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(254, 250, 224, 0.97) 0%, rgba(247, 239, 213, 0.96) 100%);
+  --color-blog-panel-border-tinted: rgba(122, 90, 54, 0.44);
+  --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(58, 41, 24, 0.2);
 }
 
 .dark {
@@ -51,6 +57,12 @@
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;
   --color-about-gradient: var(--color-about-gradient-dark);
+  --color-blog-panel-bg-editorial: rgba(46, 42, 39, 0.97);
+  --color-blog-panel-border-editorial: rgba(95, 87, 77, 0.75);
+  --color-blog-panel-shadow-editorial: 0 -12px 26px rgba(0, 0, 0, 0.4);
+  --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(51, 47, 43, 0.97) 0%, rgba(41, 37, 34, 0.96) 100%);
+  --color-blog-panel-border-tinted: rgba(126, 113, 96, 0.72);
+  --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(0, 0, 0, 0.42);
 }
 
 body {

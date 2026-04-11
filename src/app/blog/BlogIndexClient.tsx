@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import StaticTagList from "../../components/StaticTagList";
@@ -20,7 +21,9 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [isMobile, setIsMobile] = useState(false);
   const [activeMobileSlug, setActiveMobileSlug] = useState<string | null>(null);
+  const [peekHeights, setPeekHeights] = useState<Record<string, number>>({});
   const cardRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const titleRowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const isDarkMode = useIsDarkMode();
 
@@ -89,8 +92,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
 
     const updateActiveCard = () => {
       const viewportCenterY = window.innerHeight / 2;
-      let bestSlug: string | null = null;
-      let bestDistance = Number.POSITIVE_INFINITY;
+      const visibleCards: Array<{ slug: string; rect: DOMRect }> = [];
 
       for (const post of filtered) {
         const card = cardRefs.current[post.slug];
@@ -100,12 +102,30 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
         const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
         if (!isVisible) continue;
 
-        const cardCenterY = rect.top + rect.height / 2;
-        const distance = Math.abs(cardCenterY - viewportCenterY);
+        visibleCards.push({ slug: post.slug, rect });
+      }
 
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          bestSlug = post.slug;
+      if (visibleCards.length === 0) return;
+
+      const nearBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 20;
+
+      let bestSlug: string | null = null;
+
+      if (nearBottom) {
+        bestSlug = visibleCards.reduce((best, current) =>
+          current.rect.bottom > best.rect.bottom ? current : best
+        ).slug;
+      } else {
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const item of visibleCards) {
+          const cardCenterY = item.rect.top + item.rect.height / 2;
+          const distance = Math.abs(cardCenterY - viewportCenterY);
+
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestSlug = item.slug;
+          }
         }
       }
 
@@ -132,6 +152,39 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       window.removeEventListener("resize", requestUpdate);
     };
   }, [isMobile, filtered]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const measurePeekHeights = () => {
+      const next: Record<string, number> = {};
+
+      for (const post of filtered) {
+        const row = titleRowRefs.current[post.slug];
+        if (!row) continue;
+        next[post.slug] = Math.ceil(row.getBoundingClientRect().height);
+      }
+
+      setPeekHeights((prev) => {
+        const prevKeys = Object.keys(prev);
+        const nextKeys = Object.keys(next);
+        if (prevKeys.length !== nextKeys.length) return next;
+        for (const key of nextKeys) {
+          if (prev[key] !== next[key]) return next;
+        }
+        return prev;
+      });
+    };
+
+    measurePeekHeights();
+    const rafId = window.requestAnimationFrame(measurePeekHeights);
+    window.addEventListener("resize", measurePeekHeights);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", measurePeekHeights);
+    };
+  }, [filtered]);
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
@@ -172,6 +225,12 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
         {filtered.map((post, idx) => {
           const isActiveOnMobile = isMobile && activeMobileSlug === post.slug;
+          const peekHeight = peekHeights[post.slug] ?? 78;
+          const panelStyle: CSSProperties = {
+            background: "var(--color-blog-panel-bg-tinted)",
+            borderTopColor: "var(--color-blog-panel-border-tinted)",
+            boxShadow: "var(--color-blog-panel-shadow-tinted)",
+          };
 
           return (
             <FadeInSection
@@ -183,7 +242,8 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                 cardRefs.current[post.slug] = node;
               }}
               href={`/blog/${post.slug}`}
-              className="group relative block w-full h-80 rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300"
+              style={{ borderColor: "var(--color-blog-panel-border-tinted)" }}
+              className="group relative block w-full h-80 rounded-lg border bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300"
             >
               <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]">
                 {post.image && (
@@ -198,14 +258,20 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
               </div>
 
               <div
-                className={`absolute inset-x-0 bottom-0 bg-background-light/94 dark:bg-background-dark/94 backdrop-blur-sm border-t border-border-light/70 dark:border-border-dark transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                style={{ ...panelStyle, "--peek-height": `${peekHeight}px` } as CSSProperties}
+                className={`absolute inset-x-0 bottom-0 border-t transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   isActiveOnMobile
                     ? "translate-y-0"
-                    : "translate-y-[calc(100%-4.85rem)] sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0"
+                    : "translate-y-[calc(100%-var(--peek-height))] sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0"
                 }`}
               >
-                <div className="px-4 pt-3 pb-3">
-                  <h2 className="text-xl font-bold font-sans text-foreground-light dark:text-foreground-dark leading-snug">
+                <div
+                  ref={(node) => {
+                    titleRowRefs.current[post.slug] = node;
+                  }}
+                  className="px-4 pt-3 pb-3"
+                >
+                  <h2 className="text-xl font-bold font-sans text-foreground-light dark:text-foreground-dark leading-tight">
                     {post.title}
                   </h2>
                 </div>
