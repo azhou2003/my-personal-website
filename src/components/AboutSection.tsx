@@ -33,7 +33,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 href="mailto:anjie.zhou2003@gmail.com"
                 aria-label="Email"
                 className="scale-95 sm:scale-100"
-                icon={<FaEnvelope className="w-[1.2rem] h-[1.2rem] sm:w-5 sm:h-5" />}
+                icon={<FaEnvelope className="w-[1.35rem] h-[1.35rem] sm:w-[1.35rem] sm:h-[1.35rem]" />}
               />
               <IconLink
                 href="https://github.com/azhou2003"
@@ -41,7 +41,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 rel="noopener noreferrer"
                 aria-label="GitHub"
                 className="scale-95 sm:scale-100"
-                icon={<FaGithub className="w-[1.2rem] h-[1.2rem] sm:w-5 sm:h-5" />}
+                icon={<FaGithub className="w-[1.35rem] h-[1.35rem] sm:w-[1.35rem] sm:h-[1.35rem]" />}
               />
               <IconLink
                 href="https://www.linkedin.com/in/anjiezhouhtx/"
@@ -49,7 +49,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
                 className="scale-95 sm:scale-100"
-                icon={<FaLinkedin className="w-[1.2rem] h-[1.2rem] sm:w-5 sm:h-5" />}
+                icon={<FaLinkedin className="w-[1.35rem] h-[1.35rem] sm:w-[1.35rem] sm:h-[1.35rem]" />}
               />
             </div>
             <div className="flex-1 min-w-0 text-center leading-none">

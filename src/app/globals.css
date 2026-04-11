@@ -91,7 +91,7 @@ body.dark input[type="text"] {
 /* Responsive text scaling */
 @media (max-width: 640px) {
   .hero-title {
-    font-size: clamp(1.7rem, 7.6vw, 2.45rem);
+    font-size: clamp(1.95rem, 8.8vw, 2.95rem);
     line-height: 1.12;
   }
 }

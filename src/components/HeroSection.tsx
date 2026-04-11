@@ -20,12 +20,33 @@ interface OrbitDimensions {
   planetSize: number;
 }
 
-const ORBIT_ROTATION = 160;
-const ORBIT_INCLINATION = -70;
+interface OrbitSpec {
+  rotation: number;
+  inclination: number;
+  radiusMultiplierX: number;
+  radiusMultiplierY: number;
+  speedMultiplier: number;
+  baseAngle: number;
+}
+
 const ORBIT_CENTER = { x: 0, y: 0 };
-const ORBIT_ANGLES = {
-  upperRight: 0,
-  lowerLeft: 180,
+
+const EARTH_ORBIT: OrbitSpec = {
+  rotation: 160,
+  inclination: -70,
+  radiusMultiplierX: 1,
+  radiusMultiplierY: 1,
+  speedMultiplier: 1,
+  baseAngle: 0,
+};
+
+const MARS_ORBIT: OrbitSpec = {
+  rotation: 160,
+  inclination: -70,
+  radiusMultiplierX: 1.32,
+  radiusMultiplierY: 1.24,
+  speedMultiplier: 1,
+  baseAngle: 180,
 };
 
 // Default dimensions for SSR
@@ -101,7 +122,10 @@ function getOrbit3DPosition(
 function generateOrbitPath(
   startAngle: number, 
   endAngle: number, 
-  dimensions: OrbitDimensions,
+  radiusX: number,
+  radiusY: number,
+  rotation: number,
+  inclination: number,
   steps: number = 100
 ): string {
   const points = [];
@@ -109,11 +133,11 @@ function generateOrbitPath(
     const angle = startAngle + ((endAngle - startAngle) * i) / steps;
     const pos = getOrbit3DPosition(
       ORBIT_CENTER,
-      dimensions.radiusX,
-      dimensions.radiusY,
+      radiusX,
+      radiusY,
       angle,
-      ORBIT_ROTATION,
-      ORBIT_INCLINATION
+      rotation,
+      inclination
     );
     points.push(`${pos.x},${pos.y}`);
   }
@@ -122,10 +146,12 @@ function generateOrbitPath(
 
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
   const [testAngle, setTestAngle] = useState(0);
-  const [orbitPathFront, setOrbitPathFront] = useState<string>("");
-  const [orbitPathBack, setOrbitPathBack] = useState<string>("");
+  const [earthOrbitFront, setEarthOrbitFront] = useState<string>("");
+  const [earthOrbitBack, setEarthOrbitBack] = useState<string>("");
+  const [marsOrbitFront, setMarsOrbitFront] = useState<string>("");
+  const [marsOrbitBack, setMarsOrbitBack] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
-  const [earthAnimationKey, setEarthAnimationKey] = useState(0);
+  const [isSceneReady, setIsSceneReady] = useState(false);
   // Initialize with default dimensions to prevent hydration mismatch
   const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
 
@@ -137,21 +163,48 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   }, []);
   useEffect(() => {
     setIsClient(true);
-    setEarthAnimationKey(Date.now());
+    setIsSceneReady(false);
     // Set responsive dimensions after client hydration
     updateDimensions();
 
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        setIsSceneReady(true);
+      });
+    });
+
     // Add resize listener
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      window.removeEventListener('resize', updateDimensions);
+    };
   }, [updateDimensions]);
   // Update orbit paths when dimensions change
   useEffect(() => {
     const defaultDims = getDefaultOrbitDimensions();
     const currentDims = isClient ? dimensions : defaultDims;
-    
-    setOrbitPathFront(generateOrbitPath(180, 360, currentDims)); // Front half when z >= 0
-    setOrbitPathBack(generateOrbitPath(0, 180, currentDims));   // Back half when z < 0
+
+    const marsMobileAdjust = currentDims.centralRadius < 105 ? 1.2 : MARS_ORBIT.radiusMultiplierX;
+    const marsRadiusX = Math.floor(currentDims.radiusX * marsMobileAdjust);
+    const marsRadiusY = Math.floor(currentDims.radiusY * (currentDims.centralRadius < 105 ? 1.14 : MARS_ORBIT.radiusMultiplierY));
+
+    setEarthOrbitFront(
+      generateOrbitPath(180, 360, currentDims.radiusX, currentDims.radiusY, EARTH_ORBIT.rotation, EARTH_ORBIT.inclination)
+    );
+    setEarthOrbitBack(
+      generateOrbitPath(0, 180, currentDims.radiusX, currentDims.radiusY, EARTH_ORBIT.rotation, EARTH_ORBIT.inclination)
+    );
+
+    setMarsOrbitFront(
+      generateOrbitPath(180, 360, marsRadiusX, marsRadiusY, MARS_ORBIT.rotation, MARS_ORBIT.inclination)
+    );
+    setMarsOrbitBack(
+      generateOrbitPath(0, 180, marsRadiusX, marsRadiusY, MARS_ORBIT.rotation, MARS_ORBIT.inclination)
+    );
   }, [dimensions, isClient]);
 
   useEffect(() => {
@@ -162,21 +215,33 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     return () => clearInterval(interval);
   }, [animateOrbit]);
 
-  const upperRightPos = getOrbit3DPosition(
+  const marsRadiusMultiplierX = dimensions.centralRadius < 105 ? 1.2 : MARS_ORBIT.radiusMultiplierX;
+  const marsRadiusMultiplierY = dimensions.centralRadius < 105 ? 1.14 : MARS_ORBIT.radiusMultiplierY;
+  const marsRadiusX = Math.floor(dimensions.radiusX * marsRadiusMultiplierX);
+  const marsRadiusY = Math.floor(dimensions.radiusY * marsRadiusMultiplierY);
+
+  const earthAngle = animateOrbit
+    ? (testAngle * EARTH_ORBIT.speedMultiplier + EARTH_ORBIT.baseAngle) % 360
+    : EARTH_ORBIT.baseAngle;
+  const marsAngle = animateOrbit
+    ? (testAngle * MARS_ORBIT.speedMultiplier + MARS_ORBIT.baseAngle) % 360
+    : MARS_ORBIT.baseAngle;
+
+  const earthPos = getOrbit3DPosition(
     ORBIT_CENTER,
     dimensions.radiusX,
     dimensions.radiusY,
-    animateOrbit ? testAngle : ORBIT_ANGLES.upperRight,
-    ORBIT_ROTATION,
-    ORBIT_INCLINATION
+    earthAngle,
+    EARTH_ORBIT.rotation,
+    EARTH_ORBIT.inclination
   );
-  const lowerLeftPos = getOrbit3DPosition(
+  const marsPos = getOrbit3DPosition(
     ORBIT_CENTER,
-    dimensions.radiusX,
-    dimensions.radiusY,
-    animateOrbit ? ((testAngle + 180) % 360) : ORBIT_ANGLES.lowerLeft,
-    ORBIT_ROTATION,
-    ORBIT_INCLINATION
+    marsRadiusX,
+    marsRadiusY,
+    marsAngle,
+    MARS_ORBIT.rotation,
+    MARS_ORBIT.inclination
   );
   const renderPlanet = (pos: Position3D, planetTexture: string) => (
     <div
@@ -189,7 +254,6 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       }}
     >
       <div 
-        key={earthAnimationKey} // Shared animation key for consistency
         className="rounded-full shadow-xl bg-cover bg-center"
         style={{
           width: `${dimensions.planetSize}px`,
@@ -201,20 +265,18 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       />
     </div>
   );
-  const svgSize = Math.max(Math.floor(dimensions.radiusX * 2.75), 420);
+  const maxOrbitRadius = Math.max(dimensions.radiusX, dimensions.radiusY, marsRadiusX, marsRadiusY);
+  const svgSize = Math.max(Math.floor(maxOrbitRadius * 2.9), 460);
   const halfSvgSize = svgSize / 2;
-  const sceneCenterY =
-    dimensions.centralRadius >= 150
-      ? "50%"
-      : dimensions.centralRadius < 100
-        ? "58%"
-        : dimensions.centralRadius < 125
-          ? "55%"
-          : "53%";
+  const sceneCenterY = "50%";
 
   return (
-    <section key={isClient ? 'client' : 'server'} className="relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden">
-      {orbitPathBack && (
+    <section
+      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
+      }`}
+    >
+      {earthOrbitBack && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
           style={{
@@ -225,7 +287,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
           <polyline
-            points={orbitPathBack}
+            points={earthOrbitBack}
             fill="none"
             stroke="#7f746455"
             strokeDasharray="2 7"
@@ -235,12 +297,33 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         </svg>
       )}
 
+      {marsOrbitBack && (
+        <svg
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[1]"
+          style={{
+            width: `${svgSize}px`,
+            height: `${svgSize}px`,
+            top: sceneCenterY,
+          }}
+          viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
+        >
+          <polyline
+            points={marsOrbitBack}
+            fill="none"
+            stroke="#6e7d8c4f"
+            strokeDasharray="3 8"
+            strokeLinecap="round"
+            strokeWidth="1.35"
+          />
+        </svg>
+      )}
+
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(upperRightPos, '/flat-cartoon-earth.jpg')}
+        {renderPlanet(earthPos, '/flat-cartoon-earth.jpg')}
       </div>
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(lowerLeftPos, '/flat-cartoon-mars.jpg')}
+        {renderPlanet(marsPos, '/flat-cartoon-mars.jpg')}
       </div>
       <div
         className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
@@ -278,7 +361,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           />
         </div>
       </div>
-      {isClient && (
+      {isClient && earthOrbitFront && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
           style={{
@@ -289,12 +372,33 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
           <polyline
-            points={orbitPathFront}
+            points={earthOrbitFront}
             fill="none"
             stroke="#9b8d796e"
             strokeDasharray="2 7"
             strokeLinecap="round"
             strokeWidth="1.7"
+          />
+        </svg>
+      )}
+
+      {isClient && marsOrbitFront && (
+        <svg
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[21]"
+          style={{
+            width: `${svgSize}px`,
+            height: `${svgSize}px`,
+            top: sceneCenterY,
+          }}
+          viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
+        >
+          <polyline
+            points={marsOrbitFront}
+            fill="none"
+            stroke="#7f90a37a"
+            strokeDasharray="3 8"
+            strokeLinecap="round"
+            strokeWidth="1.55"
           />
         </svg>
       )}
