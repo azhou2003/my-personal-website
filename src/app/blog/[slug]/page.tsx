@@ -1,36 +1,26 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { getBlogPostBySlug } from "../../../lib/markdown";
+import { getAllBlogPosts, getBlogPostBySlug } from "../../../lib/markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
+import { getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
-import { BLOG_POSTS_DIR } from "../../../lib/contentPaths";
 
 type BlogPageParams = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: BlogPageParams }): Promise<Metadata> {
   const resolvedParams = await params;
-  const postPath = path.join(BLOG_POSTS_DIR, `${resolvedParams.slug}.md`);
-  try {
-    const file = fs.readFileSync(postPath, "utf8");
-    const { data } = matter(file);
-    return {
-      title: data.title || resolvedParams.slug,
-      description: data.summary || data.description || "",
-    };
-  } catch {
-    return { title: "Post not found" };
-  }
+  const post = await getBlogPostBySlug(resolvedParams.slug);
+  if (!post) return { title: "Post not found" };
+  return {
+    title: post.metadata.title || resolvedParams.slug,
+    description: post.metadata.summary || "",
+  };
 }
 
 export async function generateStaticParams() {
-  const files = fs.readdirSync(BLOG_POSTS_DIR).filter((f) => f.endsWith(".md"));
-  return files.map((file) => ({ slug: file.replace(/\.md$/, "") }));
+  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
 export default async function BlogPostPage({ params }: { params: BlogPageParams }) {
@@ -40,8 +30,9 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
 
   const { metadata: data, contentHtml: content } = post;
 
-  // Get all blog post slugs for prev/next navigation
-  const posts = getSortedBlogPosts(BLOG_POSTS_DIR);
+  const posts = getAllBlogPosts()
+    .map(({ slug, title, date }) => ({ slug, title, date }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const { prevPost, nextPost } = getPrevNextPosts(posts, resolvedParams.slug);
 
   return (

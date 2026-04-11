@@ -5,10 +5,24 @@ import path from "path";
 import fs from "fs";
 import type { BlogMeta } from "./types";
 import { BLOG_POSTS_DIR } from "./contentPaths";
+import {
+  getSampleBlogPostBySlug,
+  getSampleBlogPosts,
+  shouldIncludeLocalSampleContent,
+} from "./sampleContent";
 
 export async function getBlogPostBySlug(slug: string) {
   const postPath = path.join(BLOG_POSTS_DIR, `${slug}.md`);
-  if (!fs.existsSync(postPath)) return null;
+  if (!fs.existsSync(postPath)) {
+    if (!shouldIncludeLocalSampleContent()) return null;
+    const samplePost = getSampleBlogPostBySlug(slug);
+    if (!samplePost) return null;
+    const processedContent = await remark().use(html).process(samplePost.content);
+    return {
+      metadata: samplePost.metadata,
+      contentHtml: processedContent.toString(),
+    };
+  }
 
   const file = fs.readFileSync(postPath, "utf8");
   const { data, content } = matter(file);
@@ -22,7 +36,7 @@ export async function getBlogPostBySlug(slug: string) {
 
 export function getAllBlogPosts(): BlogMeta[] {
   const files = fs.readdirSync(BLOG_POSTS_DIR);
-  return files
+  const filePosts = files
     .filter((file) => file.endsWith(".md"))
     .map((file) => {
       const slug = file.replace(/\.md$/, "");
@@ -37,6 +51,11 @@ export function getAllBlogPosts(): BlogMeta[] {
         summary: data.summary || "",
         image: data.image || undefined,
       };
-    })
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+    });
+
+  const posts = shouldIncludeLocalSampleContent()
+    ? [...filePosts, ...getSampleBlogPosts()]
+    : filePosts;
+
+  return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
 }

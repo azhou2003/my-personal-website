@@ -14,7 +14,7 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
         </p>
         <h1 className="hero-title font-extrabold text-foreground-light dark:text-foreground-dark drop-shadow-[0_6px_24px_rgba(0,0,0,0.22)] select-none leading-[1.1] tracking-[-0.02em] lg:whitespace-nowrap">
           <span className="block lg:inline">
-            {Array.from("Welcome...").map((char, i) => (
+            {Array.from("Welcome").map((char, i) => (
               <span
                 key={i}
                 className={`inline-block transition-[opacity,transform,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -30,7 +30,7 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
           </span>
           <span className="hidden lg:inline">{"\u00A0"}</span>
           <span className="block lg:inline whitespace-nowrap">
-            {Array.from("To My World.").map((char, i) => (
+            {Array.from("to My World.").map((char, i) => (
               <span
                 key={`world-${i}`}
                 className={`inline-block transition-[opacity,transform,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
