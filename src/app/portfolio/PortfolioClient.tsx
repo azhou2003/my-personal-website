@@ -29,6 +29,8 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [activeMobileIndex, setActiveMobileIndex] = useState<number | null>(null);
+  const [activeDesktopIndex, setActiveDesktopIndex] = useState<number | null>(null);
+  const [timelineScaleByIndex, setTimelineScaleByIndex] = useState<Record<number, number>>({});
   const timelineRowRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const lastScrollYRef = useRef(0);
   const isDarkMode = useIsDarkMode();
@@ -161,6 +163,68 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
     };
   }, [isMobile, filtered]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let ticking = false;
+
+    const updateTimelineScales = () => {
+      const viewportCenterY = window.innerHeight / 2;
+      const influenceDistance = window.innerHeight * 0.55;
+      const nextScaleByIndex: Record<number, number> = {};
+      let closestIndex: number | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (let idx = 0; idx < filtered.length; idx += 1) {
+        const row = timelineRowRefs.current[idx];
+        if (!row) continue;
+
+        const rect = row.getBoundingClientRect();
+        const rowCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(rowCenterY - viewportCenterY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = idx;
+        }
+        const normalized = Math.min(distance / influenceDistance, 1);
+        const scale = 1.12 - normalized * 0.22;
+
+        nextScaleByIndex[idx] = Number(scale.toFixed(3));
+      }
+
+      setTimelineScaleByIndex((prev) => {
+        const prevKeys = Object.keys(prev);
+        const nextKeys = Object.keys(nextScaleByIndex);
+        if (prevKeys.length !== nextKeys.length) return nextScaleByIndex;
+        for (const key of nextKeys) {
+          const numericKey = Number(key);
+          if (prev[numericKey] !== nextScaleByIndex[numericKey]) return nextScaleByIndex;
+        }
+        return prev;
+      });
+
+      setActiveDesktopIndex((prev) => (prev === closestIndex ? prev : closestIndex));
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateTimelineScales();
+        ticking = false;
+      });
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [filtered]);
+
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
@@ -264,8 +328,11 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           {filtered.map((project, idx) => {
             const isLeft = idx % 2 === 0;
             const isActiveOnMobile = isMobile && activeMobileIndex === idx;
-            const popupVisibilityClass =
-              "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
+            const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
+            const rowScale = timelineScaleByIndex[idx] ?? 1;
+            const popupVisibilityClass = isActiveOnDesktop
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
 
             const popupPositionClass = isLeft
               ? "left-full ml-10 origin-left"
@@ -278,6 +345,11 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                     timelineRowRefs.current[idx] = node;
                   }}
                   className="relative flex items-center min-h-[180px] group"
+                  style={{
+                    transform: `scale(${rowScale})`,
+                    transformOrigin: "center center",
+                    transition: "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
                 >
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">

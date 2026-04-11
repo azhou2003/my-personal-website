@@ -26,8 +26,8 @@
   --color-timeline-line: #23201c;
   --color-timeline-fill: #23201c;
   --color-card-muted-bg: #ece7d5;
-  --color-portfolio-present: #8a6110;
-  --color-portfolio-past: #b96534;
+  --color-portfolio-present: #ffe066;
+  --color-portfolio-past: #ffb385;
   --color-about-gradient-light: linear-gradient(90deg, #5a4e1f, #8a4f31, #2f5a3f, #5a4e1f);
   --color-about-gradient-dark: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
   --color-about-gradient: var(--color-about-gradient-light);
@@ -58,8 +58,8 @@
   --color-timeline-line: #ece7d5;
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;
-  --color-portfolio-present: #ffe066;
-  --color-portfolio-past: #ffb385;
+  --color-portfolio-present: #8a6110;
+  --color-portfolio-past: #b96534;
   --color-about-gradient: var(--color-about-gradient-dark);
   --color-blog-panel-bg-editorial: rgba(46, 42, 39, 0.97);
   --color-blog-panel-border-editorial: rgba(95, 87, 77, 0.75);
