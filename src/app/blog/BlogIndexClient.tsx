@@ -191,7 +191,7 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
         <TypingAnimation
           text="Thinking Out Loud"
-          speed={120}
+          speed={75}
           showCursor={true}
         />
       </h1>

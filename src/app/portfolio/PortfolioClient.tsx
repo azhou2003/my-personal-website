@@ -74,7 +74,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         <span>From </span>
         <span className="relative inline-block">
           <span 
-            className={`transition-all duration-500 ease-in-out text-accent-yellow ${
+            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
               sortOrder === "desc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 -translate-y-2"
@@ -87,7 +87,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             Present
           </span>
           <span 
-            className={`transition-all duration-500 ease-in-out text-accent-orange ${
+            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
               sortOrder === "asc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-2"
@@ -103,7 +103,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         <span> to </span>
         <span className="relative inline-block">
           <span 
-            className={`transition-all duration-500 ease-in-out text-accent-orange ${
+            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
               sortOrder === "desc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-2"
@@ -116,7 +116,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             Past
           </span>
           <span 
-            className={`transition-all duration-500 ease-in-out text-accent-yellow ${
+            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
               sortOrder === "asc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 -translate-y-2"
