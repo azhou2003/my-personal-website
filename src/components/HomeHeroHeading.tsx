@@ -45,8 +45,14 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
             ))}
           </span>
         </h1>
-        <p className={`mt-2 sm:mt-3 text-[0.86rem] sm:text-sm text-[var(--color-hero-subtitle)] transition-all duration-700 ${showToMyWorld ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
-          Software Engineer | Financial Miser | Dreamer
+        <p className={`mt-3 sm:mt-4 lg:mt-5 text-[0.86rem] sm:text-sm text-[var(--color-hero-subtitle)] transition-all duration-700 ${showToMyWorld ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+          <span className="inline-flex items-center gap-2.5 sm:gap-3.5 lg:gap-5">
+            <span>Software Engineer</span>
+            <span className="opacity-60" aria-hidden="true">|</span>
+            <span>Financial Miser</span>
+            <span className="opacity-60" aria-hidden="true">|</span>
+            <span>Scholar Warrior</span>
+          </span>
         </p>
       </div>
     </div>

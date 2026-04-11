@@ -10,7 +10,7 @@
   --color-border: #e6e4d9;
   --color-nav-active: #d4501f;
   --color-hero-kicker: #3f311d;
-  --color-hero-subtitle: #352919;
+  --color-hero-subtitle: #5f4a34;
   --color-orbit-earth-back: #7f746455;
   --color-orbit-mars-back: #6e7d8c4f;
   --color-orbit-earth-front: #9b8d796e;
@@ -26,8 +26,9 @@
   --color-timeline-line: #23201c;
   --color-timeline-fill: #23201c;
   --color-card-muted-bg: #ece7d5;
-  --color-about-gradient-light: linear-gradient(90deg, #665c1d, #7a4a36, #3f4a36, #665c1d);
+  --color-about-gradient-light: linear-gradient(90deg, #5a4e1f, #8a4f31, #2f5a3f, #5a4e1f);
   --color-about-gradient-dark: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
+  --color-about-gradient: var(--color-about-gradient-light);
 }
 
 .dark {
@@ -49,6 +50,7 @@
   --color-timeline-line: #ece7d5;
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;
+  --color-about-gradient: var(--color-about-gradient-dark);
 }
 
 body {
@@ -125,8 +127,8 @@ body.dark input[type="text"] {
 }
 
 @keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-25%); }
+  0%, 100% { transform: translateY(12%); }
+  50% { transform: translateY(-12%); }
 }
 
 .animate-bounce-once {
