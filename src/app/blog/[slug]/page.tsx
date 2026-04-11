@@ -1,50 +1,38 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { getBlogPostBySlug } from "../../../lib/markdown";
+import { getAllBlogPosts, getBlogPostBySlug } from "../../../lib/markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
+import { getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
 
-// TODO: Restore correct type for params when Next.js typegen bug is fixed
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+type BlogPageParams = Promise<{ slug: string }>;
+
+export async function generateMetadata({ params }: { params: BlogPageParams }): Promise<Metadata> {
   const resolvedParams = await params;
-  const postPath = path.join(process.cwd(), "src", "content", "posts", `${resolvedParams.slug}.md`);
-  try {
-    const file = fs.readFileSync(postPath, "utf8");
-    const { data } = matter(file);
-    return {
-      title: data.title || resolvedParams.slug,
-      description: data.summary || data.description || "",
-    };
-  } catch {
-    return { title: "Post not found" };
-  }
+  const post = await getBlogPostBySlug(resolvedParams.slug);
+  if (!post) return { title: "Post not found" };
+  return {
+    title: post.metadata.title || resolvedParams.slug,
+    description: post.metadata.summary || "",
+  };
 }
 
 export async function generateStaticParams() {
-  const postsDir = path.join(process.cwd(), "src/content/posts");
-  const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".md"));
-  return files.map((file) => ({ slug: file.replace(/\.md$/, "") }));
+  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
-// TODO: Restore correct type for params when Next.js typegen bug is fixed
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function BlogPostPage({ params }: { params: any }) {
+export default async function BlogPostPage({ params }: { params: BlogPageParams }) {
   const resolvedParams = await params;
   const post = await getBlogPostBySlug(resolvedParams.slug);
   if (!post) return notFound();
 
   const { metadata: data, contentHtml: content } = post;
 
-  // Get all blog post slugs for prev/next navigation
-  const postsDir = path.join(process.cwd(), "src/content/posts");
-  const posts = getSortedBlogPosts(postsDir);
+  const posts = getAllBlogPosts()
+    .map(({ slug, title, date }) => ({ slug, title, date }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const { prevPost, nextPost } = getPrevNextPosts(posts, resolvedParams.slug);
 
   return (

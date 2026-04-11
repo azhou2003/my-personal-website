@@ -1,6 +1,6 @@
 "use client";
 import type { PortfolioProject } from "../../lib/types";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import SearchBar from "../../components/SearchBar";
 import { formatDate } from "../../lib/formatDate";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import { accentClassesLight, accentClassesDark } from "../../components/styles/t
 import { useIsDarkMode } from "../../hooks/useIsDarkMode";
 import Tag from "../../components/Tag";
 import StaticTagList from "../../components/StaticTagList";
+import FadeInSection from "../../components/FadeInSection";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -19,65 +20,6 @@ function getTagFrequency(projects: PortfolioProject[]) {
     });
   });
   return freq;
-}
-
-function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const lastScrollY = useRef<number>(0);
-  const [scrollDir, setScrollDir] = useState<'down' | 'up'>('down');
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  useEffect(() => {
-    lastScrollY.current = window.scrollY;
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      setScrollDir(currentY > lastScrollY.current ? 'down' : 'up');
-      lastScrollY.current = currentY;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new window.IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            node.classList.add('opacity-100', 'translate-y-0');
-            node.classList.remove('opacity-0', 'fade-out-up', 'fade-out-down', 'duration-500');
-            setHasLoaded(true);
-          }, delay);
-        } else {
-          node.classList.remove('opacity-100', 'translate-y-0');
-          // Use faster fade for scroll-out, slower for initial load
-          if (scrollDir === 'down') {
-            const classes = ['opacity-0', 'fade-out-down'];
-            if (hasLoaded) classes.push('duration-500');
-            node.classList.add(...classes);
-            node.classList.remove('fade-out-up');
-          } else {
-            const classes = ['opacity-0', 'fade-out-up'];
-            if (hasLoaded) classes.push('duration-500');
-            node.classList.add(...classes);
-            node.classList.remove('fade-out-down');
-          }
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [scrollDir, delay, hasLoaded]);
-  return (
-    <div
-      ref={ref}
-      className="opacity-0 translate-y-8 transition-all duration-300 will-change-transform"
-    >
-      {children}
-    </div>
-  );
 }
 
 export default function PortfolioClient({ projects }: { projects: PortfolioProject[] }) {
@@ -132,7 +74,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         <span>From </span>
         <span className="relative inline-block">
           <span 
-            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+            className={`transition-all duration-500 ease-in-out text-accent-yellow ${
               sortOrder === "desc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 -translate-y-2"
@@ -145,7 +87,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             Present
           </span>
           <span 
-            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+            className={`transition-all duration-500 ease-in-out text-accent-orange ${
               sortOrder === "asc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-2"
@@ -161,7 +103,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         <span> to </span>
         <span className="relative inline-block">
           <span 
-            className={`transition-all duration-500 ease-in-out text-[#ffb385] dark:text-[#ffb385] ${
+            className={`transition-all duration-500 ease-in-out text-accent-orange ${
               sortOrder === "desc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-2"
@@ -174,7 +116,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             Past
           </span>
           <span 
-            className={`transition-all duration-500 ease-in-out text-[#ffe066] dark:text-[#ffe066] ${
+            className={`transition-all duration-500 ease-in-out text-accent-yellow ${
               sortOrder === "asc" 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 -translate-y-2"
@@ -219,7 +161,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       {/* Project Timeline */}
       <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
         {/* Full-height vertical timeline line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[#23201c] dark:bg-[#ece7d5] -translate-x-1/2 z-0" style={{ minHeight: '100%' }} />
+        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[var(--color-timeline-line)] -translate-x-1/2 z-0" style={{ minHeight: '100%' }} />
         <div className="flex flex-col gap-24 w-full relative z-10">
           {filtered.length === 0 && (
             <div className="text-center text-border-light dark:text-border-dark">
@@ -233,7 +175,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                 <div className="relative flex items-center min-h-[180px] group">
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
-                    <div className="w-6 h-6 rounded-full border-4 border-[#23201c] dark:border-[#ece7d5] shadow-lg bg-[#23201c] dark:bg-[#ece7d5] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
+                    <div className="w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
                   </div>                  {/* Left side */}
                   <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
                     {isLeft ? (

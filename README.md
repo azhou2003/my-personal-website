@@ -2,79 +2,91 @@
 
 # My Personal Website
 
-This is a personal website built with [Next.js](https://nextjs.org), featuring a markdown-powered blog and a portfolio section. The site is fully responsive, supports dark mode, and is easily extensible.
+Personal website built with Next.js App Router, featuring:
+- a markdown-powered blog
+- a portfolio timeline loaded from JSON
+- dark mode support
 
----
+## Tech Stack
 
-## 🚀 Getting Started
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS v4 (`@tailwindcss/postcss`)
 
-To run the development server:
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the site.
+Open `http://localhost:3000`.
 
+Other scripts:
+
+```bash
+npm run build
+npm run start
+npm run lint
+```
+
+## Content
+
+### Blog posts
+
+Location: `src/content/posts/*.md`
+
+Required frontmatter:
+
+```yaml
 ---
-
-## ✍️ Adding a Blog Post
-
-Blog posts are written in Markdown and stored in `src/posts/`.
-
-**To add a new blog post:**
-1. Create a new `.md` file in `src/posts/` (e.g., `my-new-post.md`).
-2. Add frontmatter at the top of the file:
-
-   ```markdown
-   ---
-   title: My New Blog Post
-   date: "2024-06-01"
-   tags: ["Next.js", "React"]
-   summary: "A short summary of my new post."
-   image: "/path/to/image.png"
-   ---
-   
-   Your blog content goes here. You can use Markdown syntax!
-   ```
-
-3. Save the file. The post will automatically appear on the blog page.
-
+title: "Post Title"
+date: "YYYY-MM-DD"
+tags: ["Tag1", "Tag2"]
+summary: "Brief summary"
+image: "/path/to/image.png"
 ---
+```
 
-## 🗂️ Adding a Portfolio Project
+`slug` is derived from the markdown filename.
 
-Portfolio projects are defined as JSON files in `src/data/`.
+### Portfolio projects
 
-**To add a new project:**
-1. Create a new `.json` file in `src/data/` (e.g., `my-cool-project.json`).
-2. Use the following structure:
+Location: `src/content/data/*.json`
 
-   ```json
-   {
-     "title": "My Cool Project",
-     "description": "A brief description of the project.",
-     "date": "2024-05-15",
-     "tags": ["Next.js", "TypeScript"],
-     "images": ["/path/to/image.png"],
-     "link": "https://github.com/yourusername/my-cool-project"
-   }
-   ```
+Shape:
 
-3. Save the file. The project will automatically appear in the portfolio section.
+```json
+{
+  "title": "Project title",
+  "description": "Brief description",
+  "date": "YYYY-MM-DD",
+  "tags": ["Next.js", "TypeScript"],
+  "images": ["/path/to/image.png"],
+  "link": "https://example.com"
+}
+```
 
----
+Notes:
+- `images` is required and should include at least one image path.
+- `link` is optional.
 
-## 🌐 Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/app/` - route pages (home, blog, portfolio)
+- `src/components/` - reusable UI components
+- `src/content/posts/` - blog markdown files
+- `src/content/data/` - portfolio JSON files
+- `src/lib/` - content loaders, metadata, utilities, shared types
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
 
----
+Deployed on Vercel.
