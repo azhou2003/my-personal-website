@@ -179,6 +179,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const [isClient, setIsClient] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
+  const [isSunHovered, setIsSunHovered] = useState(false);
   const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
   // Initialize with default dimensions to prevent hydration mismatch
   const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
@@ -411,12 +412,25 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const svgSize = Math.max(Math.floor(maxOrbitRadius * 2.9), 460);
   const halfSvgSize = svgSize / 2;
   const sceneCenterY = "50%";
-  const portraitWidth = dimensions.centralRadius * 2.18;
-  const portraitHeight = dimensions.centralRadius * 2.4;
+  const clickMeArcId = React.useId().replace(/:/g, "");
+  const portraitWidth = dimensions.centralRadius * 2.30;
+  const portraitHeight = dimensions.centralRadius * 2.52;
+  const portraitHeightScale = portraitHeight / dimensions.centralRadius;
+  const portraitCutoffPercent =
+    ((portraitHeightScale - 2 + PORTRAIT_CUTOFF * 2) / portraitHeightScale) * 100;
+  const clickMeArcRadius = dimensions.centralRadius * 1.04;
+  const clickMeArcBoxSize = Math.floor(clickMeArcRadius * 2 + dimensions.centralRadius * 0.9);
+  const clickMeArcCenter = clickMeArcBoxSize / 2;
+  const clickMeStartAngle = (-185 * Math.PI) / 180;
+  const clickMeEndAngle = (-78 * Math.PI) / 180;
+  const clickMeStartX = clickMeArcCenter + clickMeArcRadius * Math.cos(clickMeStartAngle);
+  const clickMeStartY = clickMeArcCenter + clickMeArcRadius * Math.sin(clickMeStartAngle);
+  const clickMeEndX = clickMeArcCenter + clickMeArcRadius * Math.cos(clickMeEndAngle);
+  const clickMeEndY = clickMeArcCenter + clickMeArcRadius * Math.sin(clickMeEndAngle);
 
   return (
     <section
-      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-x-hidden overflow-y-visible will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
       }`}
     >
@@ -497,8 +511,12 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             style={{ clipPath: `inset(0 0 ${100 - PORTRAIT_CUTOFF * 100}% 0)` }}
           />
           <div
-            className="absolute inset-0 z-10 overflow-visible pointer-events-none"
-            style={{ clipPath: `inset(0 0 ${100 - PORTRAIT_CUTOFF * 100}% 0)` }}
+            className="absolute left-1/2 bottom-0 z-10 transform -translate-x-1/2 pointer-events-none"
+            style={{
+              width: `${portraitWidth}px`,
+              height: `${portraitHeight}px`,
+              clipPath: `inset(0 0 ${100 - portraitCutoffPercent}% 0)`,
+            }}
           >
             <Image
               src="/portrait1.png"
@@ -538,15 +556,50 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             ref={portraitButtonRef}
             type="button"
             onClick={() => setIsOrbitMenuOpen((prev) => !prev)}
-            className="absolute left-1/2 bottom-0 z-30 transform -translate-x-1/2 appearance-none bg-transparent border-0 p-0 leading-none overflow-visible cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+            onMouseEnter={() => setIsSunHovered(true)}
+            onMouseLeave={() => setIsSunHovered(false)}
+            onFocus={() => setIsSunHovered(true)}
+            onBlur={() => setIsSunHovered(false)}
+            className="absolute left-1/2 z-30 transform -translate-x-1/2 -translate-y-1/2 appearance-none bg-transparent border-0 p-0 leading-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] rounded-full"
             aria-label="Open orbit controls"
             aria-expanded={isOrbitMenuOpen}
             style={{
-              width: `${portraitWidth}px`,
-              height: `${portraitHeight}px`,
+              top: sceneCenterY,
+              width: `${dimensions.centralRadius * 2}px`,
+              height: `${dimensions.centralRadius * 2}px`,
             }}
           />
         </div>
+      </div>
+      <div
+        className="absolute left-1/2 z-[32] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        style={{
+          top: sceneCenterY,
+          width: `${clickMeArcBoxSize}px`,
+          height: `${clickMeArcBoxSize}px`,
+        }}
+      >
+        <svg width="100%" height="100%" viewBox={`0 0 ${clickMeArcBoxSize} ${clickMeArcBoxSize}`}>
+          <defs>
+            <path
+              id={clickMeArcId}
+              d={`M ${clickMeStartX} ${clickMeStartY} A ${clickMeArcRadius} ${clickMeArcRadius} 0 0 1 ${clickMeEndX} ${clickMeEndY}`}
+            />
+          </defs>
+          <text
+            className="font-semibold tracking-wide"
+            style={{
+              fill: "var(--color-hero-click-hint)",
+              letterSpacing: "0.08em",
+              fontSize: isSunHovered ? "22px" : "18px",
+              transition: "font-size 180ms ease",
+            }}
+          >
+            <textPath href={`#${clickMeArcId}`} startOffset="50%" textAnchor="middle">
+              Click on Me!
+            </textPath>
+          </text>
+        </svg>
       </div>
       {isOrbitMenuOpen && (
         <div

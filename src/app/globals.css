@@ -17,6 +17,7 @@
   --color-orbit-mars-front: #7f90a37a;
   --color-hero-core-bg: #ff9f80;
   --color-hero-core-border: #d4501f;
+  --color-hero-click-hint: #7a4d2f;
   --color-tab-border: #9a8d6b;
   --color-tab-border-dark: #5f574d;
   --color-switch-track-off: #e6e4d9;
@@ -49,6 +50,7 @@
   --color-nav-active: #ff9f80;
   --color-hero-kicker: #d8c7ab;
   --color-hero-subtitle: #d9c8ad;
+  --color-hero-click-hint: #f0dbc0;
   --color-tab-border: #5f574d;
   --color-tab-border-dark: #5f574d;
   --color-switch-track-off: #3f3b36;
