@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import StaticTagList from "../../components/StaticTagList";
@@ -18,6 +18,9 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [triggerKey, setTriggerKey] = useState(0);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeMobileSlug, setActiveMobileSlug] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   const isDarkMode = useIsDarkMode();
 
@@ -57,9 +60,83 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   useEffect(() => {
     setTriggerKey((k) => k + 1);
   }, [search, selectedTags]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    const updateMobileState = () => setIsMobile(mediaQuery.matches);
+
+    updateMobileState();
+    mediaQuery.addEventListener("change", updateMobileState);
+    return () => mediaQuery.removeEventListener("change", updateMobileState);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setActiveMobileSlug(null);
+      return;
+    }
+
+    const firstSlug = filtered[0]?.slug ?? null;
+    setActiveMobileSlug((prev) => prev ?? firstSlug);
+  }, [isMobile, filtered]);
+
+  useEffect(() => {
+    if (!isMobile || typeof window === "undefined") return;
+
+    let ticking = false;
+
+    const updateActiveCard = () => {
+      const viewportCenterY = window.innerHeight / 2;
+      let bestSlug: string | null = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+
+      for (const post of filtered) {
+        const card = cardRefs.current[post.slug];
+        if (!card) continue;
+
+        const rect = card.getBoundingClientRect();
+        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!isVisible) continue;
+
+        const cardCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(cardCenterY - viewportCenterY);
+
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestSlug = post.slug;
+        }
+      }
+
+      if (bestSlug) {
+        setActiveMobileSlug((prev) => (prev === bestSlug ? prev : bestSlug));
+      }
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateActiveCard();
+        ticking = false;
+      });
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [isMobile, filtered]);
+
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
-        <TypingAnimation 
+    <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
+        <TypingAnimation
           text="Thinking Out Loud"
           speed={120}
           showCursor={true}
@@ -93,15 +170,22 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       </div>
       {/* Blog Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-        {filtered.map((post, idx) => (          <FadeInSection
-            key={triggerKey + '-' + post.slug}
+        {filtered.map((post, idx) => {
+          const isActiveOnMobile = isMobile && activeMobileSlug === post.slug;
+
+          return (
+            <FadeInSection
+              key={triggerKey + "-" + post.slug}
             delay={idx * 25}
           >
             <Link
+              ref={(node) => {
+                cardRefs.current[post.slug] = node;
+              }}
               href={`/blog/${post.slug}`}
-              className="group rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden flex flex-col h-80 transform-gpu hover:scale-105 focus:scale-105 duration-300"
+              className="group relative block w-full h-80 rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300"
             >
-              <div className="relative w-full h-48 bg-[var(--color-card-muted-bg)]">
+              <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]">
                 {post.image && (
                   <Image
                     src={post.image}
@@ -110,25 +194,42 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                     className="object-cover object-center"
                   />
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/5 to-transparent" />
               </div>
-              <div className="flex-1 flex flex-col p-4 gap-2">
-                <h2 className="text-xl font-bold font-sans group-hover:text-accent-yellow transition-colors text-foreground-light dark:text-foreground-dark">
-                  {post.title}
-                </h2>
-                <StaticTagList tags={post.tags} className="mb-1" />
-                <span className="text-xs text-border-light dark:text-border-dark mb-1">
-                  {formatDate(post.date)}
-                </span>
-                <div className="relative flex-1 overflow-hidden">
-                  <p className="text-sm text-foreground-light dark:text-foreground-dark mb-2">
+
+              <div
+                className={`absolute inset-x-0 bottom-0 bg-background-light/94 dark:bg-background-dark/94 backdrop-blur-sm border-t border-border-light/70 dark:border-border-dark transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isActiveOnMobile
+                    ? "translate-y-0"
+                    : "translate-y-[calc(100%-4.85rem)] sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0"
+                }`}
+              >
+                <div className="px-4 pt-3 pb-3">
+                  <h2 className="text-xl font-bold font-sans text-foreground-light dark:text-foreground-dark leading-snug">
+                    {post.title}
+                  </h2>
+                </div>
+
+                <div
+                  className={`px-4 pb-4 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    isActiveOnMobile
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-2 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:group-focus-within:opacity-100 sm:group-focus-within:translate-y-0"
+                  }`}
+                >
+                  <StaticTagList tags={post.tags} className="mb-1" />
+                  <span className="text-xs text-border-light dark:text-border-dark block">
+                    {formatDate(post.date)}
+                  </span>
+                  <p className="text-sm text-foreground-light dark:text-foreground-dark line-clamp-3 mt-1">
                     {post.summary}
                   </p>
-                  <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background-light dark:from-background-dark to-transparent pointer-events-none" />
                 </div>
               </div>
             </Link>
           </FadeInSection>
-        ))}
+          );
+        })}
       </div>
     </main>
   );
