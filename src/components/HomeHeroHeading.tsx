@@ -9,7 +9,7 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
   return (
     <div className="hero-title-container absolute inset-0 flex items-start justify-center pointer-events-none z-50 pt-[clamp(0.75rem,4.5vh,3.5rem)]">
       <div className="text-center px-2 sm:px-6 max-w-3xl lg:max-w-none">
-        <p className={`uppercase tracking-[0.18em] text-[0.68rem] sm:text-[0.72rem] text-[var(--color-hero-kicker)] mb-2 sm:mb-3 transition-all duration-700 ${showWelcome ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+        <p className={`uppercase tracking-[0.18em] text-[0.8rem] sm:text-[0.9rem] lg:text-[1rem] text-[var(--color-hero-kicker)] mb-2 sm:mb-3 transition-all duration-700 ${showWelcome ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
           Anjie Zhou
         </p>
         <h1 className="hero-title font-extrabold text-foreground-light dark:text-foreground-dark drop-shadow-[0_6px_24px_rgba(0,0,0,0.22)] select-none leading-[1.1] tracking-[-0.02em] lg:whitespace-nowrap">
@@ -45,8 +45,14 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
             ))}
           </span>
         </h1>
-        <p className={`mt-2 sm:mt-3 text-[0.86rem] sm:text-sm text-[var(--color-hero-subtitle)] transition-all duration-700 ${showToMyWorld ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
-          Software Engineer | Financial Miser | Dreamer
+        <p className={`mt-3 sm:mt-4 lg:mt-5 text-[0.86rem] sm:text-sm text-[var(--color-hero-subtitle)] transition-all duration-700 ${showToMyWorld ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+          <span className="inline-flex items-center gap-2.5 sm:gap-3.5 lg:gap-5">
+            <span>Software Engineer</span>
+            <span className="opacity-60" aria-hidden="true">|</span>
+            <span>Financial Miser</span>
+            <span className="opacity-60" aria-hidden="true">|</span>
+            <span>Scholar Warrior</span>
+          </span>
         </p>
       </div>
     </div>

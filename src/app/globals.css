@@ -10,7 +10,7 @@
   --color-border: #e6e4d9;
   --color-nav-active: #d4501f;
   --color-hero-kicker: #3f311d;
-  --color-hero-subtitle: #352919;
+  --color-hero-subtitle: #5f4a34;
   --color-orbit-earth-back: #7f746455;
   --color-orbit-mars-back: #6e7d8c4f;
   --color-orbit-earth-front: #9b8d796e;
@@ -26,8 +26,17 @@
   --color-timeline-line: #23201c;
   --color-timeline-fill: #23201c;
   --color-card-muted-bg: #ece7d5;
-  --color-about-gradient-light: linear-gradient(90deg, #665c1d, #7a4a36, #3f4a36, #665c1d);
+  --color-portfolio-present: #ffe066;
+  --color-portfolio-past: #ffb385;
+  --color-about-gradient-light: linear-gradient(90deg, #5a4e1f, #8a4f31, #2f5a3f, #5a4e1f);
   --color-about-gradient-dark: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
+  --color-about-gradient: var(--color-about-gradient-light);
+  --color-blog-panel-bg-editorial: rgba(254, 250, 224, 0.98);
+  --color-blog-panel-border-editorial: rgba(154, 141, 107, 0.55);
+  --color-blog-panel-shadow-editorial: 0 -10px 22px rgba(43, 34, 24, 0.16);
+  --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(254, 250, 224, 0.97) 0%, rgba(247, 239, 213, 0.96) 100%);
+  --color-blog-panel-border-tinted: rgba(122, 90, 54, 0.44);
+  --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(58, 41, 24, 0.2);
 }
 
 .dark {
@@ -49,6 +58,15 @@
   --color-timeline-line: #ece7d5;
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;
+  --color-portfolio-present: #8a6110;
+  --color-portfolio-past: #b96534;
+  --color-about-gradient: var(--color-about-gradient-dark);
+  --color-blog-panel-bg-editorial: rgba(46, 42, 39, 0.97);
+  --color-blog-panel-border-editorial: rgba(95, 87, 77, 0.75);
+  --color-blog-panel-shadow-editorial: 0 -12px 26px rgba(0, 0, 0, 0.4);
+  --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(51, 47, 43, 0.97) 0%, rgba(41, 37, 34, 0.96) 100%);
+  --color-blog-panel-border-tinted: rgba(126, 113, 96, 0.72);
+  --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(0, 0, 0, 0.42);
 }
 
 body {
@@ -125,8 +143,8 @@ body.dark input[type="text"] {
 }
 
 @keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-25%); }
+  0%, 100% { transform: translateY(12%); }
+  50% { transform: translateY(-12%); }
 }
 
 .animate-bounce-once {
