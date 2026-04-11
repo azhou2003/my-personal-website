@@ -4,9 +4,10 @@ import html from "remark-html";
 import path from "path";
 import fs from "fs";
 import type { BlogMeta } from "./types";
+import { BLOG_POSTS_DIR } from "./contentPaths";
 
 export async function getBlogPostBySlug(slug: string) {
-  const postPath = path.join(process.cwd(), "src/content/posts", `${slug}.md`);
+  const postPath = path.join(BLOG_POSTS_DIR, `${slug}.md`);
   if (!fs.existsSync(postPath)) return null;
 
   const file = fs.readFileSync(postPath, "utf8");
@@ -20,13 +21,12 @@ export async function getBlogPostBySlug(slug: string) {
 }
 
 export function getAllBlogPosts(): BlogMeta[] {
-  const postsDir = path.join(process.cwd(), "src/content/posts");
-  const files = fs.readdirSync(postsDir);
+  const files = fs.readdirSync(BLOG_POSTS_DIR);
   return files
     .filter((file) => file.endsWith(".md"))
     .map((file) => {
       const slug = file.replace(/\.md$/, "");
-      const fullPath = path.join(postsDir, file);
+      const fullPath = path.join(BLOG_POSTS_DIR, file);
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data } = matter(fileContents);
       return {

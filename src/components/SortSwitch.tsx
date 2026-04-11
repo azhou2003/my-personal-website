@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useIsDarkMode } from "../hooks/useIsDarkMode";
+import { designTokens } from "../lib/designTokens";
 
 interface SortSwitchProps {
   value: "desc" | "asc";
@@ -10,9 +11,9 @@ interface SortSwitchProps {
 
 export default function SortSwitch({ value, onChange, className = "" }: SortSwitchProps) {
   const isDarkMode = useIsDarkMode();
-  const trackOff = isDarkMode ? "#3f3b36" : "#e6e4d9"; // use dark sage instead of background in dark mode
-  const trackOn = isDarkMode ? "#3f4a36" : "#b7c7a3"; // sage colors from your palette
-  const thumbColor = isDarkMode ? "#f5f5f5" : "#fefae0"; // your foreground/background colors
+  const trackOff = designTokens.switchTrackOff;
+  const trackOn = designTokens.switchTrackOn;
+  const thumbColor = designTokens.switchThumb;
   const labelClass = "text-[11px] sm:text-xs font-semibold transition-colors w-14 sm:w-16 text-center flex-shrink-0";
 
   // Track color logic
@@ -25,7 +26,7 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
   };
 
   const [isActive, setIsActive] = React.useState(false);
-  const ringColor = isDarkMode ? '0 0 0 4px rgba(63, 74, 54, 0.3)' : '0 0 0 4px rgba(183, 199, 163, 0.3)';
+  const ringColor = isDarkMode ? designTokens.switchRing.dark : designTokens.switchRing.light;
 
   const switchStyle = {
     width: "var(--switch-w)",
@@ -50,7 +51,7 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
     position: 'absolute' as const,
     display: 'block',
     background: getThumbColor(),
-    border: `1px solid ${isDarkMode ? '#3f3b36' : '#b7c7a3'}`, // border colors from your theme
+    border: `1px solid ${designTokens.switchThumbBorder}`,
     transform: baseTransform + activeScale,
   };
 

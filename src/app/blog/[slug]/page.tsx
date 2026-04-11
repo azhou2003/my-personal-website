@@ -9,12 +9,13 @@ import { getSortedBlogPosts, getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
+import { BLOG_POSTS_DIR } from "../../../lib/contentPaths";
 
-// TODO: Restore correct type for params when Next.js typegen bug is fixed
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+type BlogPageParams = Promise<{ slug: string }>;
+
+export async function generateMetadata({ params }: { params: BlogPageParams }): Promise<Metadata> {
   const resolvedParams = await params;
-  const postPath = path.join(process.cwd(), "src", "content", "posts", `${resolvedParams.slug}.md`);
+  const postPath = path.join(BLOG_POSTS_DIR, `${resolvedParams.slug}.md`);
   try {
     const file = fs.readFileSync(postPath, "utf8");
     const { data } = matter(file);
@@ -28,14 +29,11 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const postsDir = path.join(process.cwd(), "src/content/posts");
-  const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".md"));
+  const files = fs.readdirSync(BLOG_POSTS_DIR).filter((f) => f.endsWith(".md"));
   return files.map((file) => ({ slug: file.replace(/\.md$/, "") }));
 }
 
-// TODO: Restore correct type for params when Next.js typegen bug is fixed
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function BlogPostPage({ params }: { params: any }) {
+export default async function BlogPostPage({ params }: { params: BlogPageParams }) {
   const resolvedParams = await params;
   const post = await getBlogPostBySlug(resolvedParams.slug);
   if (!post) return notFound();
@@ -43,8 +41,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
   const { metadata: data, contentHtml: content } = post;
 
   // Get all blog post slugs for prev/next navigation
-  const postsDir = path.join(process.cwd(), "src/content/posts");
-  const posts = getSortedBlogPosts(postsDir);
+  const posts = getSortedBlogPosts(BLOG_POSTS_DIR);
   const { prevPost, nextPost } = getPrevNextPosts(posts, resolvedParams.slug);
 
   return (

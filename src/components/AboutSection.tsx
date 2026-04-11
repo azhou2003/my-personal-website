@@ -26,7 +26,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
       <div
         className={`w-full flex justify-center px-3 sm:px-4 pt-1.5 sm:pt-2 transition-all ${animateIn ? 'duration-1000' : 'duration-200'} ease-out ${showCompactText ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
       >
-        <div className="w-[min(92vw,23rem)] bg-background-light/96 dark:bg-background-dark/96 border border-[#9a8d6b] dark:border-[#5f574d] rounded-full px-3.5 sm:px-5 py-1.5 sm:py-2 shadow-[0_8px_22px_rgba(43,34,24,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.34)] backdrop-blur-[2px]">
+        <div className="w-[min(92vw,23rem)] bg-background-light/96 dark:bg-background-dark/96 border border-[var(--color-tab-border)] rounded-full px-3.5 sm:px-5 py-1.5 sm:py-2 shadow-[0_8px_22px_rgba(43,34,24,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.34)] backdrop-blur-[2px]">
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-1.5 sm:gap-3">
             <div className="flex gap-1 sm:gap-2.5 flex-shrink-0">
               <IconLink
@@ -95,7 +95,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 100% { background-position: 0% 50%; }
               }
               .gradient-text-light {
-                background: linear-gradient(90deg, #665c1d, #7a4a36, #3f4a36, #665c1d);
+                background: var(--color-about-gradient-light);
                 background-size: 300% 100%;
                 -webkit-background-clip: text;
                 background-clip: text;
@@ -103,7 +103,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
                 animation: gradient 6s ease infinite;
               }
               .gradient-text-dark {
-                background: linear-gradient(90deg, #ffe066, #ffb385, #b7c7a3, #ffe066);
+                background: var(--color-about-gradient-dark);
                 background-size: 300% 100%;
                 -webkit-background-clip: text;
                 background-clip: text;

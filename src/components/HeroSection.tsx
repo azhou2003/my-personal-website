@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { ORBIT_ANIMATION } from "../lib/motion";
 
 // Type definitions
 interface Position3D {
@@ -211,7 +212,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     if (!animateOrbit) return;
     const interval = setInterval(() => {
       setTestAngle((prev) => (prev + 1) % 360);
-    }, 16);
+    }, ORBIT_ANIMATION.tickMs);
     return () => clearInterval(interval);
   }, [animateOrbit]);
 
@@ -289,7 +290,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           <polyline
             points={earthOrbitBack}
             fill="none"
-            stroke="#7f746455"
+            stroke="var(--color-orbit-earth-back)"
             strokeDasharray="2 7"
             strokeLinecap="round"
             strokeWidth="1.5"
@@ -310,7 +311,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           <polyline
             points={marsOrbitBack}
             fill="none"
-            stroke="#6e7d8c4f"
+            stroke="var(--color-orbit-mars-back)"
             strokeDasharray="3 8"
             strokeLinecap="round"
             strokeWidth="1.35"
@@ -344,7 +345,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           height: `${dimensions.centralRadius * 2}px`,
         }}
       >        <div 
-          className="w-full h-full rounded-full bg-[#ff9f80] border-4 sm:border-6 lg:border-8 border-[#d4501f] shadow-2xl relative" 
+          className="w-full h-full rounded-full bg-[var(--color-hero-core-bg)] border-4 sm:border-6 lg:border-8 border-[var(--color-hero-core-border)] shadow-2xl relative" 
           style={{ overflow: 'visible' }}
         >          {/* Portrait image - positioned at bottom, clipped by circle at bottom only */}
           <Image
@@ -374,7 +375,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           <polyline
             points={earthOrbitFront}
             fill="none"
-            stroke="#9b8d796e"
+            stroke="var(--color-orbit-earth-front)"
             strokeDasharray="2 7"
             strokeLinecap="round"
             strokeWidth="1.7"
@@ -395,7 +396,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           <polyline
             points={marsOrbitFront}
             fill="none"
-            stroke="#7f90a37a"
+            stroke="var(--color-orbit-mars-front)"
             strokeDasharray="3 8"
             strokeLinecap="round"
             strokeWidth="1.55"

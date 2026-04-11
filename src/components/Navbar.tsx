@@ -24,10 +24,10 @@ const Navbar: React.FC = () => {
     const isActive = isActivePage(href);
     
     if (isActive) {
-      return `${baseClasses} text-[#d4501f] dark:text-[#ff9f80] underline decoration-2 underline-offset-4`;
+      return `${baseClasses} text-[var(--color-nav-active)] underline decoration-2 underline-offset-4`;
     }
     
-    return `${baseClasses} hover:underline hover:text-[#d4501f] dark:hover:text-[#ff9f80]`;
+    return `${baseClasses} hover:underline hover:text-[var(--color-nav-active)]`;
   };
 
   useEffect(() => {
