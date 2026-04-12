@@ -135,7 +135,6 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
     const handleWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaY) < 3) return;
-      event.preventDefault();
 
       const now = window.performance.now();
       if (now - wheelBurstRef.current.lastTs > 140) {
@@ -175,6 +174,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       const targetIndex = Math.max(0, Math.min(unclampedTarget, filtered.length - 1));
       if (targetIndex === currentIndex) return;
 
+      event.preventDefault();
       scrollToIndex(targetIndex);
     };
 
