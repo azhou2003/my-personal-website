@@ -30,4 +30,12 @@ export interface AboutSlide {
   imageAlt: string;
   imageSrc?: string;
   paragraphs: string[];
+  links?: AboutSlideLink[];
+}
+
+export interface AboutSlideLink {
+  label: string;
+  href: string;
+  icon: "email" | "github" | "linkedin" | "external";
+  external?: boolean;
 }

@@ -1,8 +1,8 @@
 import React from "react";
-import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt } from "react-icons/fa";
 import Image from "next/image";
 import IconLink from "./IconLink";
-import type { AboutSlide } from "../lib/types";
+import type { AboutSlide, AboutSlideLink } from "../lib/types";
 
 interface AboutSectionProps {
   isExpanded: boolean;
@@ -13,23 +13,40 @@ interface AboutSectionProps {
 const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slides = [] }) => {  
   const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
   const scrollRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(true);
+  const [activeSlideIndex, setActiveSlideIndex] = React.useState(0);
+
+  const defaultSlideLinks: AboutSlideLink[] = [
+    {
+      label: "Email",
+      href: "mailto:anjie.zhou2003@gmail.com",
+      icon: "email",
+    },
+    {
+      label: "GitHub",
+      href: "https://github.com/azhou2003",
+      icon: "github",
+      external: true,
+    },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/anjiezhouhtx/",
+      icon: "linkedin",
+      external: true,
+    },
+  ];
+
+  const iconByKey: Record<AboutSlideLink["icon"], React.ReactNode> = {
+    email: <FaEnvelope className="w-6 h-6" />,
+    github: <FaGithub className="w-6 h-6" />,
+    linkedin: <FaLinkedin className="w-6 h-6" />,
+    external: <FaExternalLinkAlt className="w-5 h-5" />,
+  };
 
   const aboutSlides = slides;
 
-  const updateScrollState = React.useCallback(() => {
+  const getSlideMetrics = React.useCallback(() => {
     const scrollEl = scrollRef.current;
-    if (!scrollEl) return;
-
-    const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
-    setCanScrollLeft(scrollEl.scrollLeft > 4);
-    setCanScrollRight(scrollEl.scrollLeft < maxScrollLeft - 4);
-  }, []);
-
-  const scrollBySlide = React.useCallback((direction: -1 | 1) => {
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) return;
+    if (!scrollEl) return null;
 
     const trackEl = scrollEl.firstElementChild as HTMLElement | null;
     const firstSlide = trackEl?.querySelector<HTMLElement>("[data-about-slide]");
@@ -37,11 +54,50 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
     const gapValue = trackEl ? window.getComputedStyle(trackEl).columnGap || window.getComputedStyle(trackEl).gap : "0";
     const gap = Number.parseFloat(gapValue) || 0;
 
-    scrollEl.scrollBy({
-      left: direction * (slideWidth + gap),
+    return {
+      slideWidth,
+      gap,
+    };
+  }, []);
+
+  const updateActiveSlideIndex = React.useCallback(() => {
+    const scrollEl = scrollRef.current;
+    const metrics = getSlideMetrics();
+    if (!scrollEl || !metrics || aboutSlides.length === 0) return;
+
+    const snapDistance = metrics.slideWidth + metrics.gap;
+    const rawIndex = Math.round(scrollEl.scrollLeft / snapDistance);
+    const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, rawIndex));
+    setActiveSlideIndex(nextIndex);
+  }, [aboutSlides.length, getSlideMetrics]);
+
+  const scrollToSlide = React.useCallback((index: number) => {
+    const scrollEl = scrollRef.current;
+    const metrics = getSlideMetrics();
+    if (!scrollEl || !metrics || aboutSlides.length === 0) return;
+
+    const nextIndex = ((index % aboutSlides.length) + aboutSlides.length) % aboutSlides.length;
+    const snapDistance = metrics.slideWidth + metrics.gap;
+
+    scrollEl.scrollTo({
+      left: nextIndex * snapDistance,
       behavior: "smooth",
     });
-  }, []);
+  }, [aboutSlides.length, getSlideMetrics]);
+
+  const scrollBySlide = React.useCallback((direction: -1 | 1) => {
+    if (aboutSlides.length === 0) return;
+
+    setActiveSlideIndex((currentIndex) => {
+      const nextIndex =
+        direction === 1
+          ? (currentIndex + 1) % aboutSlides.length
+          : (currentIndex - 1 + aboutSlides.length) % aboutSlides.length;
+
+      scrollToSlide(nextIndex);
+      return nextIndex;
+    });
+  }, [aboutSlides.length, scrollToSlide]);
 
   React.useEffect(() => {
     if (!isExpanded && animateIn) {
@@ -58,15 +114,15 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
 
-    updateScrollState();
-    scrollEl.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
+    updateActiveSlideIndex();
+    scrollEl.addEventListener("scroll", updateActiveSlideIndex, { passive: true });
+    window.addEventListener("resize", updateActiveSlideIndex);
 
     return () => {
-      scrollEl.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
+      scrollEl.removeEventListener("scroll", updateActiveSlideIndex);
+      window.removeEventListener("resize", updateActiveSlideIndex);
     };
-  }, [isExpanded, updateScrollState]);
+  }, [isExpanded, updateActiveSlideIndex]);
 
   if (!isExpanded) {
     return (
@@ -129,24 +185,25 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
           100% { background-position: 0% 50%; }
         }
         .gradient-text-name {
-          display: inline-block;
+          display: inline;
           color: #7a5a36;
           background: var(--color-about-gradient);
           background-size: 300% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
+          padding-bottom: 0.08em;
+          line-height: 1.15;
           animation: gradient 6s ease infinite;
         }
       `}</style>
 
-      <div className="relative px-5 sm:px-8">
+      <div className="relative px-5 sm:px-8" data-active-slide={activeSlideIndex}>
         <button
           type="button"
           onClick={() => scrollBySlide(-1)}
           aria-label="Previous section"
-          disabled={!canScrollLeft}
-          className="absolute left-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity disabled:opacity-30 enabled:hover:opacity-100 enabled:opacity-70"
+          className="absolute left-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity hover:opacity-100 opacity-75 cursor-pointer"
         >
           <FaChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
         </button>
@@ -154,8 +211,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
           type="button"
           onClick={() => scrollBySlide(1)}
           aria-label="Next section"
-          disabled={!canScrollRight}
-          className="absolute right-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity disabled:opacity-30 enabled:hover:opacity-100 enabled:opacity-70"
+          className="absolute right-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity hover:opacity-100 opacity-75 cursor-pointer"
         >
           <FaChevronRight className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
         </button>
@@ -165,18 +221,21 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
           className="overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="grid grid-flow-col auto-cols-[100%] gap-4 sm:gap-6">
-            {aboutSlides.map((slide, index) => (
-              <article
-                key={slide.id}
-                data-about-slide
-                className="snap-center snap-always rounded-[1.75rem] bg-background-light/80 dark:bg-background-dark/80 p-4 sm:p-6 lg:p-8 min-h-[30rem] sm:min-h-[34rem]"
-              >
+            {aboutSlides.map((slide, index) => {
+              const linksToRender = slide.links ?? defaultSlideLinks;
+
+              return (
+                <article
+                  key={slide.id}
+                  data-about-slide
+                  className="snap-center snap-always rounded-[1.75rem] bg-background-light/80 dark:bg-background-dark/80 p-4 sm:p-6 lg:p-8 min-h-[30rem] sm:min-h-[34rem]"
+                >
                 <div className="grid xl:grid-cols-2 gap-4 sm:gap-7 lg:gap-10 items-center h-full">
                   <div className="flex flex-col items-center order-2 xl:order-1">
                     {index === 0 ? (
                       <div className="relative">
                         <Image
-                          src={slide.imageSrc}
+                          src={slide.imageSrc ?? "/houston.jpeg"}
                           alt={slide.imageAlt}
                           width={352}
                           height={480}
@@ -205,7 +264,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                       <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-1.5 sm:mb-2.5 font-medium">
                         {slide.eyebrow}
                       </p>
-                      <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 text-foreground-light dark:text-foreground-dark leading-tight">
+                      <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-foreground-light dark:text-foreground-dark leading-[1.15]">
                         {index === 0 ? (
                           <>
                             Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -223,32 +282,28 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                       ))}
                     </div>
 
-                    <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600 mx-auto xl:mx-0"></div>
-                    <div className="flex gap-3 sm:gap-6 justify-center xl:justify-start">
-                      <IconLink
-                        href="mailto:anjie.zhou2003@gmail.com"
-                        aria-label="Email"
-                        icon={<FaEnvelope className="w-6 h-6" />}
-                      />
-                      <IconLink
-                        href="https://github.com/azhou2003"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="GitHub"
-                        icon={<FaGithub className="w-6 h-6" />}
-                      />
-                      <IconLink
-                        href="https://www.linkedin.com/in/anjiezhouhtx/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="LinkedIn"
-                        icon={<FaLinkedin className="w-6 h-6" />}
-                      />
-                    </div>
+                    {linksToRender.length > 0 && (
+                      <>
+                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600 mx-auto xl:mx-0"></div>
+                        <div className="flex gap-3 sm:gap-6 justify-center xl:justify-start">
+                          {linksToRender.map((link) => (
+                            <IconLink
+                              key={`${slide.id}-${link.label}-${link.href}`}
+                              href={link.href}
+                              target={link.external ? "_blank" : undefined}
+                              rel={link.external ? "noopener noreferrer" : undefined}
+                              aria-label={link.label}
+                              icon={iconByKey[link.icon]}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
       </div>
