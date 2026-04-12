@@ -29,6 +29,7 @@ export interface AboutSlide {
   title: string;
   imageAlt: string;
   imageSrc?: string;
+  imagePosition?: string;
   paragraphs: string[];
   links?: AboutSlideLink[];
 }

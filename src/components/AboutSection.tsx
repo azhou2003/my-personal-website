@@ -260,7 +260,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                           height={480}
                           quality={95}
                           sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover object-center rounded-3xl select-none"
+                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
+                          style={{ objectPosition: slide.imagePosition ?? "center" }}
                           draggable="false"
                         />
                         {index === 0 && (

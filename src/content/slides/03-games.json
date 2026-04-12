@@ -1,13 +1,13 @@
 {
   "id": "game",
   "eyebrow": "Games",
-  "title": "My Favorite Games",
-  "imageSrc": "/radahn.jpg",
-  "imageAlt": "Asian man with long hair reading on a kindle.",
+  "title": "Cross the Fog",
+  "imageSrc": "/frenzied-flame.png",
+  "imageAlt": "The Lord of Frenzied Flame ending scene from Elden Ring",
   "paragraphs": [
-    "There is a special place in my heart for FromSoft souls games. Each installment is an experiences that captures a unique feeling with their iconic atmosphere and sparse dialogue. You're often alone in a dying world, but it is strangely... peaceful.",
-    "Gameplay-wise, the mechanics respect the players ability to learn and adapt, while not going overboard (most of the time). ",
-    "If I feel strongly about a game, I may also write a blog post about it!"
+    "There is a special place in my heart for FromSoft games.",
+    "You're often alone in a dying world, but it is strangely... peaceful. Elden Ring, of course, was the Magnum Opus.",
+    "If I feel strongly about a game, I may write a blog post about it!"
   ],
   "links": [
     {

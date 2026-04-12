@@ -28,6 +28,7 @@ function isAboutSlide(value: unknown): value is AboutSlide {
     typeof candidate.title === "string" &&
     typeof candidate.imageAlt === "string" &&
     (candidate.imageSrc === undefined || typeof candidate.imageSrc === "string") &&
+    (candidate.imagePosition === undefined || typeof candidate.imagePosition === "string") &&
     Array.isArray(candidate.paragraphs) &&
     candidate.paragraphs.every((paragraph) => typeof paragraph === "string") &&
     (candidate.links === undefined ||
