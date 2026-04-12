@@ -270,24 +270,24 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
                   ref={(node) => {
                     titleRowRefs.current[post.slug] = node;
                   }}
-                  className="px-4 pt-3 pb-3"
+                  className="px-4 pt-3 pb-2"
                 >
                   <h2 className="text-xl font-bold font-sans text-foreground-light dark:text-foreground-dark leading-tight">
                     {post.title}
                   </h2>
+                  <span className="mt-0.5 block text-xs text-border-light dark:text-border-dark">
+                    {formatDate(post.date)}
+                  </span>
                 </div>
 
                 <div
-                  className={`px-4 pb-4 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  className={`px-4 pb-4 pt-2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                     isActiveOnMobile
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-2 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:group-focus-within:opacity-100 sm:group-focus-within:translate-y-0"
                   }`}
                 >
-                  <StaticTagList tags={post.tags} className="mb-1" />
-                  <span className="text-xs text-border-light dark:text-border-dark block">
-                    {formatDate(post.date)}
-                  </span>
+                  <StaticTagList tags={post.tags} className="mt-1 mb-1" />
                   <p className="text-sm text-foreground-light dark:text-foreground-dark line-clamp-3 mt-1">
                     {post.summary}
                   </p>

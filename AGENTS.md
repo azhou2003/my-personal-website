@@ -11,7 +11,7 @@ Personal website built with Next.js 15.3.3, featuring a markdown-powered blog an
 
 ## Content Structure
 **Blog posts**: `src/content/posts/*.md` (README incorrectly says `src/posts/`)
-**Portfolio projects**: `src/content/data/*.json` (README incorrectly says `src/data/`)
+**Portfolio projects**: `src/content/projects/*.json`
 
 Blog post frontmatter:
 ```yaml

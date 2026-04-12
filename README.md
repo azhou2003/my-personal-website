@@ -60,7 +60,7 @@ image: "/path/to/image.png"
 
 ### Portfolio projects
 
-Location: `src/content/data/*.json`
+Location: `src/content/projects/*.json`
 
 Shape:
 
@@ -84,7 +84,7 @@ Notes:
 - `src/app/` - route pages (home, blog, portfolio)
 - `src/components/` - reusable UI components
 - `src/content/posts/` - blog markdown files
-- `src/content/data/` - portfolio JSON files
+- `src/content/projects/` - portfolio JSON files
 - `src/lib/` - content loaders, metadata, utilities, shared types
 
 ## Deployment
