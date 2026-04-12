@@ -485,7 +485,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         <button
           type="button"
           onClick={() => setIsOrbitMenuOpen(false)}
-          className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-tab-border)] dark:border-[var(--color-tab-border-dark)] bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 cursor-pointer"
+          className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-tab-border)] dark:border-[var(--color-tab-border-dark)] bg-white/80 dark:bg-white/10 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px] dark:hover:bg-white/20 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
         >
           Close
         </button>
@@ -495,10 +495,10 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           type="button"
           onClick={() => setActivePlanetTab("earth")}
           aria-pressed={activePlanetTab === "earth"}
-          className={`text-xs py-2 rounded-full border transition-colors cursor-pointer ${
+          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
             activePlanetTab === "earth"
-              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25"
-              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
           }`}
         >
           Earth
@@ -507,10 +507,10 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           type="button"
           onClick={() => setActivePlanetTab("mars")}
           aria-pressed={activePlanetTab === "mars"}
-          className={`text-xs py-2 rounded-full border transition-colors cursor-pointer ${
+          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
             activePlanetTab === "mars"
-              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25"
-              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
           }`}
         >
           Mars
@@ -528,7 +528,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       <button
         type="button"
         onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
-        className="w-full text-xs py-2.5 rounded-xl border border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 hover:bg-accent-orange/40 dark:hover:bg-accent-orange/35 cursor-pointer"
+        className="w-full text-xs py-2.5 rounded-xl border border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-accent-orange/45 dark:hover:bg-accent-orange/35 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
       >
         Reset to Defaults
       </button>
