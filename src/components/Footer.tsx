@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="w-full border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark py-6 text-xs">
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-4 px-4 md:grid-cols-3">
-        <div className="order-2 md:order-1 flex h-full flex-col justify-center text-center md:text-left text-border-light dark:text-border-dark">
+        <div className="hidden md:order-1 md:flex md:h-full md:flex-col md:justify-center md:text-left text-border-light dark:text-border-dark">
           <p className="italic">&ldquo;{activeQuote.text}&rdquo;</p>
           {activeQuote.author && <p className="mt-1 opacity-80">- {activeQuote.author}</p>}
         </div>
@@ -142,7 +142,7 @@ const Footer: React.FC = () => {
           <span>© {new Date().getFullYear()} Anjie Zhou</span>
         </div>
 
-        <div className="order-3 md:order-3 flex h-full flex-col items-center justify-center gap-2 text-center md:items-end md:text-right text-border-light dark:text-border-dark">
+        <div className="hidden md:order-3 md:flex md:h-full md:flex-col md:items-end md:justify-center md:gap-2 md:text-right text-border-light dark:text-border-dark">
           <div className="space-y-0.5">
             <p>Austin, TX · {timeLabel || "--:--"}</p>
             <p className="inline-flex items-center gap-1.5">
