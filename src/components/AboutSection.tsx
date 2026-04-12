@@ -1,5 +1,5 @@
 import React from "react";
-import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGoodreadsG, FaPenNib, FaSteam } from "react-icons/fa";
 import Image from "next/image";
 import IconLink from "./IconLink";
 import type { AboutSlide, AboutSlideLink } from "../lib/types";
@@ -40,6 +40,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
     github: <FaGithub className="w-6 h-6" />,
     linkedin: <FaLinkedin className="w-6 h-6" />,
     external: <FaExternalLinkAlt className="w-5 h-5" />,
+    goodreads: <FaGoodreadsG className="w-6 h-6" />,
+    blog: <FaPenNib className="w-5 h-5" />,
+    steam: <FaSteam className="w-6 h-6" />,
   };
 
   const aboutSlides = slides;
@@ -230,20 +233,42 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                   data-about-slide
                   className="snap-center snap-always rounded-[1.75rem] bg-background-light/80 dark:bg-background-dark/80 p-4 sm:p-6 lg:p-8 min-h-[30rem] sm:min-h-[34rem]"
                 >
-                <div className="grid xl:grid-cols-2 gap-4 sm:gap-7 lg:gap-10 items-center h-full">
+                <div className="grid xl:grid-cols-2 gap-4 sm:gap-7 lg:gap-10 xl:items-center">
+                  <div className="order-1 xl:hidden text-center">
+                    <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-1.5 sm:mb-2.5 font-medium">
+                      {slide.eyebrow}
+                    </p>
+                    <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-foreground-light dark:text-foreground-dark leading-[1.15]">
+                      {index === 0 ? (
+                        <>
+                          Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
+                        </>
+                      ) : (
+                        slide.title
+                      )}
+                    </h2>
+                    <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-1 sm:mb-2 mx-auto"></div>
+                  </div>
+
                   <div className="flex flex-col items-center order-2 xl:order-1">
-                    {index === 0 ? (
+                    {slide.imageSrc ? (
                       <div className="relative">
                         <Image
-                          src={slide.imageSrc ?? "/houston.jpeg"}
+                          src={slide.imageSrc}
                           alt={slide.imageAlt}
                           width={352}
                           height={480}
-                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
+                          quality={95}
+                          sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
+                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover object-center rounded-3xl select-none"
                           draggable="false"
                         />
-                        <div className="absolute -top-1 sm:-top-4 -right-1 sm:-right-4 w-3 sm:w-8 h-3 sm:h-8 bg-accent-yellow rounded-full opacity-80"></div>
-                        <div className="absolute -bottom-1 sm:-bottom-4 -left-1 sm:-left-4 w-2.5 sm:w-6 h-2.5 sm:h-6 bg-accent-yellow/60 rounded-full"></div>
+                        {index === 0 && (
+                          <>
+                            <div className="absolute -top-1 sm:-top-4 -right-1 sm:-right-4 w-3 sm:w-8 h-3 sm:h-8 bg-accent-yellow rounded-full opacity-80"></div>
+                            <div className="absolute -bottom-1 sm:-bottom-4 -left-1 sm:-left-4 w-2.5 sm:w-6 h-2.5 sm:h-6 bg-accent-yellow/60 rounded-full"></div>
+                          </>
+                        )}
                       </div>
                     ) : (
                       <div className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
@@ -259,8 +284,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                     )}
                   </div>
 
-                  <div className="space-y-3 sm:space-y-7 order-1 xl:order-2 text-center xl:text-left">
-                    <div>
+                  <div className="space-y-3 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left">
+                    <div className="hidden xl:block">
                       <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-1.5 sm:mb-2.5 font-medium">
                         {slide.eyebrow}
                       </p>
@@ -273,7 +298,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
                           slide.title
                         )}
                       </h2>
-                      <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-6 mx-auto xl:mx-0"></div>
+                      <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                     </div>
 
                     <div className="space-y-2.5 sm:space-y-5 text-[0.9rem] sm:text-lg leading-[1.45] sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-xl mx-auto xl:mx-0">

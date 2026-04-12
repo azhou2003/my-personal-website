@@ -36,6 +36,6 @@ export interface AboutSlide {
 export interface AboutSlideLink {
   label: string;
   href: string;
-  icon: "email" | "github" | "linkedin" | "external";
+  icon: "email" | "github" | "linkedin" | "external" | "goodreads" | "blog" | "steam";
   external?: boolean;
 }

@@ -3,7 +3,7 @@ import path from "path";
 import { ABOUT_SLIDES_DIR } from "./contentPaths";
 import type { AboutSlide, AboutSlideLink } from "./types";
 
-const ABOUT_LINK_ICONS = ["email", "github", "linkedin", "external"] as const;
+const ABOUT_LINK_ICONS = ["email", "github", "linkedin", "external", "goodreads", "blog", "steam"] as const;
 
 function isAboutSlideLink(value: unknown): value is AboutSlideLink {
   if (!value || typeof value !== "object") return false;
