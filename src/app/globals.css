@@ -38,6 +38,7 @@
   --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(254, 250, 224, 0.97) 0%, rgba(247, 239, 213, 0.96) 100%);
   --color-blog-panel-border-tinted: rgba(122, 90, 54, 0.44);
   --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(58, 41, 24, 0.2);
+  --color-orbit-menu-bg: linear-gradient(170deg, rgba(254, 250, 224, 0.98) 0%, rgba(247, 239, 213, 0.98) 100%);
 }
 
 .dark {
@@ -69,6 +70,7 @@
   --color-blog-panel-bg-tinted: linear-gradient(180deg, rgba(51, 47, 43, 0.97) 0%, rgba(41, 37, 34, 0.96) 100%);
   --color-blog-panel-border-tinted: rgba(126, 113, 96, 0.72);
   --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(0, 0, 0, 0.42);
+  --color-orbit-menu-bg: linear-gradient(170deg, rgba(51, 47, 43, 0.98) 0%, rgba(41, 37, 34, 0.98) 100%);
 }
 
 body {

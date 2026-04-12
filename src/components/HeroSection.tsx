@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { ORBIT_ANIMATION } from "../lib/motion";
 
 // Type definitions
@@ -64,7 +65,6 @@ const ORBIT_CONTROL_FIELDS: OrbitControlField[] = [
   { key: "radiusMultiplierX", label: "Radius X", min: 0.4, max: 2.4, step: 0.01 },
   { key: "radiusMultiplierY", label: "Radius Y", min: 0.4, max: 2.4, step: 0.01 },
   { key: "speedMultiplier", label: "Speed", min: 0, max: 3, step: 0.01 },
-  { key: "baseAngle", label: "Base Angle", min: 0, max: 359, step: 1 },
 ];
 
 const getDefaultOrbitConfig = () => ({
@@ -179,11 +179,13 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const [isClient, setIsClient] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
+  const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
   const [isSunHovered, setIsSunHovered] = useState(false);
   const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
   // Initialize with default dimensions to prevent hydration mismatch
   const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
-  const orbitMenuRef = React.useRef<HTMLDivElement>(null);
+  const orbitMenuMobileRef = React.useRef<HTMLDivElement>(null);
+  const orbitMenuDesktopRef = React.useRef<HTMLDivElement>(null);
   const portraitButtonRef = React.useRef<HTMLButtonElement>(null);
 
   const updateOrbitSpec = useCallback((planet: "earth" | "mars", field: keyof OrbitSpec, value: number) => {
@@ -232,7 +234,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     if (!isOrbitMenuOpen) return;
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (orbitMenuRef.current?.contains(target) || portraitButtonRef.current?.contains(target)) {
+      if (
+        orbitMenuMobileRef.current?.contains(target) ||
+        orbitMenuDesktopRef.current?.contains(target) ||
+        portraitButtonRef.current?.contains(target)
+      ) {
         return;
       }
       setIsOrbitMenuOpen(false);
@@ -251,6 +257,24 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       window.removeEventListener("mousedown", handlePointerDown);
       window.removeEventListener("keydown", handleEscape);
     };
+  }, [isOrbitMenuOpen]);
+
+  useEffect(() => {
+    if (!isOrbitMenuOpen) return;
+    if (!window.matchMedia("(max-width: 639px)").matches) {
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOrbitMenuOpen]);
+
+  useEffect(() => {
+    if (isOrbitMenuOpen) {
+      setActivePlanetTab("earth");
+    }
   }, [isOrbitMenuOpen]);
 
   // Update orbit paths when dimensions change
@@ -360,17 +384,19 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     orbitConfig.mars.inclination
   );
   const renderOrbitControls = (planet: "earth" | "mars", label: string) => (
-    <div className="rounded-lg border border-black/10 dark:border-white/20 bg-black/[0.03] dark:bg-white/[0.04] p-3 space-y-2">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground-light/85 dark:text-foreground-dark/85">
+    <div className="rounded-2xl border border-black/10 dark:border-white/20 bg-[var(--color-card-muted-bg)] p-3 sm:p-4 space-y-2.5">
+      <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
         {label}
       </h4>
       {ORBIT_CONTROL_FIELDS.map((field) => {
         const value = orbitConfig[planet][field.key];
         return (
-          <label key={`${planet}-${field.key}`} className="block text-xs space-y-1">
+          <label key={`${planet}-${field.key}`} className="block text-xs space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <span>{field.label}</span>
-              <span className="font-mono text-[11px]">{value.toFixed(field.step < 1 ? 2 : 0)}</span>
+              <span className="text-foreground-light/85 dark:text-foreground-dark/85">{field.label}</span>
+              <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">
+                {value.toFixed(field.step < 1 ? 2 : 0)}
+              </span>
             </div>
             <input
               type="range"
@@ -379,12 +405,69 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
               step={field.step}
               value={value}
               onChange={(event) => updateOrbitSpec(planet, field.key, Number(event.target.value))}
-              className="w-full accent-[var(--color-link)]"
+              className="w-full accent-accent-orange cursor-pointer"
             />
           </label>
         );
       })}
     </div>
+  );
+
+  const renderOrbitMenuContent = () => (
+    <>
+      <div className="flex items-center justify-between gap-2 border-b border-black/10 dark:border-white/15 pb-2">
+        <h3 className="text-sm font-semibold tracking-wide">Orbit Controls</h3>
+        <button
+          type="button"
+          onClick={() => setIsOrbitMenuOpen(false)}
+          className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-tab-border)] dark:border-[var(--color-tab-border-dark)] bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 cursor-pointer"
+        >
+          Close
+        </button>
+      </div>
+      <div className="sm:hidden rounded-full border border-black/10 dark:border-white/20 p-1 grid grid-cols-2 gap-1 bg-[var(--color-card-muted-bg)]">
+        <button
+          type="button"
+          onClick={() => setActivePlanetTab("earth")}
+          aria-pressed={activePlanetTab === "earth"}
+          className={`text-xs py-2 rounded-full border transition-colors cursor-pointer ${
+            activePlanetTab === "earth"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10"
+          }`}
+        >
+          Earth
+        </button>
+        <button
+          type="button"
+          onClick={() => setActivePlanetTab("mars")}
+          aria-pressed={activePlanetTab === "mars"}
+          className={`text-xs py-2 rounded-full border transition-colors cursor-pointer ${
+            activePlanetTab === "mars"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10"
+          }`}
+        >
+          Mars
+        </button>
+      </div>
+      <div className="sm:hidden">
+        {activePlanetTab === "earth"
+          ? renderOrbitControls("earth", "Earth Orbit")
+          : renderOrbitControls("mars", "Mars Orbit")}
+      </div>
+      <div className="hidden sm:block space-y-3">
+        {renderOrbitControls("earth", "Earth Orbit")}
+        {renderOrbitControls("mars", "Mars Orbit")}
+      </div>
+      <button
+        type="button"
+        onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
+        className="w-full text-xs py-2.5 rounded-xl border border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 hover:bg-accent-orange/40 dark:hover:bg-accent-orange/35 cursor-pointer"
+      >
+        Reset to Defaults
+      </button>
+    </>
   );
   const renderPlanet = (pos: Position3D, planetTexture: string) => (
     <div
@@ -418,6 +501,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const portraitHeightScale = portraitHeight / dimensions.centralRadius;
   const portraitCutoffPercent =
     ((portraitHeightScale - 2 + PORTRAIT_CUTOFF * 2) / portraitHeightScale) * 100;
+  const clickHintBaseFontSize = Math.max(12, Math.min(18, dimensions.centralRadius * 0.14));
+  const clickHintHoverFontSize = Math.max(16, Math.min(22, dimensions.centralRadius * 0.17));
   const clickMeArcRadius = dimensions.centralRadius * 1.04;
   const clickMeArcBoxSize = Math.floor(clickMeArcRadius * 2 + dimensions.centralRadius * 0.9);
   const clickMeArcCenter = clickMeArcBoxSize / 2;
@@ -591,7 +676,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             style={{
               fill: "var(--color-hero-click-hint)",
               letterSpacing: "0.08em",
-              fontSize: isSunHovered ? "22px" : "18px",
+              fontSize: `${isSunHovered ? clickHintHoverFontSize : clickHintBaseFontSize}px`,
               transition: "font-size 180ms ease",
             }}
           >
@@ -601,30 +686,27 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           </text>
         </svg>
       </div>
+      {isClient && isOrbitMenuOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[120] p-3 overflow-y-auto bg-black/45 dark:bg-black/60 backdrop-blur-[2px] sm:hidden"
+        >
+          <div
+            ref={orbitMenuMobileRef}
+            className="mx-auto w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.28)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)] p-3 space-y-3"
+            style={{ background: "var(--color-orbit-menu-bg)" }}
+          >
+            {renderOrbitMenuContent()}
+          </div>
+        </div>,
+        document.body
+      )}
       {isOrbitMenuOpen && (
         <div
-          ref={orbitMenuRef}
-          className="absolute z-40 right-3 top-3 sm:right-5 sm:top-5 w-[min(22rem,calc(100vw-1.5rem))] max-h-[80vh] overflow-y-auto rounded-xl border border-black/10 dark:border-white/20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md shadow-2xl p-3 sm:p-4 space-y-3"
+          ref={orbitMenuDesktopRef}
+          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.22)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.38)] p-4 space-y-3"
+          style={{ background: "var(--color-orbit-menu-bg)" }}
         >
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold">Orbit Controls</h3>
-            <button
-              type="button"
-              onClick={() => setIsOrbitMenuOpen(false)}
-              className="text-xs px-2 py-1 rounded border border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10"
-            >
-              Close
-            </button>
-          </div>
-          {renderOrbitControls("earth", "Earth Orbit")}
-          {renderOrbitControls("mars", "Mars Orbit")}
-          <button
-            type="button"
-            onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
-            className="w-full text-xs py-2 rounded-md border border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10"
-          >
-            Reset to Defaults
-          </button>
+          {renderOrbitMenuContent()}
         </div>
       )}
       {isClient && earthOrbitFront && (
