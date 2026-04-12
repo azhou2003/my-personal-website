@@ -427,7 +427,9 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             const isLeft = idx % 2 === 0;
             const isActiveOnMobile = isMobile && activeMobileIndex === idx;
             const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
+            const isFocused = isActiveOnMobile || isActiveOnDesktop;
             const rowScale = timelineScaleByIndex[idx] ?? 1;
+            const focusedRowScale = isFocused ? rowScale * 1.04 : rowScale;
             const popupVisibilityClass = isActiveOnDesktop
               ? "opacity-100 scale-100 pointer-events-auto"
               : "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
@@ -444,14 +446,14 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                   }}
                   className="relative flex items-center min-h-[180px] group"
                   style={{
-                    transform: `scale(${rowScale})`,
+                    transform: `scale(${focusedRowScale})`,
                     transformOrigin: "center center",
                     transition: "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                 >
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
-                    <div className="w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
+                    <div className={`w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125 ${isFocused ? "scale-125" : ""}`} />
                   </div>
                   {/* Left side */}
                   <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
@@ -471,7 +473,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className="relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               <Image
                                 src={project.images[0] || "/file.svg"}
                                 alt={project.title}
@@ -507,7 +509,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className="relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               <Image
                                 src={project.images[0] || "/file.svg"}
                                 alt={project.title}

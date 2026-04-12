@@ -113,10 +113,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
 
           <div className="space-y-2.5 sm:space-y-5 text-[0.9rem] sm:text-lg leading-[1.45] sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-xl mx-auto xl:mx-0">
             <p>
-                I grew up in Houston, but currently I&apos;m a software engineer working in Austin.
+                I grew up in Houston, but I currently work as a software engineer in Austin.
             </p>
             <p>
-                When I&apos;m not being a couch potato, I enjoy bouldering, reading (fantasy, sci-fi at the moment), video games (arpgs are my favorite), and superhero media.
+                When I&apos;m not being a couch potato, I enjoy bouldering, reading (fantasy, sci-fi at the moment), video games (ARPGs are my favorite), and superhero media.
             </p>
           </div>
           <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600 mx-auto xl:mx-0"></div>
