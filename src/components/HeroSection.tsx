@@ -38,6 +38,7 @@ interface OrbitSpec {
   radiusMultiplierX: number;
   radiusMultiplierY: number;
   speedMultiplier: number;
+  rotationSpeed: number;
   baseAngle: number;
 }
 
@@ -57,6 +58,7 @@ const EARTH_ORBIT: OrbitSpec = {
   radiusMultiplierX: 1,
   radiusMultiplierY: 1,
   speedMultiplier: 1,
+  rotationSpeed: 1,
   baseAngle: 0,
 };
 
@@ -66,6 +68,7 @@ const MARS_ORBIT: OrbitSpec = {
   radiusMultiplierX: 1.32,
   radiusMultiplierY: 1.24,
   speedMultiplier: 1,
+  rotationSpeed: 1,
   baseAngle: 180,
 };
 
@@ -74,7 +77,8 @@ const ORBIT_CONTROL_FIELDS: OrbitControlField[] = [
   { key: "inclination", label: "Inclination", min: -90, max: 90, step: 1 },
   { key: "radiusMultiplierX", label: "Radius X", min: 0.4, max: 2.4, step: 0.01 },
   { key: "radiusMultiplierY", label: "Radius Y", min: 0.4, max: 2.4, step: 0.01 },
-  { key: "speedMultiplier", label: "Speed", min: 0, max: 3, step: 0.01 },
+  { key: "speedMultiplier", label: "Orbit Speed", min: 0, max: 3, step: 0.01 },
+  { key: "rotationSpeed", label: "Rotation Speed", min: 0, max: 3, step: 0.01 },
 ];
 
 const getDefaultOrbitConfig = () => ({
@@ -264,7 +268,8 @@ function buildOrbitRenderData(
 }
 
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
-  const [testAngle, setTestAngle] = useState(0);
+  const [earthAnimatedAngle, setEarthAnimatedAngle] = useState(0);
+  const [marsAnimatedAngle, setMarsAnimatedAngle] = useState(0);
   const [earthOrbitData, setEarthOrbitData] = useState<OrbitRenderData | null>(null);
   const [marsOrbitData, setMarsOrbitData] = useState<OrbitRenderData | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -408,11 +413,14 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
 
   useEffect(() => {
     if (!animateOrbit) return;
+
     const interval = setInterval(() => {
-      setTestAngle((prev) => (prev + 1) % 360);
+      setEarthAnimatedAngle((prev) => (prev + orbitConfig.earth.speedMultiplier) % 360);
+      setMarsAnimatedAngle((prev) => (prev + orbitConfig.mars.speedMultiplier) % 360);
     }, ORBIT_ANIMATION.tickMs);
+
     return () => clearInterval(interval);
-  }, [animateOrbit]);
+  }, [animateOrbit, orbitConfig.earth.speedMultiplier, orbitConfig.mars.speedMultiplier]);
 
   const earthRadiusX = Math.floor(dimensions.radiusX * orbitConfig.earth.radiusMultiplierX);
   const earthRadiusY = Math.floor(dimensions.radiusY * orbitConfig.earth.radiusMultiplierY);
@@ -428,10 +436,10 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const marsRadiusY = Math.floor(dimensions.radiusY * marsRadiusMultiplierY);
 
   const earthAngle = animateOrbit
-    ? (testAngle * orbitConfig.earth.speedMultiplier + orbitConfig.earth.baseAngle) % 360
+    ? (earthAnimatedAngle + orbitConfig.earth.baseAngle) % 360
     : orbitConfig.earth.baseAngle;
   const marsAngle = animateOrbit
-    ? (testAngle * orbitConfig.mars.speedMultiplier + orbitConfig.mars.baseAngle) % 360
+    ? (marsAnimatedAngle + orbitConfig.mars.baseAngle) % 360
     : orbitConfig.mars.baseAngle;
 
   const earthPos = getOrbit3DPosition(
@@ -536,7 +544,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       </button>
     </>
   );
-  const renderPlanet = (pos: Position3D, planetTexture: string) => (
+  const renderPlanet = (pos: Position3D, planetTexture: string, rotationSpeed: number) => (
     <div
       className="absolute"
       style={{
@@ -555,7 +563,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           backgroundSize: "300% 100%",
           backgroundPosition: "0% center",
           backgroundRepeat: "repeat-x",
-          animation: "earthSpin 8s linear infinite"
+          animation: rotationSpeed > 0 ? `earthSpin ${8 / rotationSpeed}s linear infinite` : "none"
         }}
       />
     </div>
@@ -639,11 +647,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       )}
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(earthPos, '/flat-cartoon-earth.jpg')}
+        {renderPlanet(earthPos, '/flat-cartoon-earth.jpg', orbitConfig.earth.rotationSpeed)}
       </div>
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(marsPos, '/flat-cartoon-mars.jpg')}
+        {renderPlanet(marsPos, '/flat-cartoon-mars.jpg', orbitConfig.mars.rotationSpeed)}
       </div>
       <div
         className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
