@@ -118,6 +118,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn }) =>
             <p>
                 When I&apos;m not being a couch potato, I enjoy bouldering, reading (fantasy, sci-fi at the moment), video games (ARPGs are my favorite), and superhero media.
             </p>
+            <p>
+                Feel free to explore my projects and blog.
+            </p>
           </div>
           <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600 mx-auto xl:mx-0"></div>
           <div className="space-y-2 sm:space-y-4">

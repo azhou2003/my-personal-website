@@ -22,6 +22,16 @@ interface OrbitDimensions {
   planetSize: number;
 }
 
+interface OrbitSegment {
+  points: string;
+  dashOffset: number;
+}
+
+interface OrbitRenderData {
+  front: OrbitSegment[];
+  back: OrbitSegment[];
+}
+
 interface OrbitSpec {
   rotation: number;
   inclination: number;
@@ -145,37 +155,116 @@ function getOrbit3DPosition(
   };
 }
 
-function generateOrbitPath(
-  startAngle: number, 
-  endAngle: number, 
+function buildOrbitRenderData(
   radiusX: number,
   radiusY: number,
   rotation: number,
   inclination: number,
-  steps: number = 100
-): string {
-  const points = [];
-  for (let i = 0; i <= steps; i++) {
-    const angle = startAngle + ((endAngle - startAngle) * i) / steps;
-    const pos = getOrbit3DPosition(
-      ORBIT_CENTER,
-      radiusX,
-      radiusY,
-      angle,
-      rotation,
-      inclination
+  steps: number = 260
+): OrbitRenderData {
+  type OrbitSide = "front" | "back";
+  type SegmentAccumulator = {
+    side: OrbitSide;
+    dashOffset: number;
+    points: Position2D[];
+  };
+
+  const sampledPoints: Position3D[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const angle = (360 * i) / steps;
+    sampledPoints.push(
+      getOrbit3DPosition(ORBIT_CENTER, radiusX, radiusY, angle, rotation, inclination)
     );
-    points.push(`${pos.x},${pos.y}`);
   }
-  return points.join(" ");
+
+  const segments: OrbitRenderData = { front: [], back: [] };
+  let activeSegment: SegmentAccumulator | null = null;
+  let travelledLength = 0;
+
+  const getSide = (z: number): OrbitSide => (z >= 0 ? "front" : "back");
+  const dist = (a: Position2D, b: Position2D) => Math.hypot(b.x - a.x, b.y - a.y);
+  const addPoint = (segment: SegmentAccumulator, point: Position2D) => {
+    const previousPoint = segment.points[segment.points.length - 1];
+    if (!previousPoint || previousPoint.x !== point.x || previousPoint.y !== point.y) {
+      segment.points.push(point);
+    }
+  };
+  const startSegment = (side: OrbitSide, startPoint: Position2D, dashOffset: number) => {
+    activeSegment = { side, dashOffset, points: [] };
+    addPoint(activeSegment, startPoint);
+  };
+  const closeSegment = () => {
+    if (!activeSegment || activeSegment.points.length < 2) {
+      activeSegment = null;
+      return;
+    }
+    segments[activeSegment.side].push({
+      points: activeSegment.points.map((point) => `${point.x},${point.y}`).join(" "),
+      dashOffset: -activeSegment.dashOffset,
+    });
+    activeSegment = null;
+  };
+
+  for (let i = 0; i < sampledPoints.length - 1; i += 1) {
+    const p1 = sampledPoints[i];
+    const p2 = sampledPoints[i + 1];
+    const side1 = getSide(p1.z);
+    const side2 = getSide(p2.z);
+    const point1 = { x: p1.x, y: p1.y };
+    const point2 = { x: p2.x, y: p2.y };
+
+    if (!activeSegment) {
+      startSegment(side1, point1, travelledLength);
+    }
+
+    if (side1 === side2) {
+      if (activeSegment?.side !== side1) {
+        closeSegment();
+        startSegment(side1, point1, travelledLength);
+      }
+      if (activeSegment) {
+        addPoint(activeSegment, point2);
+      }
+      travelledLength += dist(point1, point2);
+      continue;
+    }
+
+    const denominator = p1.z - p2.z;
+    const t = denominator === 0 ? 0.5 : p1.z / denominator;
+    const clampedT = clamp(t, 0, 1);
+    const crossingPoint = {
+      x: p1.x + (p2.x - p1.x) * clampedT,
+      y: p1.y + (p2.y - p1.y) * clampedT,
+    };
+
+    const firstLegLength = dist(point1, crossingPoint);
+    const secondLegLength = dist(crossingPoint, point2);
+
+    if (activeSegment?.side !== side1) {
+      closeSegment();
+      startSegment(side1, point1, travelledLength);
+    }
+    if (activeSegment) {
+      addPoint(activeSegment, crossingPoint);
+    }
+    closeSegment();
+
+    startSegment(side2, crossingPoint, travelledLength + firstLegLength);
+    if (activeSegment) {
+      addPoint(activeSegment, point2);
+    }
+
+    travelledLength += firstLegLength + secondLegLength;
+  }
+
+  closeSegment();
+  return segments;
 }
 
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
   const [testAngle, setTestAngle] = useState(0);
-  const [earthOrbitFront, setEarthOrbitFront] = useState<string>("");
-  const [earthOrbitBack, setEarthOrbitBack] = useState<string>("");
-  const [marsOrbitFront, setMarsOrbitFront] = useState<string>("");
-  const [marsOrbitBack, setMarsOrbitBack] = useState<string>("");
+  const [earthOrbitData, setEarthOrbitData] = useState<OrbitRenderData | null>(null);
+  const [marsOrbitData, setMarsOrbitData] = useState<OrbitRenderData | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
@@ -296,20 +385,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     const marsRadiusX = Math.floor(currentDims.radiusX * marsRadiusMultiplierX);
     const marsRadiusY = Math.floor(currentDims.radiusY * marsRadiusMultiplierY);
 
-    setEarthOrbitFront(
-      generateOrbitPath(
-        180,
-        360,
-        earthRadiusX,
-        earthRadiusY,
-        orbitConfig.earth.rotation,
-        orbitConfig.earth.inclination
-      )
-    );
-    setEarthOrbitBack(
-      generateOrbitPath(
-        0,
-        180,
+    setEarthOrbitData(
+      buildOrbitRenderData(
         earthRadiusX,
         earthRadiusY,
         orbitConfig.earth.rotation,
@@ -317,20 +394,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       )
     );
 
-    setMarsOrbitFront(
-      generateOrbitPath(
-        180,
-        360,
-        marsRadiusX,
-        marsRadiusY,
-        orbitConfig.mars.rotation,
-        orbitConfig.mars.inclination
-      )
-    );
-    setMarsOrbitBack(
-      generateOrbitPath(
-        0,
-        180,
+    setMarsOrbitData(
+      buildOrbitRenderData(
         marsRadiusX,
         marsRadiusY,
         orbitConfig.mars.rotation,
@@ -519,7 +584,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
       }`}
     >
-      {earthOrbitBack && (
+      {earthOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
           style={{
@@ -529,18 +594,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={earthOrbitBack}
-            fill="none"
-            stroke="var(--color-orbit-earth-back)"
-            strokeDasharray="2 7"
-            strokeLinecap="round"
-            strokeWidth="1.5"
-          />
+          {earthOrbitData.back.map((segment, index) => (
+            <polyline
+              key={`earth-back-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-earth-back)"
+              strokeDasharray="2 7"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.6"
+            />
+          ))}
         </svg>
       )}
 
-      {marsOrbitBack && (
+      {marsOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[1]"
           style={{
@@ -550,14 +619,18 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={marsOrbitBack}
-            fill="none"
-            stroke="var(--color-orbit-mars-back)"
-            strokeDasharray="3 8"
-            strokeLinecap="round"
-            strokeWidth="1.35"
-          />
+          {marsOrbitData.back.map((segment, index) => (
+            <polyline
+              key={`mars-back-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-mars-back)"
+              strokeDasharray="3 8"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.45"
+            />
+          ))}
         </svg>
       )}
 
@@ -709,7 +782,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           {renderOrbitMenuContent()}
         </div>
       )}
-      {isClient && earthOrbitFront && (
+      {isClient && earthOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
           style={{
@@ -719,18 +792,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={earthOrbitFront}
-            fill="none"
-            stroke="var(--color-orbit-earth-front)"
-            strokeDasharray="2 7"
-            strokeLinecap="round"
-            strokeWidth="1.7"
-          />
+          {earthOrbitData.front.map((segment, index) => (
+            <polyline
+              key={`earth-front-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-earth-front)"
+              strokeDasharray="2 7"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.6"
+            />
+          ))}
         </svg>
       )}
 
-      {isClient && marsOrbitFront && (
+      {isClient && marsOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[21]"
           style={{
@@ -740,14 +817,18 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={marsOrbitFront}
-            fill="none"
-            stroke="var(--color-orbit-mars-front)"
-            strokeDasharray="3 8"
-            strokeLinecap="round"
-            strokeWidth="1.55"
-          />
+          {marsOrbitData.front.map((segment, index) => (
+            <polyline
+              key={`mars-front-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-mars-front)"
+              strokeDasharray="3 8"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.45"
+            />
+          ))}
         </svg>
       )}
     </section>
