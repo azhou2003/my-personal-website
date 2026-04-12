@@ -33,6 +33,8 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const [timelineScaleByIndex, setTimelineScaleByIndex] = useState<Record<number, number>>({});
   const timelineRowRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const lastScrollYRef = useRef(0);
+  const snapResumeTimerRef = useRef<number | null>(null);
+  const wheelBurstRef = useRef({ lastTs: 0, accumulated: 0 });
   const isDarkMode = useIsDarkMode();
 
   const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
@@ -87,6 +89,73 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
     mediaQuery.addEventListener("change", updateMobileState);
     return () => mediaQuery.removeEventListener("change", updateMobileState);
   }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined" || typeof window === "undefined") return;
+
+    const root = document.documentElement;
+    const body = document.body;
+
+    const clearResumeTimer = () => {
+      if (snapResumeTimerRef.current === null) return;
+      window.clearTimeout(snapResumeTimerRef.current);
+      snapResumeTimerRef.current = null;
+    };
+
+    const disableSnapTemporarily = () => {
+      root.classList.add("portfolio-scroll-snap-disabled");
+      body.classList.add("portfolio-scroll-snap-disabled");
+
+      clearResumeTimer();
+      snapResumeTimerRef.current = window.setTimeout(() => {
+        root.classList.remove("portfolio-scroll-snap-disabled");
+        body.classList.remove("portfolio-scroll-snap-disabled");
+        wheelBurstRef.current.accumulated = 0;
+        snapResumeTimerRef.current = null;
+      }, 320);
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      const now = window.performance.now();
+      const absDelta = Math.abs(event.deltaY);
+
+      if (now - wheelBurstRef.current.lastTs > 120) {
+        wheelBurstRef.current.accumulated = absDelta;
+      } else {
+        wheelBurstRef.current.accumulated += absDelta;
+      }
+      wheelBurstRef.current.lastTs = now;
+
+      if (absDelta >= 90 || wheelBurstRef.current.accumulated >= 180) {
+        disableSnapTemporarily();
+      }
+    };
+
+    if (isMobile) {
+      root.classList.remove("portfolio-scroll-snap");
+      body.classList.remove("portfolio-scroll-snap");
+      root.classList.remove("portfolio-scroll-snap-disabled");
+      body.classList.remove("portfolio-scroll-snap-disabled");
+      clearResumeTimer();
+      wheelBurstRef.current.accumulated = 0;
+      return;
+    }
+
+    root.classList.add("portfolio-scroll-snap");
+    body.classList.add("portfolio-scroll-snap");
+    root.classList.remove("portfolio-scroll-snap-disabled");
+    body.classList.remove("portfolio-scroll-snap-disabled");
+    window.addEventListener("wheel", handleWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      clearResumeTimer();
+      root.classList.remove("portfolio-scroll-snap");
+      body.classList.remove("portfolio-scroll-snap");
+      root.classList.remove("portfolio-scroll-snap-disabled");
+      body.classList.remove("portfolio-scroll-snap-disabled");
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -345,7 +414,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                   ref={(node) => {
                     timelineRowRefs.current[idx] = node;
                   }}
-                  className="relative flex items-center min-h-[180px] group"
+                  className="relative flex items-center min-h-[180px] group snap-center"
                   style={{
                     transform: `scale(${rowScale})`,
                     transformOrigin: "center center",

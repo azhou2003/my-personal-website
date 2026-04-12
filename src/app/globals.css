@@ -193,6 +193,18 @@ html, body {
   scroll-behavior: smooth;
 }
 
+@media (min-width: 640px) {
+  html.portfolio-scroll-snap,
+  body.portfolio-scroll-snap {
+    scroll-snap-type: y proximity;
+  }
+
+  html.portfolio-scroll-snap-disabled,
+  body.portfolio-scroll-snap-disabled {
+    scroll-snap-type: none;
+  }
+}
+
 /* Improve touch targets for mobile */
 @media (max-width: 768px) {
   button, a {
