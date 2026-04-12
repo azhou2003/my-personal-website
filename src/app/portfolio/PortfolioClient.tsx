@@ -33,7 +33,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const [timelineScaleByIndex, setTimelineScaleByIndex] = useState<Record<number, number>>({});
   const timelineRowRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const lastScrollYRef = useRef(0);
-  const snapResumeTimerRef = useRef<number | null>(null);
+  const lastSnapAtRef = useRef(0);
   const wheelBurstRef = useRef({ lastTs: 0, accumulated: 0 });
   const isDarkMode = useIsDarkMode();
 
@@ -93,69 +93,97 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   useEffect(() => {
     if (typeof document === "undefined" || typeof window === "undefined") return;
 
-    const root = document.documentElement;
-    const body = document.body;
-
-    const clearResumeTimer = () => {
-      if (snapResumeTimerRef.current === null) return;
-      window.clearTimeout(snapResumeTimerRef.current);
-      snapResumeTimerRef.current = null;
-    };
-
-    const disableSnapTemporarily = () => {
-      root.classList.add("portfolio-scroll-snap-disabled");
-      body.classList.add("portfolio-scroll-snap-disabled");
-
-      clearResumeTimer();
-      snapResumeTimerRef.current = window.setTimeout(() => {
-        root.classList.remove("portfolio-scroll-snap-disabled");
-        body.classList.remove("portfolio-scroll-snap-disabled");
-        wheelBurstRef.current.accumulated = 0;
-        snapResumeTimerRef.current = null;
-      }, 320);
-    };
-
-    const handleWheel = (event: WheelEvent) => {
-      const now = window.performance.now();
-      const absDelta = Math.abs(event.deltaY);
-
-      if (now - wheelBurstRef.current.lastTs > 120) {
-        wheelBurstRef.current.accumulated = absDelta;
-      } else {
-        wheelBurstRef.current.accumulated += absDelta;
-      }
-      wheelBurstRef.current.lastTs = now;
-
-      if (absDelta >= 90 || wheelBurstRef.current.accumulated >= 180) {
-        disableSnapTemporarily();
-      }
-    };
-
     if (isMobile) {
-      root.classList.remove("portfolio-scroll-snap");
-      body.classList.remove("portfolio-scroll-snap");
-      root.classList.remove("portfolio-scroll-snap-disabled");
-      body.classList.remove("portfolio-scroll-snap-disabled");
-      clearResumeTimer();
       wheelBurstRef.current.accumulated = 0;
       return;
     }
 
-    root.classList.add("portfolio-scroll-snap");
-    body.classList.add("portfolio-scroll-snap");
-    root.classList.remove("portfolio-scroll-snap-disabled");
-    body.classList.remove("portfolio-scroll-snap-disabled");
-    window.addEventListener("wheel", handleWheel, { passive: true });
+    const getClosestIndexToViewportCenter = () => {
+      const viewportCenterY = window.innerHeight / 2;
+      let closestIndex: number | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (let idx = 0; idx < filtered.length; idx += 1) {
+        const row = timelineRowRefs.current[idx];
+        if (!row) continue;
+
+        const rect = row.getBoundingClientRect();
+        const rowCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(rowCenterY - viewportCenterY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = idx;
+        }
+      }
+
+      return closestIndex;
+    };
+
+    const scrollToIndex = (targetIndex: number) => {
+      const targetRow = timelineRowRefs.current[targetIndex];
+      if (!targetRow) return;
+
+      const rect = targetRow.getBoundingClientRect();
+      const targetCenterY = window.scrollY + rect.top + rect.height / 2;
+      const targetTop = targetCenterY - window.innerHeight / 2;
+      const maxTop = document.documentElement.scrollHeight - window.innerHeight;
+      const clampedTop = Math.max(0, Math.min(targetTop, maxTop));
+
+      window.scrollTo({ top: clampedTop, behavior: "auto" });
+      setActiveDesktopIndex(targetIndex);
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) < 3) return;
+      event.preventDefault();
+
+      const now = window.performance.now();
+      if (now - wheelBurstRef.current.lastTs > 140) {
+        wheelBurstRef.current.accumulated = 0;
+      }
+      wheelBurstRef.current.lastTs = now;
+      wheelBurstRef.current.accumulated += event.deltaY;
+
+      let effectiveDelta = 0;
+      if (Math.abs(event.deltaY) >= 48) {
+        effectiveDelta = event.deltaY;
+        wheelBurstRef.current.accumulated = 0;
+      } else if (Math.abs(wheelBurstRef.current.accumulated) >= 48) {
+        effectiveDelta = wheelBurstRef.current.accumulated;
+        wheelBurstRef.current.accumulated = 0;
+      }
+
+      if (effectiveDelta === 0) return;
+      if (now - lastSnapAtRef.current < 65) return;
+      lastSnapAtRef.current = now;
+
+      const currentIndex = activeDesktopIndex ?? getClosestIndexToViewportCenter();
+      if (currentIndex === null) return;
+
+      const direction = effectiveDelta > 0 ? 1 : -1;
+      const strength = Math.abs(effectiveDelta);
+      let step = 1;
+      if (strength >= 520) {
+        step = 4;
+      } else if (strength >= 360) {
+        step = 3;
+      } else if (strength >= 220) {
+        step = 2;
+      }
+
+      const unclampedTarget = currentIndex + direction * step;
+      const targetIndex = Math.max(0, Math.min(unclampedTarget, filtered.length - 1));
+      if (targetIndex === currentIndex) return;
+
+      scrollToIndex(targetIndex);
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
-      clearResumeTimer();
-      root.classList.remove("portfolio-scroll-snap");
-      body.classList.remove("portfolio-scroll-snap");
-      root.classList.remove("portfolio-scroll-snap-disabled");
-      body.classList.remove("portfolio-scroll-snap-disabled");
     };
-  }, [isMobile]);
+  }, [isMobile, filtered, activeDesktopIndex]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -414,7 +442,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                   ref={(node) => {
                     timelineRowRefs.current[idx] = node;
                   }}
-                  className="relative flex items-center min-h-[180px] group snap-center"
+                  className="relative flex items-center min-h-[180px] group"
                   style={{
                     transform: `scale(${rowScale})`,
                     transformOrigin: "center center",
