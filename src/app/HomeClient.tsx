@@ -22,7 +22,6 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const [startOrbit, setStartOrbit] = useState(false);
   const [activeAboutSlideIndex, setActiveAboutSlideIndex] = useState(0);
 
-  const heroSectionRef = useRef<HTMLElement>(null);
   const aboutSectionRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +65,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
 
     const intervalId = window.setInterval(() => {
       setActiveAboutSlideIndex((prev) => (prev + 1) % aboutSlides.length);
-    }, 20000);
+    }, HOME_ANIMATION_TIMINGS.aboutPillRotateMs);
 
     return () => {
       window.clearInterval(intervalId);
@@ -221,9 +220,8 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
       </div>
       <main className="flex-1">
         {/* Hero section with integrated heading - takes full viewport minus navbar */}
-        <section
-          ref={heroSectionRef}
-          id="hero"
+          <section
+            id="hero"
           className={`w-full relative transition-all duration-800 ease-out h-[calc(100svh-72px)] min-h-[30rem] ${
             activeSection === "about"
               ? "opacity-0 -translate-y-10 pointer-events-none"

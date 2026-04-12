@@ -1,291 +1,62 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { ORBIT_ANIMATION } from "../lib/motion";
+import { buildOrbitRenderData, clamp, getOrbit3DPosition, getOrbitRadii } from "./hero-orbit/math";
+import {
+  ORBIT_CENTER,
+  ORBIT_CONTROL_FIELDS,
+  PORTRAIT_CUTOFF,
+  getDefaultOrbitConfig,
+  type OrbitSpec,
+  type Position3D,
+} from "./hero-orbit/types";
+import { useOrbitAnimation } from "./hero-orbit/useOrbitAnimation";
 
-// Type definitions
-interface Position3D {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface Position2D {
-  x: number;
-  y: number;
-}
-
-interface OrbitDimensions {
-  radiusX: number;
-  radiusY: number;
-  centralRadius: number;
-  planetSize: number;
-}
-
-interface OrbitSegment {
-  points: string;
-  dashOffset: number;
-}
-
-interface OrbitRenderData {
-  front: OrbitSegment[];
-  back: OrbitSegment[];
-}
-
-interface OrbitSpec {
-  rotation: number;
-  inclination: number;
-  radiusMultiplierX: number;
-  radiusMultiplierY: number;
-  speedMultiplier: number;
-  rotationSpeed: number;
-  baseAngle: number;
-}
-
-interface OrbitControlField {
-  key: keyof OrbitSpec;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-}
-
-const ORBIT_CENTER = { x: 0, y: 0 };
-
-const EARTH_ORBIT: OrbitSpec = {
-  rotation: 160,
-  inclination: -70,
-  radiusMultiplierX: 1,
-  radiusMultiplierY: 1,
-  speedMultiplier: 1,
-  rotationSpeed: 1,
-  baseAngle: 0,
-};
-
-const MARS_ORBIT: OrbitSpec = {
-  rotation: 160,
-  inclination: -70,
-  radiusMultiplierX: 1.32,
-  radiusMultiplierY: 1.24,
-  speedMultiplier: 1,
-  rotationSpeed: 1,
-  baseAngle: 180,
-};
-
-const ORBIT_CONTROL_FIELDS: OrbitControlField[] = [
-  { key: "rotation", label: "Rotation", min: -180, max: 180, step: 1 },
-  { key: "inclination", label: "Inclination", min: -90, max: 90, step: 1 },
-  { key: "radiusMultiplierX", label: "Radius X", min: 0.4, max: 2.4, step: 0.01 },
-  { key: "radiusMultiplierY", label: "Radius Y", min: 0.4, max: 2.4, step: 0.01 },
-  { key: "speedMultiplier", label: "Orbit Speed", min: 0, max: 3, step: 0.01 },
-  { key: "rotationSpeed", label: "Rotation Speed", min: 0, max: 3, step: 0.01 },
-];
-
-const getDefaultOrbitConfig = () => ({
-  earth: { ...EARTH_ORBIT },
-  mars: { ...MARS_ORBIT },
-});
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-const PORTRAIT_CUTOFF = 0.5;
-
-// Default dimensions for SSR
-const getDefaultOrbitDimensions = (): OrbitDimensions => ({
-  radiusX: 260,
-  radiusY: 260,
-  centralRadius: 142,
-  planetSize: 44,
-});
-
-// Responsive orbit dimensions based on viewport
-const getResponsiveOrbitDimensions = (): OrbitDimensions => {
-  if (typeof window === 'undefined') {
-    return getDefaultOrbitDimensions();
-  }
-  
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const minDimension = Math.min(vw, vh);
-  
-  let scale: number;
-  if (minDimension < 380) {
-    scale = 0.55;
-  } else if (minDimension < 480) {
-    scale = 0.66;
-  } else if (minDimension < 640) {
-    scale = 0.76;
-  } else if (minDimension < 768) {
-    scale = 0.82;
-  } else if (minDimension < 1024) {
-    scale = 0.96;
-  } else {
-    scale = Math.min(1.4, minDimension / 820);
-  }
-
-  return {
-    radiusX: Math.max(130, Math.floor(260 * scale)),
-    radiusY: Math.max(130, Math.floor(260 * scale)),
-    centralRadius: Math.max(86, Math.floor(142 * scale)),
-    planetSize: Math.max(28, Math.floor(44 * scale)),
-  };
-};
-
-function getOrbit3DPosition(
-  center: Position2D, 
-  rx: number, 
-  ry: number, 
-  angleDeg: number, 
-  thetaDeg: number, 
-  phiDeg: number
-): Position3D {  const angleRad = (angleDeg * Math.PI) / 180;
-  const thetaRad = (thetaDeg * Math.PI) / 180;
-  const phiRad = (phiDeg * Math.PI) / 180;
-
-  const x0 = rx * Math.cos(angleRad);
-  const y0 = ry * Math.sin(angleRad);
-  const z0 = 0;
-
-  const y1 = y0 * Math.cos(phiRad) - z0 * Math.sin(phiRad);
-  const z1 = y0 * Math.sin(phiRad) + z0 * Math.cos(phiRad);
-  const x1 = x0;
-
-  const xFinal = x1 * Math.cos(thetaRad) - y1 * Math.sin(thetaRad);
-  const yFinal = x1 * Math.sin(thetaRad) + y1 * Math.cos(thetaRad);
-
-  return {
-    x: center.x + xFinal,
-    y: center.y + yFinal,
-    z: z1,
-  };
-}
-
-function buildOrbitRenderData(
-  radiusX: number,
-  radiusY: number,
-  rotation: number,
-  inclination: number,
-  steps: number = 260
-): OrbitRenderData {
-  type OrbitSide = "front" | "back";
-  type SegmentAccumulator = {
-    side: OrbitSide;
-    dashOffset: number;
-    points: Position2D[];
-  };
-
-  const sampledPoints: Position3D[] = [];
-  for (let i = 0; i <= steps; i += 1) {
-    const angle = (360 * i) / steps;
-    sampledPoints.push(
-      getOrbit3DPosition(ORBIT_CENTER, radiusX, radiusY, angle, rotation, inclination)
-    );
-  }
-
-  const segments: OrbitRenderData = { front: [], back: [] };
-  let activeSegment: SegmentAccumulator | null = null;
-  let travelledLength = 0;
-
-  const getSide = (z: number): OrbitSide => (z >= 0 ? "front" : "back");
-  const dist = (a: Position2D, b: Position2D) => Math.hypot(b.x - a.x, b.y - a.y);
-  const addPoint = (segment: SegmentAccumulator, point: Position2D) => {
-    const previousPoint = segment.points[segment.points.length - 1];
-    if (!previousPoint || previousPoint.x !== point.x || previousPoint.y !== point.y) {
-      segment.points.push(point);
-    }
-  };
-  const getSegmentSide = (segment: SegmentAccumulator | null): OrbitSide | null =>
-    segment ? segment.side : null;
-  const startSegment = (side: OrbitSide, startPoint: Position2D, dashOffset: number) => {
-    activeSegment = { side, dashOffset, points: [] };
-    addPoint(activeSegment, startPoint);
-  };
-  const closeSegment = () => {
-    if (!activeSegment || activeSegment.points.length < 2) {
-      activeSegment = null;
-      return;
-    }
-    segments[activeSegment.side].push({
-      points: activeSegment.points.map((point) => `${point.x},${point.y}`).join(" "),
-      dashOffset: -activeSegment.dashOffset,
-    });
-    activeSegment = null;
-  };
-
-  for (let i = 0; i < sampledPoints.length - 1; i += 1) {
-    const p1 = sampledPoints[i];
-    const p2 = sampledPoints[i + 1];
-    const side1 = getSide(p1.z);
-    const side2 = getSide(p2.z);
-    const point1 = { x: p1.x, y: p1.y };
-    const point2 = { x: p2.x, y: p2.y };
-
-    if (!activeSegment) {
-      startSegment(side1, point1, travelledLength);
-    }
-
-    if (side1 === side2) {
-      if (getSegmentSide(activeSegment) !== side1) {
-        closeSegment();
-        startSegment(side1, point1, travelledLength);
-      }
-      if (activeSegment) {
-        addPoint(activeSegment, point2);
-      }
-      travelledLength += dist(point1, point2);
-      continue;
-    }
-
-    const denominator = p1.z - p2.z;
-    const t = denominator === 0 ? 0.5 : p1.z / denominator;
-    const clampedT = clamp(t, 0, 1);
-    const crossingPoint = {
-      x: p1.x + (p2.x - p1.x) * clampedT,
-      y: p1.y + (p2.y - p1.y) * clampedT,
-    };
-
-    const firstLegLength = dist(point1, crossingPoint);
-    const secondLegLength = dist(crossingPoint, point2);
-
-    if (getSegmentSide(activeSegment) !== side1) {
-      closeSegment();
-      startSegment(side1, point1, travelledLength);
-    }
-    if (activeSegment) {
-      addPoint(activeSegment, crossingPoint);
-    }
-    closeSegment();
-
-    startSegment(side2, crossingPoint, travelledLength + firstLegLength);
-    if (activeSegment) {
-      addPoint(activeSegment, point2);
-    }
-
-    travelledLength += firstLegLength + secondLegLength;
-  }
-
-  closeSegment();
-  return segments;
-}
+const ORBIT_CONTROL_FIELD_MAP = new Map(ORBIT_CONTROL_FIELDS.map((field) => [field.key, field] as const));
 
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
-  const [earthAnimatedAngle, setEarthAnimatedAngle] = useState(0);
-  const [marsAnimatedAngle, setMarsAnimatedAngle] = useState(0);
-  const [earthOrbitData, setEarthOrbitData] = useState<OrbitRenderData | null>(null);
-  const [marsOrbitData, setMarsOrbitData] = useState<OrbitRenderData | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const [isSceneReady, setIsSceneReady] = useState(false);
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
   const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
   const [isSunHovered, setIsSunHovered] = useState(false);
   const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
-  // Initialize with default dimensions to prevent hydration mismatch
-  const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
   const orbitMenuMobileRef = React.useRef<HTMLDivElement>(null);
   const orbitMenuDesktopRef = React.useRef<HTMLDivElement>(null);
   const portraitButtonRef = React.useRef<HTMLButtonElement>(null);
 
+  const { dimensions, isClient, isSceneReady, earthAngle, marsAngle } = useOrbitAnimation({
+    animateOrbit,
+    orbitConfig,
+  });
+
+  const { earthRadiusX, earthRadiusY, marsRadiusX, marsRadiusY } = useMemo(
+    () => getOrbitRadii(dimensions, orbitConfig),
+    [dimensions, orbitConfig]
+  );
+
+  const earthOrbitData = useMemo(
+    () =>
+      buildOrbitRenderData(
+        earthRadiusX,
+        earthRadiusY,
+        orbitConfig.earth.rotation,
+        orbitConfig.earth.inclination
+      ),
+    [earthRadiusX, earthRadiusY, orbitConfig.earth.rotation, orbitConfig.earth.inclination]
+  );
+
+  const marsOrbitData = useMemo(
+    () =>
+      buildOrbitRenderData(
+        marsRadiusX,
+        marsRadiusY,
+        orbitConfig.mars.rotation,
+        orbitConfig.mars.inclination
+      ),
+    [marsRadiusX, marsRadiusY, orbitConfig.mars.rotation, orbitConfig.mars.inclination]
+  );
+
   const updateOrbitSpec = useCallback((planet: "earth" | "mars", field: keyof OrbitSpec, value: number) => {
-    const fieldConfig = ORBIT_CONTROL_FIELDS.find((control) => control.key === field);
+    const fieldConfig = ORBIT_CONTROL_FIELD_MAP.get(field);
     if (!fieldConfig || Number.isNaN(value)) return;
     const nextValue = clamp(value, fieldConfig.min, fieldConfig.max);
     setOrbitConfig((prev) => ({
@@ -296,35 +67,6 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       },
     }));
   }, []);
-
-  // Update dimensions on resize
-  const updateDimensions = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      setDimensions(getResponsiveOrbitDimensions());
-    }
-  }, []);
-  useEffect(() => {
-    setIsClient(true);
-    setIsSceneReady(false);
-    // Set responsive dimensions after client hydration
-    updateDimensions();
-
-    let raf1 = 0;
-    let raf2 = 0;
-    raf1 = window.requestAnimationFrame(() => {
-      raf2 = window.requestAnimationFrame(() => {
-        setIsSceneReady(true);
-      });
-    });
-
-    // Add resize listener
-    window.addEventListener('resize', updateDimensions);
-    return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
-      window.removeEventListener('resize', updateDimensions);
-    };
-  }, [updateDimensions]);
 
   useEffect(() => {
     if (!isOrbitMenuOpen) return;
@@ -372,75 +114,6 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       setActivePlanetTab("earth");
     }
   }, [isOrbitMenuOpen]);
-
-  // Update orbit paths when dimensions change
-  useEffect(() => {
-    const defaultDims = getDefaultOrbitDimensions();
-    const currentDims = isClient ? dimensions : defaultDims;
-
-    const earthRadiusX = Math.floor(currentDims.radiusX * orbitConfig.earth.radiusMultiplierX);
-    const earthRadiusY = Math.floor(currentDims.radiusY * orbitConfig.earth.radiusMultiplierY);
-
-    const marsRadiusMultiplierX =
-      currentDims.centralRadius < 105
-        ? Math.max(1.2, orbitConfig.mars.radiusMultiplierX)
-        : orbitConfig.mars.radiusMultiplierX;
-    const marsRadiusMultiplierY =
-      currentDims.centralRadius < 105
-        ? Math.max(1.14, orbitConfig.mars.radiusMultiplierY)
-        : orbitConfig.mars.radiusMultiplierY;
-    const marsRadiusX = Math.floor(currentDims.radiusX * marsRadiusMultiplierX);
-    const marsRadiusY = Math.floor(currentDims.radiusY * marsRadiusMultiplierY);
-
-    setEarthOrbitData(
-      buildOrbitRenderData(
-        earthRadiusX,
-        earthRadiusY,
-        orbitConfig.earth.rotation,
-        orbitConfig.earth.inclination
-      )
-    );
-
-    setMarsOrbitData(
-      buildOrbitRenderData(
-        marsRadiusX,
-        marsRadiusY,
-        orbitConfig.mars.rotation,
-        orbitConfig.mars.inclination
-      )
-    );
-  }, [dimensions, isClient, orbitConfig]);
-
-  useEffect(() => {
-    if (!animateOrbit) return;
-
-    const interval = setInterval(() => {
-      setEarthAnimatedAngle((prev) => (prev + orbitConfig.earth.speedMultiplier) % 360);
-      setMarsAnimatedAngle((prev) => (prev + orbitConfig.mars.speedMultiplier) % 360);
-    }, ORBIT_ANIMATION.tickMs);
-
-    return () => clearInterval(interval);
-  }, [animateOrbit, orbitConfig.earth.speedMultiplier, orbitConfig.mars.speedMultiplier]);
-
-  const earthRadiusX = Math.floor(dimensions.radiusX * orbitConfig.earth.radiusMultiplierX);
-  const earthRadiusY = Math.floor(dimensions.radiusY * orbitConfig.earth.radiusMultiplierY);
-  const marsRadiusMultiplierX =
-    dimensions.centralRadius < 105
-      ? Math.max(1.2, orbitConfig.mars.radiusMultiplierX)
-      : orbitConfig.mars.radiusMultiplierX;
-  const marsRadiusMultiplierY =
-    dimensions.centralRadius < 105
-      ? Math.max(1.14, orbitConfig.mars.radiusMultiplierY)
-      : orbitConfig.mars.radiusMultiplierY;
-  const marsRadiusX = Math.floor(dimensions.radiusX * marsRadiusMultiplierX);
-  const marsRadiusY = Math.floor(dimensions.radiusY * marsRadiusMultiplierY);
-
-  const earthAngle = animateOrbit
-    ? (earthAnimatedAngle + orbitConfig.earth.baseAngle) % 360
-    : orbitConfig.earth.baseAngle;
-  const marsAngle = animateOrbit
-    ? (marsAnimatedAngle + orbitConfig.mars.baseAngle) % 360
-    : orbitConfig.mars.baseAngle;
 
   const earthPos = getOrbit3DPosition(
     ORBIT_CENTER,
@@ -596,7 +269,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
       }`}
     >
-      {earthOrbitData && (
+      {isClient && earthOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
           style={{
@@ -621,7 +294,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         </svg>
       )}
 
-      {marsOrbitData && (
+      {isClient && marsOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[1]"
           style={{
