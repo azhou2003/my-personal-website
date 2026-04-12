@@ -8,12 +8,22 @@ interface AboutSectionProps {
   isExpanded: boolean;
   animateIn?: boolean; // new prop for initial load animation
   slides?: AboutSlide[];
+  activeSlideIndex?: number;
+  onActiveSlideIndexChange?: (index: number) => void;
+  isActive?: boolean;
 }
 
-const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slides = [] }) => {  
+const AboutSection: React.FC<AboutSectionProps> = ({
+  isExpanded,
+  animateIn,
+  slides = [],
+  activeSlideIndex,
+  onActiveSlideIndexChange,
+  isActive = true,
+}) => {
   const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
   const scrollRef = React.useRef<HTMLDivElement>(null);
-  const [activeSlideIndex, setActiveSlideIndex] = React.useState(0);
+  const [internalActiveSlideIndex, setInternalActiveSlideIndex] = React.useState(0);
 
   const defaultSlideLinks: AboutSlideLink[] = [
     {
@@ -46,6 +56,25 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
   };
 
   const aboutSlides = slides;
+  const resolvedActiveSlideIndex = activeSlideIndex ?? internalActiveSlideIndex;
+
+  const setResolvedActiveSlideIndex = React.useCallback(
+    (nextIndex: number) => {
+      if (activeSlideIndex === undefined) {
+        setInternalActiveSlideIndex(nextIndex);
+      }
+      onActiveSlideIndexChange?.(nextIndex);
+    },
+    [activeSlideIndex, onActiveSlideIndexChange]
+  );
+
+  React.useEffect(() => {
+    if (aboutSlides.length === 0) return;
+    const clampedIndex = Math.max(0, Math.min(resolvedActiveSlideIndex, aboutSlides.length - 1));
+    if (clampedIndex !== resolvedActiveSlideIndex) {
+      setResolvedActiveSlideIndex(clampedIndex);
+    }
+  }, [aboutSlides.length, resolvedActiveSlideIndex, setResolvedActiveSlideIndex]);
 
   const getSlideMetrics = React.useCallback(() => {
     const scrollEl = scrollRef.current;
@@ -71,10 +100,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
     const snapDistance = metrics.slideWidth + metrics.gap;
     const rawIndex = Math.round(scrollEl.scrollLeft / snapDistance);
     const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, rawIndex));
-    setActiveSlideIndex(nextIndex);
-  }, [aboutSlides.length, getSlideMetrics]);
+    setResolvedActiveSlideIndex(nextIndex);
+  }, [aboutSlides.length, getSlideMetrics, setResolvedActiveSlideIndex]);
 
-  const scrollToSlide = React.useCallback((index: number) => {
+  const scrollToSlide = React.useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const scrollEl = scrollRef.current;
     const metrics = getSlideMetrics();
     if (!scrollEl || !metrics || aboutSlides.length === 0) return;
@@ -84,23 +113,25 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
 
     scrollEl.scrollTo({
       left: nextIndex * snapDistance,
-      behavior: "smooth",
+      behavior,
     });
   }, [aboutSlides.length, getSlideMetrics]);
 
   const scrollBySlide = React.useCallback((direction: -1 | 1) => {
     if (aboutSlides.length === 0) return;
 
-    setActiveSlideIndex((currentIndex) => {
-      const nextIndex =
-        direction === 1
-          ? (currentIndex + 1) % aboutSlides.length
-          : (currentIndex - 1 + aboutSlides.length) % aboutSlides.length;
+    const nextIndex =
+      direction === 1
+        ? (resolvedActiveSlideIndex + 1) % aboutSlides.length
+        : (resolvedActiveSlideIndex - 1 + aboutSlides.length) % aboutSlides.length;
 
-      scrollToSlide(nextIndex);
-      return nextIndex;
-    });
-  }, [aboutSlides.length, scrollToSlide]);
+    setResolvedActiveSlideIndex(nextIndex);
+    scrollToSlide(nextIndex);
+  }, [aboutSlides.length, resolvedActiveSlideIndex, scrollToSlide, setResolvedActiveSlideIndex]);
+
+  const activeSlide = aboutSlides[resolvedActiveSlideIndex];
+  const compactPillText = activeSlide?.pillText?.trim() || "Meet Anjie";
+  const compactLinksToRender = activeSlide?.links ?? defaultSlideLinks;
 
   React.useEffect(() => {
     if (!isExpanded && animateIn) {
@@ -113,7 +144,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
   }, [isExpanded, animateIn]);
 
   React.useEffect(() => {
-    if (!isExpanded) return;
+    if (!isExpanded || !isActive || activeSlideIndex !== undefined) return;
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
 
@@ -125,7 +156,37 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
       scrollEl.removeEventListener("scroll", updateActiveSlideIndex);
       window.removeEventListener("resize", updateActiveSlideIndex);
     };
-  }, [isExpanded, updateActiveSlideIndex]);
+  }, [isExpanded, isActive, activeSlideIndex, updateActiveSlideIndex]);
+
+  React.useEffect(() => {
+    if (!isExpanded || !isActive) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isTypingTarget =
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTypingTarget) return;
+
+      if (event.key === " " || event.key === "Spacebar" || event.key === "ArrowRight") {
+        event.preventDefault();
+        scrollBySlide(1);
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        scrollBySlide(-1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isExpanded, isActive, scrollBySlide]);
+
+  React.useEffect(() => {
+    if (!isExpanded || !isActive || activeSlideIndex === undefined || aboutSlides.length === 0) return;
+    scrollToSlide(activeSlideIndex, "auto");
+  }, [isExpanded, isActive, activeSlideIndex, aboutSlides.length, scrollToSlide]);
 
   if (!isExpanded) {
     return (
@@ -135,35 +196,24 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
         <div className="w-[min(92vw,23rem)] lg:w-[min(74vw,30rem)] bg-background-light/96 dark:bg-background-dark/96 border border-[var(--color-tab-border)] rounded-full px-3.5 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 shadow-[0_8px_22px_rgba(43,34,24,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.34)] backdrop-blur-[2px]">
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-1.5 sm:gap-3 lg:gap-4">
             <div className="flex gap-1 sm:gap-2.5 lg:gap-3 flex-shrink-0">
-              <IconLink
-                href="mailto:anjie.zhou2003@gmail.com"
-                aria-label="Email"
-                className="scale-95 sm:scale-100"
-                icon={<FaEnvelope className="w-[1.35rem] h-[1.35rem] lg:w-[1.5rem] lg:h-[1.5rem]" />}
-              />
-              <IconLink
-                href="https://github.com/azhou2003"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                className="scale-95 sm:scale-100"
-                icon={<FaGithub className="w-[1.35rem] h-[1.35rem] lg:w-[1.5rem] lg:h-[1.5rem]" />}
-              />
-              <IconLink
-                href="https://www.linkedin.com/in/anjiezhouhtx/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="scale-95 sm:scale-100"
-                icon={<FaLinkedin className="w-[1.35rem] h-[1.35rem] lg:w-[1.5rem] lg:h-[1.5rem]" />}
-              />
+              {compactLinksToRender.map((link) => (
+                <IconLink
+                  key={`${link.label}-${link.href}`}
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
+                  aria-label={link.label}
+                  className="scale-95 sm:scale-100"
+                  icon={iconByKey[link.icon]}
+                />
+              ))}
             </div>
             <div className="flex-1 min-w-0 text-center leading-none">
               <p className="text-[0.58rem] sm:text-[0.63rem] lg:text-[0.7rem] uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-0.5 font-medium">
                 Scroll To
               </p>
               <h3 className="text-[0.95rem] sm:text-[1.05rem] lg:text-[1.18rem] font-semibold tracking-[0.015em] text-foreground-light dark:text-foreground-dark whitespace-nowrap">
-                Meet Anjie
+                {compactPillText}
               </h3>
             </div>
             <div className="text-foreground-light dark:text-foreground-dark text-[1.05rem] sm:text-[1.2rem] lg:text-[1.35rem] font-bold drop-shadow-sm animate-bounce-slow [animation-duration:3.1s] sm:[animation-duration:2.4s] flex-shrink-0">
@@ -201,7 +251,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isExpanded, animateIn, slid
         }
       `}</style>
 
-      <div className="relative px-5 sm:px-8" data-active-slide={activeSlideIndex}>
+      <div className="relative px-5 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
         <button
           type="button"
           onClick={() => scrollBySlide(-1)}

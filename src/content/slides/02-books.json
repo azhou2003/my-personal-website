@@ -2,6 +2,7 @@
   "id": "read",
   "eyebrow": "Books",
   "title": "Rec a Read!",
+  "pillText": "Rec a Read!",
   "imageSrc": "/lofi-reading-kindle.png",
   "imageAlt": "Asian man with long hair reading on a kindle.",
   "paragraphs": [

@@ -1,7 +1,8 @@
 {
   "id": "game",
   "eyebrow": "Games",
-  "title": "Cross the Fog",
+  "title": "The Lands Between",
+  "pillText": "Cross the Fog",
   "imageSrc": "/frenzied-flame.png",
   "imageAlt": "The Lord of Frenzied Flame ending scene from Elden Ring",
   "paragraphs": [

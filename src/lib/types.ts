@@ -27,6 +27,7 @@ export interface AboutSlide {
   id: string;
   eyebrow: string;
   title: string;
+  pillText?: string;
   imageAlt: string;
   imageSrc?: string;
   imagePosition?: string;

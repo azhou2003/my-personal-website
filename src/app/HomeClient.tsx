@@ -20,6 +20,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showToMyWorld, setShowToMyWorld] = useState(false);
   const [startOrbit, setStartOrbit] = useState(false);
+  const [activeAboutSlideIndex, setActiveAboutSlideIndex] = useState(0);
 
   const heroSectionRef = useRef<HTMLElement>(null);
   const aboutSectionRef = useRef<HTMLDivElement>(null);
@@ -59,6 +60,18 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   useEffect(() => {
     activeSectionRef.current = activeSection;
   }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection !== "hero" || aboutSlides.length === 0) return;
+
+    const intervalId = window.setInterval(() => {
+      setActiveAboutSlideIndex((prev) => (prev + 1) % aboutSlides.length);
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [activeSection, aboutSlides.length]);
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
@@ -231,7 +244,13 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
           }`}
           style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
         >
-          <AboutSection isExpanded={false} animateIn={true} />
+          <AboutSection
+            isExpanded={false}
+            animateIn={true}
+            slides={aboutSlides}
+            activeSlideIndex={activeAboutSlideIndex}
+            isActive={activeSection === "hero"}
+          />
         </div>
 
         {/* About Me Expanded Section - Shows on scroll */}
@@ -241,7 +260,13 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
             activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
           }`}
         >
-          <AboutSection isExpanded={true} slides={aboutSlides} />
+          <AboutSection
+            isExpanded={true}
+            slides={aboutSlides}
+            activeSlideIndex={activeAboutSlideIndex}
+            onActiveSlideIndexChange={setActiveAboutSlideIndex}
+            isActive={activeSection === "about"}
+          />
         </section>
 
         <footer

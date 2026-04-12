@@ -26,6 +26,7 @@ function isAboutSlide(value: unknown): value is AboutSlide {
     typeof candidate.id === "string" &&
     typeof candidate.eyebrow === "string" &&
     typeof candidate.title === "string" &&
+    (candidate.pillText === undefined || typeof candidate.pillText === "string") &&
     typeof candidate.imageAlt === "string" &&
     (candidate.imageSrc === undefined || typeof candidate.imageSrc === "string") &&
     (candidate.imagePosition === undefined || typeof candidate.imagePosition === "string") &&
