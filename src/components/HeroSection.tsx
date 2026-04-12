@@ -553,6 +553,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           height: `${dimensions.planetSize}px`,
           backgroundImage: `url('${planetTexture}')`,
           backgroundSize: "300% 100%",
+          backgroundPosition: "0% center",
+          backgroundRepeat: "repeat-x",
           animation: "earthSpin 8s linear infinite"
         }}
       />
