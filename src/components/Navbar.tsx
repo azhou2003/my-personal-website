@@ -31,19 +31,41 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    let lastY = window.scrollY;
+    let lastY = Math.max(window.scrollY, 0);
+    const minDelta = 8;
+    const showAtOrAboveY = 80;
+
     const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY < lastY) {
+      const currentY = Math.max(window.scrollY, 0);
+      const delta = currentY - lastY;
+
+      if (currentY <= showAtOrAboveY) {
         setShow(true);
-      } else if (currentY > lastY) {
+        lastY = currentY;
+        return;
+      }
+
+      if (Math.abs(delta) < minDelta) {
+        return;
+      }
+
+      if (delta < 0) {
+        setShow(true);
+      } else {
         setShow(false);
       }
+
       lastY = currentY;
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    setShow(true);
+  }, [pathname]);
+
   return (
     <nav
       className={`w-full px-4 sm:px-6 py-2.5 sm:py-4 bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark shadow-md z-50 transition-transform duration-300 ${show ? "translate-y-0" : "-translate-y-full"}`}
