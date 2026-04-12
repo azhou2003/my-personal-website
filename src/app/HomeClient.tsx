@@ -66,7 +66,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
 
     const intervalId = window.setInterval(() => {
       setActiveAboutSlideIndex((prev) => (prev + 1) % aboutSlides.length);
-    }, 10000);
+    }, 20000);
 
     return () => {
       window.clearInterval(intervalId);
