@@ -21,6 +21,7 @@ export default function HomeClient() {
   const footerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
+  const activeSectionRef = useRef<"hero" | "about">("hero");
   const touchStartYRef = useRef<number | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
@@ -45,10 +46,14 @@ export default function HomeClient() {
 
       window.setTimeout(() => {
         isSnappingRef.current = false;
-      }, 550);
+      }, 420);
     },
     [getTargetTop]
   );
+
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
@@ -103,11 +108,22 @@ export default function HomeClient() {
     };
 
     const handleWheel = (event: WheelEvent) => {
-      if (isSnappingRef.current || Math.abs(event.deltaY) < 12) return;
-      if (event.deltaY > 0 && activeSection === "hero") {
+      if (Math.abs(event.deltaY) < 6) return;
+
+      if (isSnappingRef.current) {
+        event.preventDefault();
+        return;
+      }
+
+      const aboutEl = aboutSectionRef.current;
+      if (!aboutEl) return;
+      const aboutTop = getTargetTop(aboutEl);
+      const currentTop = scrollRoot.scrollTop;
+
+      if (event.deltaY > 0 && activeSectionRef.current === "hero") {
         event.preventDefault();
         snapToSection("about");
-      } else if (event.deltaY < 0 && activeSection === "about") {
+      } else if (event.deltaY < 0 && activeSectionRef.current === "about" && currentTop <= aboutTop + 96) {
         event.preventDefault();
         snapToSection("hero");
       }
@@ -128,10 +144,16 @@ export default function HomeClient() {
       touchStartYRef.current = null;
       touchStartXRef.current = null;
 
-      if (Math.abs(deltaY) < 28 || Math.abs(deltaY) < Math.abs(deltaX)) return;
-      if (deltaY > 0 && activeSection === "hero") {
+      if (Math.abs(deltaY) < 18 || Math.abs(deltaY) < Math.abs(deltaX)) return;
+
+      const aboutEl = aboutSectionRef.current;
+      if (!aboutEl) return;
+      const aboutTop = getTargetTop(aboutEl);
+      const currentTop = scrollRoot.scrollTop;
+
+      if (deltaY > 0 && activeSectionRef.current === "hero") {
         snapToSection("about");
-      } else if (deltaY < 0 && activeSection === "about") {
+      } else if (deltaY < 0 && activeSectionRef.current === "about" && currentTop <= aboutTop + 96) {
         snapToSection("hero");
       }
     };
@@ -151,7 +173,7 @@ export default function HomeClient() {
       scrollRoot.removeEventListener("touchstart", handleTouchStart);
       scrollRoot.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [activeSection, getTargetTop, snapToSection]);
+  }, [getTargetTop, snapToSection]);
 
   // Staggered text animation on mount
   useEffect(() => {
