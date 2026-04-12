@@ -227,6 +227,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
+      <p className="section-kicker text-center mb-2">My Portfolio</p>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
         <span>From </span>
         <span className="relative inline-block">

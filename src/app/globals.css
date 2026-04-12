@@ -159,6 +159,13 @@ body.dark input[type="text"] {
   animation: bounce-slow 2s ease-in-out infinite;
 }
 
+.section-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  color: var(--color-hero-kicker);
+}
+
 /* Responsive text scaling */
 @media (max-width: 640px) {
   .hero-title {
