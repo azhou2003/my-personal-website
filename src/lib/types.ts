@@ -17,3 +17,8 @@ export type PortfolioProject = {
   images: string[];
   link?: string;
 };
+
+export interface FooterQuote {
+  text: string;
+  author?: string;
+}
