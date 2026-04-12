@@ -189,6 +189,8 @@ function buildOrbitRenderData(
       segment.points.push(point);
     }
   };
+  const getSegmentSide = (segment: SegmentAccumulator | null): OrbitSide | null =>
+    segment ? segment.side : null;
   const startSegment = (side: OrbitSide, startPoint: Position2D, dashOffset: number) => {
     activeSegment = { side, dashOffset, points: [] };
     addPoint(activeSegment, startPoint);
@@ -218,7 +220,7 @@ function buildOrbitRenderData(
     }
 
     if (side1 === side2) {
-      if (activeSegment?.side !== side1) {
+      if (getSegmentSide(activeSegment) !== side1) {
         closeSegment();
         startSegment(side1, point1, travelledLength);
       }
@@ -240,7 +242,7 @@ function buildOrbitRenderData(
     const firstLegLength = dist(point1, crossingPoint);
     const secondLegLength = dist(crossingPoint, point2);
 
-    if (activeSegment?.side !== side1) {
+    if (getSegmentSide(activeSegment) !== side1) {
       closeSegment();
       startSegment(side1, point1, travelledLength);
     }
