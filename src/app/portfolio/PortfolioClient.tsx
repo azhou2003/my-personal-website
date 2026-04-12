@@ -33,6 +33,8 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const [timelineScaleByIndex, setTimelineScaleByIndex] = useState<Record<number, number>>({});
   const timelineRowRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const lastScrollYRef = useRef(0);
+  const lastSnapAtRef = useRef(0);
+  const wheelBurstRef = useRef({ lastTs: 0, accumulated: 0 });
   const isDarkMode = useIsDarkMode();
 
   const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
@@ -87,6 +89,101 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
     mediaQuery.addEventListener("change", updateMobileState);
     return () => mediaQuery.removeEventListener("change", updateMobileState);
   }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined" || typeof window === "undefined") return;
+
+    if (isMobile) {
+      wheelBurstRef.current.accumulated = 0;
+      return;
+    }
+
+    const getClosestIndexToViewportCenter = () => {
+      const viewportCenterY = window.innerHeight / 2;
+      let closestIndex: number | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (let idx = 0; idx < filtered.length; idx += 1) {
+        const row = timelineRowRefs.current[idx];
+        if (!row) continue;
+
+        const rect = row.getBoundingClientRect();
+        const rowCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(rowCenterY - viewportCenterY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = idx;
+        }
+      }
+
+      return closestIndex;
+    };
+
+    const scrollToIndex = (targetIndex: number) => {
+      const targetRow = timelineRowRefs.current[targetIndex];
+      if (!targetRow) return;
+
+      const rect = targetRow.getBoundingClientRect();
+      const targetCenterY = window.scrollY + rect.top + rect.height / 2;
+      const targetTop = targetCenterY - window.innerHeight / 2;
+      const maxTop = document.documentElement.scrollHeight - window.innerHeight;
+      const clampedTop = Math.max(0, Math.min(targetTop, maxTop));
+
+      window.scrollTo({ top: clampedTop, behavior: "auto" });
+      setActiveDesktopIndex(targetIndex);
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) < 3) return;
+
+      const now = window.performance.now();
+      if (now - wheelBurstRef.current.lastTs > 140) {
+        wheelBurstRef.current.accumulated = 0;
+      }
+      wheelBurstRef.current.lastTs = now;
+      wheelBurstRef.current.accumulated += event.deltaY;
+
+      let effectiveDelta = 0;
+      if (Math.abs(event.deltaY) >= 48) {
+        effectiveDelta = event.deltaY;
+        wheelBurstRef.current.accumulated = 0;
+      } else if (Math.abs(wheelBurstRef.current.accumulated) >= 48) {
+        effectiveDelta = wheelBurstRef.current.accumulated;
+        wheelBurstRef.current.accumulated = 0;
+      }
+
+      if (effectiveDelta === 0) return;
+      if (now - lastSnapAtRef.current < 65) return;
+      lastSnapAtRef.current = now;
+
+      const currentIndex = activeDesktopIndex ?? getClosestIndexToViewportCenter();
+      if (currentIndex === null) return;
+
+      const direction = effectiveDelta > 0 ? 1 : -1;
+      const strength = Math.abs(effectiveDelta);
+      let step = 1;
+      if (strength >= 520) {
+        step = 4;
+      } else if (strength >= 360) {
+        step = 3;
+      } else if (strength >= 220) {
+        step = 2;
+      }
+
+      const unclampedTarget = currentIndex + direction * step;
+      const targetIndex = Math.max(0, Math.min(unclampedTarget, filtered.length - 1));
+      if (targetIndex === currentIndex) return;
+
+      event.preventDefault();
+      scrollToIndex(targetIndex);
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, [isMobile, filtered, activeDesktopIndex]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -227,6 +324,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
+      <p className="section-kicker text-center mb-2">My Portfolio</p>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
         <span>From </span>
         <span className="relative inline-block">
@@ -319,7 +417,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
         {/* Full-height vertical timeline line */}
         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[var(--color-timeline-line)] -translate-x-1/2 z-0" style={{ minHeight: '100%' }} />
-        <div className="flex flex-col gap-24 w-full relative z-10">
+        <div className="flex flex-col gap-24 w-full relative z-10 pb-28 sm:pb-0">
           {filtered.length === 0 && (
             <div className="text-center text-border-light dark:text-border-dark">
               No projects found.
@@ -329,7 +427,9 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             const isLeft = idx % 2 === 0;
             const isActiveOnMobile = isMobile && activeMobileIndex === idx;
             const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
+            const isFocused = isActiveOnMobile || isActiveOnDesktop;
             const rowScale = timelineScaleByIndex[idx] ?? 1;
+            const focusedRowScale = isFocused ? rowScale * 1.04 : rowScale;
             const popupVisibilityClass = isActiveOnDesktop
               ? "opacity-100 scale-100 pointer-events-auto"
               : "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
@@ -346,14 +446,14 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                   }}
                   className="relative flex items-center min-h-[180px] group"
                   style={{
-                    transform: `scale(${rowScale})`,
+                    transform: `scale(${focusedRowScale})`,
                     transformOrigin: "center center",
                     transition: "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                 >
                   {/* Timeline node */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
-                    <div className="w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125" />
+                    <div className={`w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125 ${isFocused ? "scale-125" : ""}`} />
                   </div>
                   {/* Left side */}
                   <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
@@ -373,7 +473,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className="relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               <Image
                                 src={project.images[0] || "/file.svg"}
                                 alt={project.title}
@@ -409,7 +509,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className="relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10">
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               <Image
                                 src={project.images[0] || "/file.svg"}
                                 alt={project.title}

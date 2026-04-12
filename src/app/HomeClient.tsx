@@ -5,20 +5,55 @@ import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
 import AboutSection from "../components/AboutSection";
 import HomeHeroHeading from "../components/HomeHeroHeading";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HOME_ANIMATION_TIMINGS } from "../lib/motion";
 
 export default function HomeClient() {
-  const [isAboutVisible, setIsAboutVisible] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<"hero" | "about">("hero");
   const [showWelcome, setShowWelcome] = useState(false);
   const [showToMyWorld, setShowToMyWorld] = useState(false);
   const [startOrbit, setStartOrbit] = useState(false);
 
+  const heroSectionRef = useRef<HTMLElement>(null);
   const aboutSectionRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isSnappingRef = useRef(false);
+  const activeSectionRef = useRef<"hero" | "about">("hero");
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+
+  const getTargetTop = useCallback((element: HTMLElement) => {
+    const scrollRoot = scrollContainerRef.current;
+    if (!scrollRoot) return 0;
+    const rootRect = scrollRoot.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    return scrollRoot.scrollTop + (elementRect.top - rootRect.top);
+  }, []);
+
+  const snapToSection = useCallback(
+    (section: "hero" | "about") => {
+      const scrollRoot = scrollContainerRef.current;
+      const aboutEl = aboutSectionRef.current;
+      if (!scrollRoot || !aboutEl) return;
+
+      const targetTop = section === "hero" ? 0 : getTargetTop(aboutEl);
+      isSnappingRef.current = true;
+      setActiveSection(section);
+      scrollRoot.scrollTo({ top: targetTop, behavior: "smooth" });
+
+      window.setTimeout(() => {
+        isSnappingRef.current = false;
+      }, 420);
+    },
+    [getTargetTop]
+  );
+
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
@@ -43,18 +78,7 @@ export default function HomeClient() {
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
-    const isSmallViewport = window.innerHeight < 800;
-
-    const aboutObserver = new IntersectionObserver(
-      ([entry]) => {
-        setIsAboutVisible(entry.isIntersecting);
-      },
-      {
-        root: scrollRoot,
-        rootMargin: "0px",
-        threshold: isSmallViewport ? 0.3 : 0.5,
-      }
-    );
+    if (!scrollRoot) return;
 
     const footerObserver = new IntersectionObserver(
       ([entry]) => {
@@ -67,33 +91,89 @@ export default function HomeClient() {
       }
     );
 
-    const currentAboutRef = aboutSectionRef.current;
-    if (currentAboutRef) {
-      aboutObserver.observe(currentAboutRef);
-    }
-
     const currentFooterRef = footerRef.current;
     if (currentFooterRef) {
       footerObserver.observe(currentFooterRef);
     }
 
     const handleScroll = () => {
-      setIsScrolled((scrollRoot?.scrollTop ?? window.scrollY) > 50);
+      const currentTop = scrollRoot.scrollTop;
+      setIsScrolled(currentTop > 50);
+
+      const aboutEl = aboutSectionRef.current;
+      if (!aboutEl || isSnappingRef.current) return;
+      const aboutTop = getTargetTop(aboutEl);
+      const midpoint = aboutTop / 2;
+      setActiveSection(currentTop >= midpoint ? "about" : "hero");
     };
 
-    scrollRoot?.addEventListener("scroll", handleScroll, { passive: true });
+    const handleWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) < 6) return;
+
+      if (isSnappingRef.current) {
+        event.preventDefault();
+        return;
+      }
+
+      const aboutEl = aboutSectionRef.current;
+      if (!aboutEl) return;
+      const aboutTop = getTargetTop(aboutEl);
+      const currentTop = scrollRoot.scrollTop;
+
+      if (event.deltaY > 0 && activeSectionRef.current === "hero") {
+        event.preventDefault();
+        snapToSection("about");
+      } else if (event.deltaY < 0 && activeSectionRef.current === "about" && currentTop <= aboutTop + 96) {
+        event.preventDefault();
+        snapToSection("hero");
+      }
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      touchStartYRef.current = touch.clientY;
+      touchStartXRef.current = touch.clientX;
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (isSnappingRef.current || touchStartYRef.current === null || touchStartXRef.current === null) return;
+      const touch = event.changedTouches[0];
+      const deltaY = touchStartYRef.current - touch.clientY;
+      const deltaX = touchStartXRef.current - touch.clientX;
+
+      touchStartYRef.current = null;
+      touchStartXRef.current = null;
+
+      if (Math.abs(deltaY) < 18 || Math.abs(deltaY) < Math.abs(deltaX)) return;
+
+      const aboutEl = aboutSectionRef.current;
+      if (!aboutEl) return;
+      const aboutTop = getTargetTop(aboutEl);
+      const currentTop = scrollRoot.scrollTop;
+
+      if (deltaY > 0 && activeSectionRef.current === "hero") {
+        snapToSection("about");
+      } else if (deltaY < 0 && activeSectionRef.current === "about" && currentTop <= aboutTop + 96) {
+        snapToSection("hero");
+      }
+    };
+
+    scrollRoot.addEventListener("scroll", handleScroll, { passive: true });
+    scrollRoot.addEventListener("wheel", handleWheel, { passive: false });
+    scrollRoot.addEventListener("touchstart", handleTouchStart, { passive: true });
+    scrollRoot.addEventListener("touchend", handleTouchEnd, { passive: true });
     handleScroll();
 
     return () => {
-      if (currentAboutRef) {
-        aboutObserver.unobserve(currentAboutRef);
-      }
       if (currentFooterRef) {
         footerObserver.unobserve(currentFooterRef);
       }
-      scrollRoot?.removeEventListener("scroll", handleScroll);
+      scrollRoot.removeEventListener("scroll", handleScroll);
+      scrollRoot.removeEventListener("wheel", handleWheel);
+      scrollRoot.removeEventListener("touchstart", handleTouchStart);
+      scrollRoot.removeEventListener("touchend", handleTouchEnd);
     };
-  }, []);
+  }, [getTargetTop, snapToSection]);
 
   // Staggered text animation on mount
   useEffect(() => {
@@ -112,13 +192,22 @@ export default function HomeClient() {
       ref={scrollContainerRef}
       className="h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
     >
-      <Navbar />
+      <div
+        className={`transition-all duration-500 ease-out ${
+          activeSection === "hero"
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-full pointer-events-none"
+        }`}
+      >
+        <Navbar />
+      </div>
       <main className="flex-1">
         {/* Hero section with integrated heading - takes full viewport minus navbar */}
         <section
+          ref={heroSectionRef}
           id="hero"
           className={`w-full relative transition-all duration-800 ease-out h-[calc(100svh-72px)] min-h-[30rem] ${
-            isAboutVisible
+            activeSection === "about"
               ? "opacity-0 -translate-y-10 pointer-events-none"
               : "opacity-100 translate-y-0"
           }`}
@@ -131,7 +220,7 @@ export default function HomeClient() {
         {/* About Me Tab - Visible at bottom when not expanded */}
         <div
           className={`fixed bottom-0 left-0 right-0 z-10 transition-all duration-500 ${
-            isScrolled || isAboutVisible
+            isScrolled || activeSection === "about"
               ? "opacity-0 translate-y-full pointer-events-none"
               : "opacity-100 translate-y-0"
           }`}
@@ -144,7 +233,7 @@ export default function HomeClient() {
         <section
           ref={aboutSectionRef}
           className={`w-full flex items-center justify-center transition-all duration-900 max-[640px]:duration-700 ease-out min-h-[calc(100svh-72px)] ${
-            isAboutVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
+            activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
           }`}
         >
           <AboutSection isExpanded={true} />

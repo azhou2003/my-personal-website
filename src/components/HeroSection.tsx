@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { ORBIT_ANIMATION } from "../lib/motion";
 
 // Type definitions
@@ -21,6 +22,16 @@ interface OrbitDimensions {
   planetSize: number;
 }
 
+interface OrbitSegment {
+  points: string;
+  dashOffset: number;
+}
+
+interface OrbitRenderData {
+  front: OrbitSegment[];
+  back: OrbitSegment[];
+}
+
 interface OrbitSpec {
   rotation: number;
   inclination: number;
@@ -28,6 +39,14 @@ interface OrbitSpec {
   radiusMultiplierY: number;
   speedMultiplier: number;
   baseAngle: number;
+}
+
+interface OrbitControlField {
+  key: keyof OrbitSpec;
+  label: string;
+  min: number;
+  max: number;
+  step: number;
 }
 
 const ORBIT_CENTER = { x: 0, y: 0 };
@@ -49,6 +68,22 @@ const MARS_ORBIT: OrbitSpec = {
   speedMultiplier: 1,
   baseAngle: 180,
 };
+
+const ORBIT_CONTROL_FIELDS: OrbitControlField[] = [
+  { key: "rotation", label: "Rotation", min: -180, max: 180, step: 1 },
+  { key: "inclination", label: "Inclination", min: -90, max: 90, step: 1 },
+  { key: "radiusMultiplierX", label: "Radius X", min: 0.4, max: 2.4, step: 0.01 },
+  { key: "radiusMultiplierY", label: "Radius Y", min: 0.4, max: 2.4, step: 0.01 },
+  { key: "speedMultiplier", label: "Speed", min: 0, max: 3, step: 0.01 },
+];
+
+const getDefaultOrbitConfig = () => ({
+  earth: { ...EARTH_ORBIT },
+  mars: { ...MARS_ORBIT },
+});
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const PORTRAIT_CUTOFF = 0.5;
 
 // Default dimensions for SSR
 const getDefaultOrbitDimensions = (): OrbitDimensions => ({
@@ -120,41 +155,142 @@ function getOrbit3DPosition(
   };
 }
 
-function generateOrbitPath(
-  startAngle: number, 
-  endAngle: number, 
+function buildOrbitRenderData(
   radiusX: number,
   radiusY: number,
   rotation: number,
   inclination: number,
-  steps: number = 100
-): string {
-  const points = [];
-  for (let i = 0; i <= steps; i++) {
-    const angle = startAngle + ((endAngle - startAngle) * i) / steps;
-    const pos = getOrbit3DPosition(
-      ORBIT_CENTER,
-      radiusX,
-      radiusY,
-      angle,
-      rotation,
-      inclination
+  steps: number = 260
+): OrbitRenderData {
+  type OrbitSide = "front" | "back";
+  type SegmentAccumulator = {
+    side: OrbitSide;
+    dashOffset: number;
+    points: Position2D[];
+  };
+
+  const sampledPoints: Position3D[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const angle = (360 * i) / steps;
+    sampledPoints.push(
+      getOrbit3DPosition(ORBIT_CENTER, radiusX, radiusY, angle, rotation, inclination)
     );
-    points.push(`${pos.x},${pos.y}`);
   }
-  return points.join(" ");
+
+  const segments: OrbitRenderData = { front: [], back: [] };
+  let activeSegment: SegmentAccumulator | null = null;
+  let travelledLength = 0;
+
+  const getSide = (z: number): OrbitSide => (z >= 0 ? "front" : "back");
+  const dist = (a: Position2D, b: Position2D) => Math.hypot(b.x - a.x, b.y - a.y);
+  const addPoint = (segment: SegmentAccumulator, point: Position2D) => {
+    const previousPoint = segment.points[segment.points.length - 1];
+    if (!previousPoint || previousPoint.x !== point.x || previousPoint.y !== point.y) {
+      segment.points.push(point);
+    }
+  };
+  const getSegmentSide = (segment: SegmentAccumulator | null): OrbitSide | null =>
+    segment ? segment.side : null;
+  const startSegment = (side: OrbitSide, startPoint: Position2D, dashOffset: number) => {
+    activeSegment = { side, dashOffset, points: [] };
+    addPoint(activeSegment, startPoint);
+  };
+  const closeSegment = () => {
+    if (!activeSegment || activeSegment.points.length < 2) {
+      activeSegment = null;
+      return;
+    }
+    segments[activeSegment.side].push({
+      points: activeSegment.points.map((point) => `${point.x},${point.y}`).join(" "),
+      dashOffset: -activeSegment.dashOffset,
+    });
+    activeSegment = null;
+  };
+
+  for (let i = 0; i < sampledPoints.length - 1; i += 1) {
+    const p1 = sampledPoints[i];
+    const p2 = sampledPoints[i + 1];
+    const side1 = getSide(p1.z);
+    const side2 = getSide(p2.z);
+    const point1 = { x: p1.x, y: p1.y };
+    const point2 = { x: p2.x, y: p2.y };
+
+    if (!activeSegment) {
+      startSegment(side1, point1, travelledLength);
+    }
+
+    if (side1 === side2) {
+      if (getSegmentSide(activeSegment) !== side1) {
+        closeSegment();
+        startSegment(side1, point1, travelledLength);
+      }
+      if (activeSegment) {
+        addPoint(activeSegment, point2);
+      }
+      travelledLength += dist(point1, point2);
+      continue;
+    }
+
+    const denominator = p1.z - p2.z;
+    const t = denominator === 0 ? 0.5 : p1.z / denominator;
+    const clampedT = clamp(t, 0, 1);
+    const crossingPoint = {
+      x: p1.x + (p2.x - p1.x) * clampedT,
+      y: p1.y + (p2.y - p1.y) * clampedT,
+    };
+
+    const firstLegLength = dist(point1, crossingPoint);
+    const secondLegLength = dist(crossingPoint, point2);
+
+    if (getSegmentSide(activeSegment) !== side1) {
+      closeSegment();
+      startSegment(side1, point1, travelledLength);
+    }
+    if (activeSegment) {
+      addPoint(activeSegment, crossingPoint);
+    }
+    closeSegment();
+
+    startSegment(side2, crossingPoint, travelledLength + firstLegLength);
+    if (activeSegment) {
+      addPoint(activeSegment, point2);
+    }
+
+    travelledLength += firstLegLength + secondLegLength;
+  }
+
+  closeSegment();
+  return segments;
 }
 
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
   const [testAngle, setTestAngle] = useState(0);
-  const [earthOrbitFront, setEarthOrbitFront] = useState<string>("");
-  const [earthOrbitBack, setEarthOrbitBack] = useState<string>("");
-  const [marsOrbitFront, setMarsOrbitFront] = useState<string>("");
-  const [marsOrbitBack, setMarsOrbitBack] = useState<string>("");
+  const [earthOrbitData, setEarthOrbitData] = useState<OrbitRenderData | null>(null);
+  const [marsOrbitData, setMarsOrbitData] = useState<OrbitRenderData | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
+  const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
+  const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
+  const [isSunHovered, setIsSunHovered] = useState(false);
+  const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
   // Initialize with default dimensions to prevent hydration mismatch
   const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
+  const orbitMenuMobileRef = React.useRef<HTMLDivElement>(null);
+  const orbitMenuDesktopRef = React.useRef<HTMLDivElement>(null);
+  const portraitButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  const updateOrbitSpec = useCallback((planet: "earth" | "mars", field: keyof OrbitSpec, value: number) => {
+    const fieldConfig = ORBIT_CONTROL_FIELDS.find((control) => control.key === field);
+    if (!fieldConfig || Number.isNaN(value)) return;
+    const nextValue = clamp(value, fieldConfig.min, fieldConfig.max);
+    setOrbitConfig((prev) => ({
+      ...prev,
+      [planet]: {
+        ...prev[planet],
+        [field]: nextValue,
+      },
+    }));
+  }, []);
 
   // Update dimensions on resize
   const updateDimensions = useCallback(() => {
@@ -184,29 +320,91 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       window.removeEventListener('resize', updateDimensions);
     };
   }, [updateDimensions]);
+
+  useEffect(() => {
+    if (!isOrbitMenuOpen) return;
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        orbitMenuMobileRef.current?.contains(target) ||
+        orbitMenuDesktopRef.current?.contains(target) ||
+        portraitButtonRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setIsOrbitMenuOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOrbitMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOrbitMenuOpen]);
+
+  useEffect(() => {
+    if (!isOrbitMenuOpen) return;
+    if (!window.matchMedia("(max-width: 639px)").matches) {
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOrbitMenuOpen]);
+
+  useEffect(() => {
+    if (isOrbitMenuOpen) {
+      setActivePlanetTab("earth");
+    }
+  }, [isOrbitMenuOpen]);
+
   // Update orbit paths when dimensions change
   useEffect(() => {
     const defaultDims = getDefaultOrbitDimensions();
     const currentDims = isClient ? dimensions : defaultDims;
 
-    const marsMobileAdjust = currentDims.centralRadius < 105 ? 1.2 : MARS_ORBIT.radiusMultiplierX;
-    const marsRadiusX = Math.floor(currentDims.radiusX * marsMobileAdjust);
-    const marsRadiusY = Math.floor(currentDims.radiusY * (currentDims.centralRadius < 105 ? 1.14 : MARS_ORBIT.radiusMultiplierY));
+    const earthRadiusX = Math.floor(currentDims.radiusX * orbitConfig.earth.radiusMultiplierX);
+    const earthRadiusY = Math.floor(currentDims.radiusY * orbitConfig.earth.radiusMultiplierY);
 
-    setEarthOrbitFront(
-      generateOrbitPath(180, 360, currentDims.radiusX, currentDims.radiusY, EARTH_ORBIT.rotation, EARTH_ORBIT.inclination)
-    );
-    setEarthOrbitBack(
-      generateOrbitPath(0, 180, currentDims.radiusX, currentDims.radiusY, EARTH_ORBIT.rotation, EARTH_ORBIT.inclination)
+    const marsRadiusMultiplierX =
+      currentDims.centralRadius < 105
+        ? Math.max(1.2, orbitConfig.mars.radiusMultiplierX)
+        : orbitConfig.mars.radiusMultiplierX;
+    const marsRadiusMultiplierY =
+      currentDims.centralRadius < 105
+        ? Math.max(1.14, orbitConfig.mars.radiusMultiplierY)
+        : orbitConfig.mars.radiusMultiplierY;
+    const marsRadiusX = Math.floor(currentDims.radiusX * marsRadiusMultiplierX);
+    const marsRadiusY = Math.floor(currentDims.radiusY * marsRadiusMultiplierY);
+
+    setEarthOrbitData(
+      buildOrbitRenderData(
+        earthRadiusX,
+        earthRadiusY,
+        orbitConfig.earth.rotation,
+        orbitConfig.earth.inclination
+      )
     );
 
-    setMarsOrbitFront(
-      generateOrbitPath(180, 360, marsRadiusX, marsRadiusY, MARS_ORBIT.rotation, MARS_ORBIT.inclination)
+    setMarsOrbitData(
+      buildOrbitRenderData(
+        marsRadiusX,
+        marsRadiusY,
+        orbitConfig.mars.rotation,
+        orbitConfig.mars.inclination
+      )
     );
-    setMarsOrbitBack(
-      generateOrbitPath(0, 180, marsRadiusX, marsRadiusY, MARS_ORBIT.rotation, MARS_ORBIT.inclination)
-    );
-  }, [dimensions, isClient]);
+  }, [dimensions, isClient, orbitConfig]);
 
   useEffect(() => {
     if (!animateOrbit) return;
@@ -216,33 +414,127 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     return () => clearInterval(interval);
   }, [animateOrbit]);
 
-  const marsRadiusMultiplierX = dimensions.centralRadius < 105 ? 1.2 : MARS_ORBIT.radiusMultiplierX;
-  const marsRadiusMultiplierY = dimensions.centralRadius < 105 ? 1.14 : MARS_ORBIT.radiusMultiplierY;
+  const earthRadiusX = Math.floor(dimensions.radiusX * orbitConfig.earth.radiusMultiplierX);
+  const earthRadiusY = Math.floor(dimensions.radiusY * orbitConfig.earth.radiusMultiplierY);
+  const marsRadiusMultiplierX =
+    dimensions.centralRadius < 105
+      ? Math.max(1.2, orbitConfig.mars.radiusMultiplierX)
+      : orbitConfig.mars.radiusMultiplierX;
+  const marsRadiusMultiplierY =
+    dimensions.centralRadius < 105
+      ? Math.max(1.14, orbitConfig.mars.radiusMultiplierY)
+      : orbitConfig.mars.radiusMultiplierY;
   const marsRadiusX = Math.floor(dimensions.radiusX * marsRadiusMultiplierX);
   const marsRadiusY = Math.floor(dimensions.radiusY * marsRadiusMultiplierY);
 
   const earthAngle = animateOrbit
-    ? (testAngle * EARTH_ORBIT.speedMultiplier + EARTH_ORBIT.baseAngle) % 360
-    : EARTH_ORBIT.baseAngle;
+    ? (testAngle * orbitConfig.earth.speedMultiplier + orbitConfig.earth.baseAngle) % 360
+    : orbitConfig.earth.baseAngle;
   const marsAngle = animateOrbit
-    ? (testAngle * MARS_ORBIT.speedMultiplier + MARS_ORBIT.baseAngle) % 360
-    : MARS_ORBIT.baseAngle;
+    ? (testAngle * orbitConfig.mars.speedMultiplier + orbitConfig.mars.baseAngle) % 360
+    : orbitConfig.mars.baseAngle;
 
   const earthPos = getOrbit3DPosition(
     ORBIT_CENTER,
-    dimensions.radiusX,
-    dimensions.radiusY,
+    earthRadiusX,
+    earthRadiusY,
     earthAngle,
-    EARTH_ORBIT.rotation,
-    EARTH_ORBIT.inclination
+    orbitConfig.earth.rotation,
+    orbitConfig.earth.inclination
   );
   const marsPos = getOrbit3DPosition(
     ORBIT_CENTER,
     marsRadiusX,
     marsRadiusY,
     marsAngle,
-    MARS_ORBIT.rotation,
-    MARS_ORBIT.inclination
+    orbitConfig.mars.rotation,
+    orbitConfig.mars.inclination
+  );
+  const renderOrbitControls = (planet: "earth" | "mars", label: string) => (
+    <div className="rounded-2xl border border-black/10 dark:border-white/20 bg-[var(--color-card-muted-bg)] p-3 sm:p-4 space-y-2.5">
+      <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
+        {label}
+      </h4>
+      {ORBIT_CONTROL_FIELDS.map((field) => {
+        const value = orbitConfig[planet][field.key];
+        return (
+          <label key={`${planet}-${field.key}`} className="block text-xs space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-foreground-light/85 dark:text-foreground-dark/85">{field.label}</span>
+              <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">
+                {value.toFixed(field.step < 1 ? 2 : 0)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={field.min}
+              max={field.max}
+              step={field.step}
+              value={value}
+              onChange={(event) => updateOrbitSpec(planet, field.key, Number(event.target.value))}
+              className="w-full accent-accent-orange cursor-pointer"
+            />
+          </label>
+        );
+      })}
+    </div>
+  );
+
+  const renderOrbitMenuContent = () => (
+    <>
+      <div className="flex items-center justify-between gap-2 border-b border-black/10 dark:border-white/15 pb-2">
+        <h3 className="text-sm font-semibold tracking-wide">Orbit Controls</h3>
+        <button
+          type="button"
+          onClick={() => setIsOrbitMenuOpen(false)}
+          className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-tab-border)] dark:border-[var(--color-tab-border-dark)] bg-white/80 dark:bg-white/10 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px] dark:hover:bg-white/20 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+        >
+          Close
+        </button>
+      </div>
+      <div className="sm:hidden rounded-full border border-black/10 dark:border-white/20 p-1 grid grid-cols-2 gap-1 bg-[var(--color-card-muted-bg)]">
+        <button
+          type="button"
+          onClick={() => setActivePlanetTab("earth")}
+          aria-pressed={activePlanetTab === "earth"}
+          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+            activePlanetTab === "earth"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
+          }`}
+        >
+          Earth
+        </button>
+        <button
+          type="button"
+          onClick={() => setActivePlanetTab("mars")}
+          aria-pressed={activePlanetTab === "mars"}
+          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+            activePlanetTab === "mars"
+              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
+              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
+          }`}
+        >
+          Mars
+        </button>
+      </div>
+      <div className="sm:hidden">
+        {activePlanetTab === "earth"
+          ? renderOrbitControls("earth", "Earth Orbit")
+          : renderOrbitControls("mars", "Mars Orbit")}
+      </div>
+      <div className="hidden sm:block space-y-3">
+        {renderOrbitControls("earth", "Earth Orbit")}
+        {renderOrbitControls("mars", "Mars Orbit")}
+      </div>
+      <button
+        type="button"
+        onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
+        className="w-full text-xs py-2.5 rounded-xl border border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-accent-orange/45 dark:hover:bg-accent-orange/35 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+      >
+        Reset to Defaults
+      </button>
+    </>
   );
   const renderPlanet = (pos: Position3D, planetTexture: string) => (
     <div
@@ -266,18 +558,35 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       />
     </div>
   );
-  const maxOrbitRadius = Math.max(dimensions.radiusX, dimensions.radiusY, marsRadiusX, marsRadiusY);
+  const maxOrbitRadius = Math.max(earthRadiusX, earthRadiusY, marsRadiusX, marsRadiusY);
   const svgSize = Math.max(Math.floor(maxOrbitRadius * 2.9), 460);
   const halfSvgSize = svgSize / 2;
   const sceneCenterY = "50%";
+  const clickMeArcId = React.useId().replace(/:/g, "");
+  const portraitWidth = dimensions.centralRadius * 2.30;
+  const portraitHeight = dimensions.centralRadius * 2.52;
+  const portraitHeightScale = portraitHeight / dimensions.centralRadius;
+  const portraitCutoffPercent =
+    ((portraitHeightScale - 2 + PORTRAIT_CUTOFF * 2) / portraitHeightScale) * 100;
+  const clickHintBaseFontSize = Math.max(12, Math.min(18, dimensions.centralRadius * 0.14));
+  const clickHintHoverFontSize = Math.max(16, Math.min(22, dimensions.centralRadius * 0.17));
+  const clickMeArcRadius = dimensions.centralRadius * 1.04;
+  const clickMeArcBoxSize = Math.floor(clickMeArcRadius * 2 + dimensions.centralRadius * 0.9);
+  const clickMeArcCenter = clickMeArcBoxSize / 2;
+  const clickMeStartAngle = (-185 * Math.PI) / 180;
+  const clickMeEndAngle = (-78 * Math.PI) / 180;
+  const clickMeStartX = clickMeArcCenter + clickMeArcRadius * Math.cos(clickMeStartAngle);
+  const clickMeStartY = clickMeArcCenter + clickMeArcRadius * Math.sin(clickMeStartAngle);
+  const clickMeEndX = clickMeArcCenter + clickMeArcRadius * Math.cos(clickMeEndAngle);
+  const clickMeEndY = clickMeArcCenter + clickMeArcRadius * Math.sin(clickMeEndAngle);
 
   return (
     <section
-      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-x-hidden overflow-y-visible will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
       }`}
     >
-      {earthOrbitBack && (
+      {earthOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
           style={{
@@ -287,18 +596,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={earthOrbitBack}
-            fill="none"
-            stroke="var(--color-orbit-earth-back)"
-            strokeDasharray="2 7"
-            strokeLinecap="round"
-            strokeWidth="1.5"
-          />
+          {earthOrbitData.back.map((segment, index) => (
+            <polyline
+              key={`earth-back-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-earth-back)"
+              strokeDasharray="2 7"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.6"
+            />
+          ))}
         </svg>
       )}
 
-      {marsOrbitBack && (
+      {marsOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[1]"
           style={{
@@ -308,14 +621,18 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={marsOrbitBack}
-            fill="none"
-            stroke="var(--color-orbit-mars-back)"
-            strokeDasharray="3 8"
-            strokeLinecap="round"
-            strokeWidth="1.35"
-          />
+          {marsOrbitData.back.map((segment, index) => (
+            <polyline
+              key={`mars-back-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-mars-back)"
+              strokeDasharray="3 8"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.45"
+            />
+          ))}
         </svg>
       )}
 
@@ -344,25 +661,130 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           width: `${dimensions.centralRadius * 2}px`,
           height: `${dimensions.centralRadius * 2}px`,
         }}
-      >        <div 
-          className="w-full h-full rounded-full bg-[var(--color-hero-core-bg)] border-4 sm:border-6 lg:border-8 border-[var(--color-hero-core-border)] shadow-2xl relative" 
-          style={{ overflow: 'visible' }}
-        >          {/* Portrait image - positioned at bottom, clipped by circle at bottom only */}
-          <Image
-            src="/portrait1.png"
-            alt="Anjie Zhou headshot"
-            width={600}
-            height={600}
-            className="absolute left-1/2 bottom-0 transform -translate-x-1/2 object-cover object-top select-none"
-            style={{ 
+      >
+        <div
+          className="w-full h-full rounded-full bg-[var(--color-hero-core-bg)] shadow-2xl relative"
+          style={{ overflow: "visible" }}
+        >
+          <div
+            className="absolute inset-0 z-0 rounded-full border-4 sm:border-6 lg:border-8 border-[var(--color-hero-core-border)] pointer-events-none"
+            style={{ clipPath: `inset(0 0 ${100 - PORTRAIT_CUTOFF * 100}% 0)` }}
+          />
+          <div
+            className="absolute left-1/2 bottom-0 z-10 transform -translate-x-1/2 pointer-events-none"
+            style={{
+              width: `${portraitWidth}px`,
+              height: `${portraitHeight}px`,
+              clipPath: `inset(0 0 ${100 - portraitCutoffPercent}% 0)`,
+            }}
+          >
+            <Image
+              src="/portrait1.png"
+              alt=""
+              aria-hidden
+              width={600}
+              height={600}
+              className="absolute left-1/2 bottom-0 transform -translate-x-1/2 object-cover object-top select-none"
+              style={{
+                width: `${portraitWidth}px`,
+                height: `${portraitHeight}px`,
+              }}
+            />
+          </div>
+          <div
+            className="absolute inset-0 z-[11] rounded-full overflow-hidden pointer-events-none"
+            style={{ clipPath: `inset(${PORTRAIT_CUTOFF * 100}% 0 0 0)` }}
+          >
+            <Image
+              src="/portrait1.png"
+              alt=""
+              aria-hidden
+              width={600}
+              height={600}
+              className="absolute left-1/2 bottom-0 transform -translate-x-1/2 object-cover object-top select-none"
+              style={{
+                width: `${portraitWidth}px`,
+                height: `${portraitHeight}px`,
+              }}
+            />
+          </div>
+          <div
+            className="absolute inset-0 z-20 rounded-full border-4 sm:border-6 lg:border-8 border-[var(--color-hero-core-border)] pointer-events-none"
+            style={{ clipPath: `inset(${PORTRAIT_CUTOFF * 100}% 0 0 0)` }}
+          />
+          <button
+            ref={portraitButtonRef}
+            type="button"
+            onClick={() => setIsOrbitMenuOpen((prev) => !prev)}
+            onMouseEnter={() => setIsSunHovered(true)}
+            onMouseLeave={() => setIsSunHovered(false)}
+            onFocus={() => setIsSunHovered(true)}
+            onBlur={() => setIsSunHovered(false)}
+            className="absolute left-1/2 z-30 transform -translate-x-1/2 -translate-y-1/2 appearance-none bg-transparent border-0 p-0 leading-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] rounded-full"
+            aria-label="Open orbit controls"
+            aria-expanded={isOrbitMenuOpen}
+            style={{
+              top: sceneCenterY,
               width: `${dimensions.centralRadius * 2}px`,
-              height: `${dimensions.centralRadius * 2.4}px`,
-              clipPath: `ellipse(${dimensions.centralRadius}px ${dimensions.centralRadius}px at 50% ${dimensions.centralRadius * 1.4}px)`,
+              height: `${dimensions.centralRadius * 2}px`,
             }}
           />
         </div>
       </div>
-      {isClient && earthOrbitFront && (
+      <div
+        className="absolute left-1/2 z-[32] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        style={{
+          top: sceneCenterY,
+          width: `${clickMeArcBoxSize}px`,
+          height: `${clickMeArcBoxSize}px`,
+        }}
+      >
+        <svg width="100%" height="100%" viewBox={`0 0 ${clickMeArcBoxSize} ${clickMeArcBoxSize}`}>
+          <defs>
+            <path
+              id={clickMeArcId}
+              d={`M ${clickMeStartX} ${clickMeStartY} A ${clickMeArcRadius} ${clickMeArcRadius} 0 0 1 ${clickMeEndX} ${clickMeEndY}`}
+            />
+          </defs>
+          <text
+            className="font-semibold tracking-wide"
+            style={{
+              fill: "var(--color-hero-click-hint)",
+              letterSpacing: "0.08em",
+              fontSize: `${isSunHovered ? clickHintHoverFontSize : clickHintBaseFontSize}px`,
+              transition: "font-size 180ms ease",
+            }}
+          >
+            <textPath href={`#${clickMeArcId}`} startOffset="50%" textAnchor="middle">
+              Click on Me!
+            </textPath>
+          </text>
+        </svg>
+      </div>
+      {isClient && isOrbitMenuOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[120] p-3 overflow-y-auto bg-black/45 dark:bg-black/60 backdrop-blur-[2px] sm:hidden"
+        >
+          <div
+            ref={orbitMenuMobileRef}
+            className="mx-auto w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.28)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)] p-3 space-y-3"
+            style={{ background: "var(--color-orbit-menu-bg)" }}
+          >
+            {renderOrbitMenuContent()}
+          </div>
+        </div>,
+        document.body
+      )}
+      {isOrbitMenuOpen && (
+        <div
+          ref={orbitMenuDesktopRef}
+          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.22)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.38)] p-4 space-y-3"
+          style={{ background: "var(--color-orbit-menu-bg)" }}
+        >
+          {renderOrbitMenuContent()}
+        </div>
+      )}
+      {isClient && earthOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
           style={{
@@ -372,18 +794,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={earthOrbitFront}
-            fill="none"
-            stroke="var(--color-orbit-earth-front)"
-            strokeDasharray="2 7"
-            strokeLinecap="round"
-            strokeWidth="1.7"
-          />
+          {earthOrbitData.front.map((segment, index) => (
+            <polyline
+              key={`earth-front-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-earth-front)"
+              strokeDasharray="2 7"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.6"
+            />
+          ))}
         </svg>
       )}
 
-      {isClient && marsOrbitFront && (
+      {isClient && marsOrbitData && (
         <svg
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[21]"
           style={{
@@ -393,14 +819,18 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           }}
           viewBox={`-${halfSvgSize} -${halfSvgSize} ${svgSize} ${svgSize}`}
         >
-          <polyline
-            points={marsOrbitFront}
-            fill="none"
-            stroke="var(--color-orbit-mars-front)"
-            strokeDasharray="3 8"
-            strokeLinecap="round"
-            strokeWidth="1.55"
-          />
+          {marsOrbitData.front.map((segment, index) => (
+            <polyline
+              key={`mars-front-${index}`}
+              points={segment.points}
+              fill="none"
+              stroke="var(--color-orbit-mars-front)"
+              strokeDasharray="3 8"
+              strokeDashoffset={segment.dashOffset}
+              strokeLinecap="round"
+              strokeWidth="1.45"
+            />
+          ))}
         </svg>
       )}
     </section>
