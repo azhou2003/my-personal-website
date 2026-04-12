@@ -417,7 +417,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
         {/* Full-height vertical timeline line */}
         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[var(--color-timeline-line)] -translate-x-1/2 z-0" style={{ minHeight: '100%' }} />
-        <div className="flex flex-col gap-24 w-full relative z-10">
+        <div className="flex flex-col gap-24 w-full relative z-10 pb-28 sm:pb-0">
           {filtered.length === 0 && (
             <div className="text-center text-border-light dark:text-border-dark">
               No projects found.
