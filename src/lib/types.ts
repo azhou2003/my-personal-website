@@ -22,3 +22,12 @@ export interface FooterQuote {
   text: string;
   author?: string;
 }
+
+export interface AboutSlide {
+  id: string;
+  eyebrow: string;
+  title: string;
+  imageAlt: string;
+  imageSrc?: string;
+  paragraphs: string[];
+}

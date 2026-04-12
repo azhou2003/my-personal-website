@@ -1,0 +1,11 @@
+{
+  "id": "focus",
+  "eyebrow": "Mock Section",
+  "title": "What I'm building right now",
+  "imageAlt": "Abstract gradient card",
+  "paragraphs": [
+    "I'm currently focused on sharpening my full-stack toolkit: pragmatic UI architecture, reliable backend patterns, and cleaner deployments.",
+    "Lately I've been experimenting with API design patterns and simple automation workflows that remove repetitive tasks.",
+    "This is placeholder content to show how another section can occupy the same footprint as the main About card."
+  ]
+}

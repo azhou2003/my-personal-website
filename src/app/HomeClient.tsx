@@ -7,8 +7,13 @@ import AboutSection from "../components/AboutSection";
 import HomeHeroHeading from "../components/HomeHeroHeading";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HOME_ANIMATION_TIMINGS } from "../lib/motion";
+import type { AboutSlide } from "../lib/types";
 
-export default function HomeClient() {
+interface HomeClientProps {
+  aboutSlides: AboutSlide[];
+}
+
+export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<"hero" | "about">("hero");
@@ -236,7 +241,7 @@ export default function HomeClient() {
             activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
           }`}
         >
-          <AboutSection isExpanded={true} />
+          <AboutSection isExpanded={true} slides={aboutSlides} />
         </section>
 
         <footer
