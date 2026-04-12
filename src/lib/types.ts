@@ -22,3 +22,22 @@ export interface FooterQuote {
   text: string;
   author?: string;
 }
+
+export interface AboutSlide {
+  id: string;
+  eyebrow: string;
+  title: string;
+  pillText?: string;
+  imageAlt: string;
+  imageSrc?: string;
+  imagePosition?: string;
+  paragraphs: string[];
+  links?: AboutSlideLink[];
+}
+
+export interface AboutSlideLink {
+  label: string;
+  href: string;
+  icon: "email" | "github" | "linkedin" | "external" | "goodreads" | "blog" | "steam";
+  external?: boolean;
+}

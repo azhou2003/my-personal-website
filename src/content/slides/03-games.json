@@ -1,0 +1,26 @@
+{
+  "id": "game",
+  "eyebrow": "Games",
+  "title": "The Lands Between",
+  "pillText": "Cross the Fog",
+  "imageSrc": "/frenzied-flame.png",
+  "imageAlt": "The Lord of Frenzied Flame ending scene from Elden Ring",
+  "paragraphs": [
+    "There is a special place in my heart for FromSoft games.",
+    "You're often alone in a dying world, but it is strangely... peaceful. Elden Ring, of course, was the Magnum Opus.",
+    "If I feel strongly about a game, I may write a blog post about it!"
+  ],
+  "links": [
+    {
+      "label": "Blog",
+      "href": "/blog",
+      "icon": "blog"
+    },
+    {
+      "label": "Steam",
+      "href": "https://steamcommunity.com/id/carrotkingaz/",
+      "icon": "steam",
+      "external": true
+    }
+  ]
+}

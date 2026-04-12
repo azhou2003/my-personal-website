@@ -7,16 +7,21 @@ import AboutSection from "../components/AboutSection";
 import HomeHeroHeading from "../components/HomeHeroHeading";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HOME_ANIMATION_TIMINGS } from "../lib/motion";
+import type { AboutSlide } from "../lib/types";
 
-export default function HomeClient() {
+interface HomeClientProps {
+  aboutSlides: AboutSlide[];
+}
+
+export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<"hero" | "about">("hero");
   const [showWelcome, setShowWelcome] = useState(false);
   const [showToMyWorld, setShowToMyWorld] = useState(false);
   const [startOrbit, setStartOrbit] = useState(false);
+  const [activeAboutSlideIndex, setActiveAboutSlideIndex] = useState(0);
 
-  const heroSectionRef = useRef<HTMLElement>(null);
   const aboutSectionRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -54,6 +59,18 @@ export default function HomeClient() {
   useEffect(() => {
     activeSectionRef.current = activeSection;
   }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection !== "hero" || aboutSlides.length === 0) return;
+
+    const intervalId = window.setInterval(() => {
+      setActiveAboutSlideIndex((prev) => (prev + 1) % aboutSlides.length);
+    }, HOME_ANIMATION_TIMINGS.aboutPillRotateMs);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [activeSection, aboutSlides.length]);
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
@@ -203,9 +220,8 @@ export default function HomeClient() {
       </div>
       <main className="flex-1">
         {/* Hero section with integrated heading - takes full viewport minus navbar */}
-        <section
-          ref={heroSectionRef}
-          id="hero"
+          <section
+            id="hero"
           className={`w-full relative transition-all duration-800 ease-out h-[calc(100svh-72px)] min-h-[30rem] ${
             activeSection === "about"
               ? "opacity-0 -translate-y-10 pointer-events-none"
@@ -226,7 +242,13 @@ export default function HomeClient() {
           }`}
           style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
         >
-          <AboutSection isExpanded={false} animateIn={true} />
+          <AboutSection
+            isExpanded={false}
+            animateIn={true}
+            slides={aboutSlides}
+            activeSlideIndex={activeAboutSlideIndex}
+            isActive={activeSection === "hero"}
+          />
         </div>
 
         {/* About Me Expanded Section - Shows on scroll */}
@@ -236,7 +258,13 @@ export default function HomeClient() {
             activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
           }`}
         >
-          <AboutSection isExpanded={true} />
+          <AboutSection
+            isExpanded={true}
+            slides={aboutSlides}
+            activeSlideIndex={activeAboutSlideIndex}
+            onActiveSlideIndexChange={setActiveAboutSlideIndex}
+            isActive={activeSection === "about"}
+          />
         </section>
 
         <footer

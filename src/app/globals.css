@@ -135,7 +135,7 @@ body.dark input[type="text"] {
     background-position: 0% center;
   }
   100% {
-    background-position: 100% center;
+    background-position: 150% center;
   }
 }
 

@@ -1,0 +1,25 @@
+{
+  "id": "read",
+  "eyebrow": "Books",
+  "title": "Rec a Read!",
+  "pillText": "Rec a Read!",
+  "imageSrc": "/lofi-reading-kindle.png",
+  "imageAlt": "Asian man with long hair reading on a kindle.",
+  "paragraphs": [
+    "Had any good reads recently? Please let me know! My goodreads is linked below.",
+    "I've been reading a lot of fantasy lately, but I'm open to any genre. I may occasionally right a blog post about a recent read."
+  ],
+  "links": [
+    {
+      "label": "Blog",
+      "href": "/blog",
+      "icon": "blog"
+    },
+    {
+      "label": "Goodreads",
+      "href": "https://www.goodreads.com/user/show/171863050-anjie-zhou",
+      "icon": "goodreads",
+      "external": true
+    }
+  ]
+}
