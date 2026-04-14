@@ -6,7 +6,7 @@ summary: "This is the first blog post."
 image: "/houston.jpeg"
 ---
 
-# Welcome!
+### Welcome!
 
 Hi, I'm Anjie, and I'm a software engineer from Houston, Texas. Outside of work, I enjoy gaming, reading, and exercise.
 
