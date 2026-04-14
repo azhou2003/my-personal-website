@@ -6,6 +6,7 @@ import { getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
+import MarkdownContent from "../../../components/MarkdownContent";
 
 type BlogPageParams = Promise<{ slug: string }>;
 
@@ -39,7 +40,8 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
     <main className="max-w-2xl mx-auto py-16 px-4">
       <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
         ← Back to Blog
-      </Link>      <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
+      </Link>
+      <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           {data.date && <p className="text-muted text-sm">{formatDate(data.date)}</p>}
@@ -47,10 +49,7 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
         </div>
       </div>
       {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
-      <article
-        className="prose prose-neutral dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+      <MarkdownContent html={content} />
       <div className="flex justify-between items-center mt-16">
         {prevPost ? (
           <Link

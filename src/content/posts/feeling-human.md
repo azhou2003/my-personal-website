@@ -1,25 +1,25 @@
 ---
 title: "The Search for Humanity"
 date: "2026-04-13"
-tags: ["Thoughts"]
-summary: "It ends here"
-image: "/houston.jpeg"
+tags: ["Musings"]
+summary: "It ends here."
+image: "/journal.jpeg"
 ---
 
+**Humans strive for perfection.** There is a certain pride in achieving the pinnacle in anything. It gives us meaning in a world that can often feel devoid of it. 
 
+However, if I were to describe something as feeling "human", it wouldn't be... that. When I think of things that feel "human", I think of:
 
-Humans strive for perfection. There is a certain pride in achieving the pinnacle in anything. It gives us (yes "us") meaning in a world that can often feel devoid of it. 
+- the *squeaks* of an acoustic guitar.
+- a song that everyone hates, but you secretly like.
+- the mother who loves her child, despite all their shortcomings.
 
-Despite this, if I were to describe something as "feeling human", it wouldn't be... that. When I think of things that feel human, I think of:
+Perfect may be the goal, but all the charm is in imperfection. 
 
-The squeaks of an acoustic guitar, the freckles on a person's face, the cold air hitting your cheeks on a dark winter morning as you can barely convince yourself to keep your eyes open.
+So, when I scroll by LinkedIn&trade; post after LinkedIn&trade; post, all perfectly written, where if I were to cover the author, I couldn't, for the life of me, be able to tell who wrote it, a little part of me dies.
 
-All things that represent how although perfection is the g
+I have always been envious of people who are great orators or great writers.
 
-Because the reality is, although our effort is put into being the best that we can be, we fail. Alot (a lot?). Many may never try again... but some do. There is charm in that. What gives achievements meaning are the failures behind it. 
+Whenever I have an interesting thought, I seldom have the skill to articulate it well. At least with writing, I can take my time. When I started journaling years ago, I would rewrite over and over again - crossing out words, rephrasing entire paragraphs - frustrated at my inability to organize my thoughts coherently. When all was said and done, in spite of all the effort, something always felt a little off.
 
-I have always been envious of people who are great orators or great writers. I always think I have an interesting though, but never the skill to articulate it well. It has been a life-long endeavor to improve this skill.
-
-When I read books from my favorite writers, even without knowing the title, I can tell that it looks familiar. 
-
-Just this once, I hope I mispelled something. I hope I used a word incorrectly. I hope I broke MANY grammatical rules. I hope that this all made very little sense. But, I also hope that, to you, this writing felt human. I also hope that when I read this again, I find me.
+But now, I appreciate those imperfections a little more. This doesn't mean I don't want to become a better writter. I hope that one day, I'll become a great writer. But when that happens, I hope there will always be something lost translating idea into actuality. At the end of the day, that gap between my writing and perfection is **me**.
