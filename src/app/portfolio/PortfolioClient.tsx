@@ -215,22 +215,29 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       }
 
       if (visibleRows.length === 0) return;
+      if (filtered.length === 0) return;
 
       const nearTop = currentScrollY <= 20;
+      const mobileBottomActivationOffset = 96;
       const nearBottom =
-        currentScrollY + window.innerHeight >= document.documentElement.scrollHeight - 20;
+        currentScrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - mobileBottomActivationOffset;
+      const atAbsoluteBottom =
+        currentScrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+
+      if ((nearBottom && !isScrollingUp) || atAbsoluteBottom) {
+        const lastIndex = filtered.length - 1;
+        setActiveMobileIndex((prev) => (prev === lastIndex ? prev : lastIndex));
+        return;
+      }
 
       let nextIndex: number;
       if (nearTop) {
         nextIndex = visibleRows.reduce((best, current) =>
           current.rect.top < best.rect.top ? current : best
         ).idx;
-      } else if (nearBottom) {
-        nextIndex = visibleRows.reduce((best, current) =>
-          current.rect.bottom > best.rect.bottom ? current : best
-        ).idx;
       } else {
-        const viewportAnchorY = isScrollingUp ? window.innerHeight * 0.4 : window.innerHeight * 0.52;
+        const viewportAnchorY = window.innerHeight * (isScrollingUp ? 0.42 : 0.5);
         nextIndex = visibleRows.reduce((best, current) => {
           const bestDistance = Math.abs(best.rect.top + best.rect.height / 2 - viewportAnchorY);
           const currentDistance = Math.abs(current.rect.top + current.rect.height / 2 - viewportAnchorY);
@@ -238,7 +245,21 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         }).idx;
       }
 
-      setActiveMobileIndex((prev) => (prev === nextIndex ? prev : nextIndex));
+      setActiveMobileIndex((prev) => {
+        if (prev === nextIndex) return prev;
+        if (prev === null) return nextIndex;
+
+        const viewportAnchorY = window.innerHeight * (isScrollingUp ? 0.42 : 0.5);
+        const prevVisible = visibleRows.find((item) => item.idx === prev);
+        const nextVisible = visibleRows.find((item) => item.idx === nextIndex);
+        if (!prevVisible || !nextVisible) return nextIndex;
+
+        const prevDistance = Math.abs(prevVisible.rect.top + prevVisible.rect.height / 2 - viewportAnchorY);
+        const nextDistance = Math.abs(nextVisible.rect.top + nextVisible.rect.height / 2 - viewportAnchorY);
+        const switchThreshold = isScrollingUp ? 0 : 8;
+
+        return nextDistance + switchThreshold < prevDistance ? nextIndex : prev;
+      });
     };
 
     const requestUpdate = () => {
@@ -430,6 +451,13 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
             const isFocused = isActiveOnMobile || isActiveOnDesktop;
             const rowScale = timelineScaleByIndex[idx] ?? 1;
             const focusedRowScale = isFocused ? rowScale * 1.04 : rowScale;
+            const imageSrc = project.images[0] || "/file.svg";
+            const isTransparentAsset = /\.(svg|png)(?:\?.*)?$/i.test(imageSrc);
+            const imageFitClass = isTransparentAsset
+              ? "object-contain p-3"
+              : "object-cover";
+            const imageContainerRadiusClass = "rounded-lg";
+            const stageGlowRadiusClass = "rounded-md";
             const popupVisibilityClass = isActiveOnDesktop
               ? "opacity-100 scale-100 pointer-events-auto"
               : "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
@@ -456,12 +484,12 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                     <div className={`w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125 ${isFocused ? "scale-125" : ""}`} />
                   </div>
                   {/* Left side */}
-                  <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
+                  <div className="w-1/2 flex justify-end pr-6 sm:pr-6 md:pr-8 lg:pr-10 pl-6 sm:pl-6 md:pl-8 lg:pl-10">
                     {isLeft ? (
                       <span
-                        className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110"
+                        className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
                       >
-                        {formatDate(project.date)}
+                        {formatDate(project.date, "MMMM yyyy")}
                       </span>
                     ) : (
                       <div className="flex justify-end relative w-full">
@@ -473,12 +501,18 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                              {isTransparentAsset && (
+                                <>
+                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
+                                  <div className={`absolute inset-1 ${stageGlowRadiusClass} bg-gradient-to-br from-white/35 to-transparent dark:from-white/6 dark:to-transparent`} aria-hidden="true" />
+                                </>
+                              )}
                               <Image
-                                src={project.images[0] || "/file.svg"}
+                                src={imageSrc}
                                 alt={project.title}
                                 fill
-                                className="object-cover"
+                                className={`${imageFitClass} z-10`}
                                 priority={idx < 2}
                               />
                             </div>
@@ -498,7 +532,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                     )}
                   </div>
                   {/* Right side */}
-                  <div className="w-1/2 flex justify-start pl-4 sm:pl-6 md:pl-8 lg:pl-10 pr-4 sm:pr-6 md:pr-8 lg:pr-10">
+                  <div className="w-1/2 flex justify-start pl-6 sm:pl-6 md:pl-8 lg:pl-10 pr-6 sm:pr-6 md:pr-8 lg:pr-10">
                     {isLeft ? (
                       <div className="flex justify-start relative w-full">
                         <div className="group relative flex items-center justify-center">
@@ -509,12 +543,18 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                              {isTransparentAsset && (
+                                <>
+                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
+                                  <div className={`absolute inset-1 ${stageGlowRadiusClass} bg-gradient-to-br from-white/35 to-transparent dark:from-white/6 dark:to-transparent`} aria-hidden="true" />
+                                </>
+                              )}
                               <Image
-                                src={project.images[0] || "/file.svg"}
+                                src={imageSrc}
                                 alt={project.title}
                                 fill
-                                className="object-cover"
+                                className={`${imageFitClass} z-10`}
                                 priority={idx < 2}
                               />
                             </div>
@@ -529,10 +569,10 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                         </div>
                       </div>
                     ) : (
-                      <span className="text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110"
+                      <span className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
                         tabIndex={0}
                       >
-                        {formatDate(project.date)}
+                        {formatDate(project.date, "MMMM yyyy")}
                       </span>
                     )}
                   </div>
