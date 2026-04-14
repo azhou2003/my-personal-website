@@ -201,7 +201,6 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
     const updateActiveTimelineItem = () => {
       const currentScrollY = window.scrollY;
-      const isScrollingUp = currentScrollY < lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
       const visibleRows: Array<{ idx: number; rect: DOMRect }> = [];
@@ -215,10 +214,13 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       }
 
       if (visibleRows.length === 0) return;
+      if (filtered.length === 0) return;
 
       const nearTop = currentScrollY <= 20;
+      const mobileBottomActivationOffset = 96;
       const nearBottom =
-        currentScrollY + window.innerHeight >= document.documentElement.scrollHeight - 20;
+        currentScrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - mobileBottomActivationOffset;
 
       let nextIndex: number;
       if (nearTop) {
@@ -226,11 +228,9 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
           current.rect.top < best.rect.top ? current : best
         ).idx;
       } else if (nearBottom) {
-        nextIndex = visibleRows.reduce((best, current) =>
-          current.rect.bottom > best.rect.bottom ? current : best
-        ).idx;
+        nextIndex = filtered.length - 1;
       } else {
-        const viewportAnchorY = isScrollingUp ? window.innerHeight * 0.4 : window.innerHeight * 0.52;
+        const viewportAnchorY = window.innerHeight * 0.48;
         nextIndex = visibleRows.reduce((best, current) => {
           const bestDistance = Math.abs(best.rect.top + best.rect.height / 2 - viewportAnchorY);
           const currentDistance = Math.abs(current.rect.top + current.rect.height / 2 - viewportAnchorY);
@@ -463,7 +463,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                     <div className={`w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125 ${isFocused ? "scale-125" : ""}`} />
                   </div>
                   {/* Left side */}
-                  <div className="w-1/2 flex justify-end pr-4 sm:pr-6 md:pr-8 lg:pr-10 pl-4 sm:pl-6 md:pl-8 lg:pl-10">
+                  <div className="w-1/2 flex justify-end pr-6 sm:pr-6 md:pr-8 lg:pr-10 pl-6 sm:pl-6 md:pl-8 lg:pl-10">
                     {isLeft ? (
                       <span
                         className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
@@ -480,7 +480,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               {isTransparentAsset && (
                                 <>
                                   <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
@@ -511,7 +511,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                     )}
                   </div>
                   {/* Right side */}
-                  <div className="w-1/2 flex justify-start pl-4 sm:pl-6 md:pl-8 lg:pl-10 pr-4 sm:pr-6 md:pr-8 lg:pr-10">
+                  <div className="w-1/2 flex justify-start pl-6 sm:pl-6 md:pl-8 lg:pl-10 pr-6 sm:pr-6 md:pr-8 lg:pr-10">
                     {isLeft ? (
                       <div className="flex justify-start relative w-full">
                         <div className="group relative flex items-center justify-center">
@@ -522,7 +522,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             className="focus:outline-none"
                             tabIndex={0}
                           >
-                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                            <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               {isTransparentAsset && (
                                 <>
                                   <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
