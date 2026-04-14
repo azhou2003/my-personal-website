@@ -201,6 +201,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
 
     const updateActiveTimelineItem = () => {
       const currentScrollY = window.scrollY;
+      const isScrollingUp = currentScrollY < lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
       const visibleRows: Array<{ idx: number; rect: DOMRect }> = [];
@@ -221,16 +222,22 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       const nearBottom =
         currentScrollY + window.innerHeight >=
         document.documentElement.scrollHeight - mobileBottomActivationOffset;
+      const atAbsoluteBottom =
+        currentScrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+
+      if ((nearBottom && !isScrollingUp) || atAbsoluteBottom) {
+        const lastIndex = filtered.length - 1;
+        setActiveMobileIndex((prev) => (prev === lastIndex ? prev : lastIndex));
+        return;
+      }
 
       let nextIndex: number;
       if (nearTop) {
         nextIndex = visibleRows.reduce((best, current) =>
           current.rect.top < best.rect.top ? current : best
         ).idx;
-      } else if (nearBottom) {
-        nextIndex = filtered.length - 1;
       } else {
-        const viewportAnchorY = window.innerHeight * 0.48;
+        const viewportAnchorY = window.innerHeight * (isScrollingUp ? 0.42 : 0.5);
         nextIndex = visibleRows.reduce((best, current) => {
           const bestDistance = Math.abs(best.rect.top + best.rect.height / 2 - viewportAnchorY);
           const currentDistance = Math.abs(current.rect.top + current.rect.height / 2 - viewportAnchorY);
@@ -238,7 +245,21 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
         }).idx;
       }
 
-      setActiveMobileIndex((prev) => (prev === nextIndex ? prev : nextIndex));
+      setActiveMobileIndex((prev) => {
+        if (prev === nextIndex) return prev;
+        if (prev === null) return nextIndex;
+
+        const viewportAnchorY = window.innerHeight * (isScrollingUp ? 0.42 : 0.5);
+        const prevVisible = visibleRows.find((item) => item.idx === prev);
+        const nextVisible = visibleRows.find((item) => item.idx === nextIndex);
+        if (!prevVisible || !nextVisible) return nextIndex;
+
+        const prevDistance = Math.abs(prevVisible.rect.top + prevVisible.rect.height / 2 - viewportAnchorY);
+        const nextDistance = Math.abs(nextVisible.rect.top + nextVisible.rect.height / 2 - viewportAnchorY);
+        const switchThreshold = isScrollingUp ? 0 : 8;
+
+        return nextDistance + switchThreshold < prevDistance ? nextIndex : prev;
+      });
     };
 
     const requestUpdate = () => {
