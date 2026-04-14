@@ -1,8 +1,8 @@
 {
   "title": "HeartReadr",
-  "description": "A desktop app that analyzes heart monitor data using OCR",
+  "description": "A desktop app that analyzes video heart monitor data using OCR",
   "date": "2023-08-24",
   "tags": ["Python", "Machine Learning"],
-  "images": ["/houston.jpeg"],
+  "images": ["/heartreader-icon.png"],
   "link": "https://github.com/azhou2003/HeartReadrApp"
 }

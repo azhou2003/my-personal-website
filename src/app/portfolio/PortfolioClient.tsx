@@ -468,7 +468,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                       <span
                         className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
                       >
-                        {formatDate(project.date)}
+                        {formatDate(project.date, "MMMM yyyy")}
                       </span>
                     ) : (
                       <div className="flex justify-end relative w-full">
@@ -483,7 +483,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               {isTransparentAsset && (
                                 <>
-                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)] border border-border-light/80 dark:border-border-dark/80" aria-hidden="true" />
+                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
                                   <div className={`absolute inset-1 ${stageGlowRadiusClass} bg-gradient-to-br from-white/35 to-transparent dark:from-white/6 dark:to-transparent`} aria-hidden="true" />
                                 </>
                               )}
@@ -525,7 +525,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                             <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-2 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                               {isTransparentAsset && (
                                 <>
-                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)] border border-border-light/80 dark:border-border-dark/80" aria-hidden="true" />
+                                  <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
                                   <div className={`absolute inset-1 ${stageGlowRadiusClass} bg-gradient-to-br from-white/35 to-transparent dark:from-white/6 dark:to-transparent`} aria-hidden="true" />
                                 </>
                               )}
@@ -551,7 +551,7 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
                       <span className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
                         tabIndex={0}
                       >
-                        {formatDate(project.date)}
+                        {formatDate(project.date, "MMMM yyyy")}
                       </span>
                     )}
                   </div>
