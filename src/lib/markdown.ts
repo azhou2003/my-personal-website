@@ -1,5 +1,7 @@
 import matter from "gray-matter";
 import { remark } from "remark";
+import breaks from "remark-breaks";
+import gfm from "remark-gfm";
 import html from "remark-html";
 import path from "path";
 import fs from "fs";
@@ -17,7 +19,11 @@ export async function getBlogPostBySlug(slug: string) {
     if (!shouldIncludeLocalSampleContent()) return null;
     const samplePost = getSampleBlogPostBySlug(slug);
     if (!samplePost) return null;
-    const processedContent = await remark().use(html).process(samplePost.content);
+    const processedContent = await remark()
+      .use(gfm)
+      .use(breaks)
+      .use(html, { sanitize: false })
+      .process(samplePost.content);
     return {
       metadata: samplePost.metadata,
       contentHtml: processedContent.toString(),
@@ -26,7 +32,7 @@ export async function getBlogPostBySlug(slug: string) {
 
   const file = fs.readFileSync(postPath, "utf8");
   const { data, content } = matter(file);
-  const processedContent = await remark().use(html).process(content);
+  const processedContent = await remark().use(gfm).use(breaks).use(html, { sanitize: false }).process(content);
 
   return {
     metadata: data,
