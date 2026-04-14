@@ -2,24 +2,26 @@
 title: "The Search for Humanity"
 date: "2026-04-13"
 tags: ["Thoughts"]
-summary: "It ends here"
+summary: "It ends here."
 image: "/houston.jpeg"
 ---
 
-
-
-Humans strive for perfection. There is a certain pride in achieving the pinnacle in anything. It gives us (yes "us") meaning in a world that can often feel devoid of it. 
+Humans strive for perfection. There is a certain pride in achieving the pinnacle in anything. It gives us (yes "us", I promise I wrote this) meaning in a world that can often feel devoid of it. 
 
 Despite this, if I were to describe something as "feeling human", it wouldn't be... that. When I think of things that feel human, I think of:
 
-The squeaks of an acoustic guitar, the freckles on a person's face, the cold air hitting your cheeks on a dark winter morning as you can barely convince yourself to keep your eyes open.
+- The squeaks of an acoustic guitar.
+- a "didn't even try look".
+- a child expressing gratitude to a parent who didn't do things perfectly, but tried their best.
 
-All things that represent how although perfection is the g
+Perfect may be the goal, but all the charm is in imperfection. 
 
-Because the reality is, although our effort is put into being the best that we can be, we fail. Alot (a lot?). Many may never try again... but some do. There is charm in that. What gives achievements meaning are the failures behind it. 
+The reality is: we fail (speak for yourself, I only succeed). Alot (a lot?). Some may never try again... but some do. And for those that eventually succeed, what gives the achievement meaning are the failures behind it. Journey before destination.
 
-I have always been envious of people who are great orators or great writers. I always think I have an interesting though, but never the skill to articulate it well. It has been a life-long endeavor to improve this skill.
+So when I scroll by LinkedIn post after LinkedIn post, where if I cover the author, I couldn't, for the life of me, be able to tell who wrote it, a little part of me dies.
 
-When I read books from my favorite writers, even without knowing the title, I can tell that it looks familiar. 
+I have always been envious of people who are great orators or great writers. Whenever I think I have an interesting thought, I seldom have the skill to articulate it well. When I started journaling years ago, I would rewrite over and over again - crossing out words, rephrasing entire paragraphs - frustrated at my inability to organize my thoughts coherently.
 
-Just this once, I hope I mispelled something. I hope I used a word incorrectly. I hope I broke MANY grammatical rules. I hope that this all made very little sense. But, I also hope that, to you, this writing felt human. I also hope that when I read this again, I find me.
+But now, I appreciate that feeling a little more. Even if there is something lost translating thought into writing. At least that gap is me.
+
+Just this once, I hope I mispelled something. I hope I used a word incorrectly. I hope I broke MANY grammatical rules. I hope that this all made VERY little sense. But, I also hope that, to you, this felt human. I also hope that, when I read this again, I find me.

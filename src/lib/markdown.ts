@@ -13,30 +13,36 @@ import {
   shouldIncludeLocalSampleContent,
 } from "./sampleContent";
 
+async function renderMarkdown(content: string) {
+  const processedContent = await remark()
+    .use(gfm)
+    .use(breaks)
+    .use(html, { sanitize: true })
+    .process(content);
+
+  return processedContent.toString();
+}
+
 export async function getBlogPostBySlug(slug: string) {
   const postPath = path.join(BLOG_POSTS_DIR, `${slug}.md`);
   if (!fs.existsSync(postPath)) {
     if (!shouldIncludeLocalSampleContent()) return null;
     const samplePost = getSampleBlogPostBySlug(slug);
     if (!samplePost) return null;
-    const processedContent = await remark()
-      .use(gfm)
-      .use(breaks)
-      .use(html, { sanitize: false })
-      .process(samplePost.content);
+    const contentHtml = await renderMarkdown(samplePost.content);
     return {
       metadata: samplePost.metadata,
-      contentHtml: processedContent.toString(),
+      contentHtml,
     };
   }
 
   const file = fs.readFileSync(postPath, "utf8");
   const { data, content } = matter(file);
-  const processedContent = await remark().use(gfm).use(breaks).use(html, { sanitize: false }).process(content);
+  const contentHtml = await renderMarkdown(content);
 
   return {
     metadata: data,
-    contentHtml: processedContent.toString(),
+    contentHtml,
   };
 }
 
