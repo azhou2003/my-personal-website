@@ -3,6 +3,6 @@
   "description": "A desktop app that helps budget and compare to census data",
   "date": "2023-11-23",
   "tags": ["Python"],
-  "images": ["/heartreader-icon.png"],
+  "images": ["/discovery.png"],
   "link": "https://github.com/azhou2003/DiscoveryBudgetingApp"
 }
