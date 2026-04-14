@@ -8,9 +8,10 @@ image: "/houston.jpeg"
 
 # Welcome!
 
-Hi, I'm Anjie, and I'm a software engineer from Houston, Texas. Outside of work, I enjoy gaming, reading, and exercise.<br><br>
+Hi, I'm Anjie, and I'm a software engineer from Houston, Texas. Outside of work, I enjoy gaming, reading, and exercise.
+
 I have no format in mind for this blog, but I'll be sharing my thoughts on personal and professional interests.
 
 
-Or just anything I feel like really.
+Or just anything I feel like, really.
 
