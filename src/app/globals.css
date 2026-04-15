@@ -91,12 +91,6 @@ h1, h2, h3, h4 {
   font-weight: 700;
 }
 
-.prose {
-  font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
-  font-size: 1.1rem;
-  line-height: 1.8;
-}
-
 .markdown-content {
   font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
   font-size: 1.1rem;
