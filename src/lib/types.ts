@@ -4,8 +4,18 @@ export interface BlogMeta {
   slug: string;
   title: string;
   date: string;
+  updated?: string;
   tags: string[];
   summary: string;
+  image?: string;
+}
+
+export interface BlogFrontmatter {
+  title?: string;
+  date?: string;
+  updated?: string;
+  tags?: string[];
+  summary?: string;
   image?: string;
 }
 

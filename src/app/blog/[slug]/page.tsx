@@ -7,6 +7,9 @@ import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
 import ShareButton from "../../../components/ShareButton";
 import MarkdownContent from "../../../components/MarkdownContent";
+import ReadingProgress from "../../../components/ReadingProgress";
+import BackToTopButton from "../../../components/BackToTopButton";
+import ReaderComfortToggle from "../../../components/ReaderComfortToggle";
 
 type BlogPageParams = Promise<{ slug: string }>;
 
@@ -29,7 +32,12 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
   const post = await getBlogPostBySlug(resolvedParams.slug);
   if (!post) return notFound();
 
-  const { metadata: data, contentHtml: content } = post;
+  const { metadata: data, contentHtml: content, readingTimeMinutes } = post;
+  const metadataParts = [
+    data.date ? `Published ${formatDate(data.date)}` : null,
+    data.updated ? `Updated ${formatDate(data.updated)}` : null,
+    `${readingTimeMinutes} min read`,
+  ].filter((part): part is string => Boolean(part));
 
   const posts = getAllBlogPosts()
     .map(({ slug, title, date }) => ({ slug, title, date }))
@@ -37,41 +45,46 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
   const { prevPost, nextPost } = getPrevNextPosts(posts, resolvedParams.slug);
 
   return (
-    <main className="max-w-2xl mx-auto py-16 px-4">
-      <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
-        ← Back to Blog
-      </Link>
-      <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          {data.date && <p className="text-muted text-sm">{formatDate(data.date)}</p>}
-          <ShareButton title={data.title || resolvedParams.slug} />
+    <>
+      <ReadingProgress />
+      <BackToTopButton />
+      <main className="max-w-2xl mx-auto py-16 px-4">
+        <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
+          ← Back to Blog
+        </Link>
+        <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <p className="text-muted text-sm">{metadataParts.join(" · ")}</p>
+            <ShareButton title={data.title || resolvedParams.slug} />
+            <ReaderComfortToggle />
+          </div>
         </div>
-      </div>
-      {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
-      <MarkdownContent html={content} />
-      <div className="flex justify-between items-center mt-16">
-        {prevPost ? (
-          <Link
-            href={`/blog/${prevPost.slug}`}
-            className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors"
-          >
-            ← Previous: {prevPost.title}
-          </Link>
-        ) : (
-          <div />
-        )}
-        {nextPost ? (
-          <Link
-            href={`/blog/${nextPost.slug}`}
-            className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors ml-auto"
-          >
-            Next: {nextPost.title} →
-          </Link>
-        ) : (
-          <div />
-        )}
-      </div>
-    </main>
+        {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
+        <MarkdownContent html={content} />
+        <div className="flex justify-between items-center mt-16">
+          {prevPost ? (
+            <Link
+              href={`/blog/${prevPost.slug}`}
+              className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors"
+            >
+              ← Previous: {prevPost.title}
+            </Link>
+          ) : (
+            <div />
+          )}
+          {nextPost ? (
+            <Link
+              href={`/blog/${nextPost.slug}`}
+              className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors ml-auto"
+            >
+              Next: {nextPost.title} →
+            </Link>
+          ) : (
+            <div />
+          )}
+        </div>
+      </main>
+    </>
   );
 }
