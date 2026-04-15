@@ -62,6 +62,26 @@ image: "/path/to/image.png"
 ---
 ```
 
+Optional frontmatter:
+
+```yaml
+updated: "YYYY-MM-DD"
+```
+
+Use `updated` only when a post has a meaningful content revision after publish.
+Example:
+
+```yaml
+---
+title: "Post Title"
+date: "2026-04-13"
+updated: "2026-04-15"
+tags: ["Tag1", "Tag2"]
+summary: "Brief summary"
+image: "/path/to/image.png"
+---
+```
+
 `slug` is derived from the markdown filename.
 
 ### Portfolio projects

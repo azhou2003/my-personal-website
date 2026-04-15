@@ -190,6 +190,70 @@ h1, h2, h3, h4 {
   display: inline;
 }
 
+.markdown-content .md-heading-anchor {
+  margin-left: 0.4rem;
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  font-size: 0.85em;
+}
+
+.markdown-content h2:hover .md-heading-anchor,
+.markdown-content h3:hover .md-heading-anchor,
+.markdown-content h4:hover .md-heading-anchor,
+.markdown-content h2:focus-within .md-heading-anchor,
+.markdown-content h3:focus-within .md-heading-anchor,
+.markdown-content h4:focus-within .md-heading-anchor {
+  opacity: 0.7;
+}
+
+.markdown-content .md-code-block {
+  position: relative;
+}
+
+.markdown-content .md-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  color: var(--color-fg);
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+
+.markdown-content img.md-zoomable-image {
+  cursor: zoom-in;
+}
+
+.md-footnote-highlight {
+  animation: footnote-highlight-fade 1.8s ease-out;
+}
+
+@keyframes footnote-highlight-fade {
+  0% {
+    background: color-mix(in srgb, var(--color-portfolio-present) 35%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.reader-comfort .markdown-content {
+  font-size: 1.18rem;
+  line-height: 1.95;
+}
+
+@media (max-width: 768px) {
+  .reader-comfort .markdown-content {
+    font-size: 1.12rem;
+    line-height: 1.88;
+  }
+}
+
 code, pre {
   font-family: var(--font-mono, 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace);
   font-size: 0.95em;
