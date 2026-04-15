@@ -8,6 +8,22 @@ import fs from "fs";
 import type { BlogMeta } from "./types";
 import { BLOG_POSTS_DIR } from "./contentPaths";
 
+function estimateReadingTimeMinutes(markdown: string) {
+  const plainText = markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, " $1 ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[>#*_~-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const words = plainText ? plainText.split(" ").length : 0;
+
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 async function renderMarkdown(content: string) {
   const processedContent = await remark()
     .use(gfm)
@@ -25,10 +41,12 @@ export async function getBlogPostBySlug(slug: string) {
   const file = fs.readFileSync(postPath, "utf8");
   const { data, content } = matter(file);
   const contentHtml = await renderMarkdown(content);
+  const readingTimeMinutes = estimateReadingTimeMinutes(content);
 
   return {
     metadata: data,
     contentHtml,
+    readingTimeMinutes,
   };
 }
 
