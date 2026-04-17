@@ -246,8 +246,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const halfSvgSize = svgSize / 2;
   const sceneCenterY = "50%";
   const clickMeArcId = React.useId().replace(/:/g, "");
-  const portraitWidth = dimensions.centralRadius * 2.30;
-  const portraitHeight = dimensions.centralRadius * 2.52;
+  const portraitWidth = dimensions.centralRadius * 1.93;
+  const portraitHeight = dimensions.centralRadius * 2.42;
   const portraitHeightScale = portraitHeight / dimensions.centralRadius;
   const portraitCutoffPercent =
     ((portraitHeightScale - 2 + PORTRAIT_CUTOFF * 2) / portraitHeightScale) * 100;
@@ -362,7 +362,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             }}
           >
             <Image
-              src="/portrait1.png"
+              src="/art-headshot.png"
               alt=""
               aria-hidden
               width={600}
@@ -379,7 +379,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             style={{ clipPath: `inset(${PORTRAIT_CUTOFF * 100}% 0 0 0)` }}
           >
             <Image
-              src="/portrait1.png"
+              src="/art-headshot.png"
               alt=""
               aria-hidden
               width={600}
