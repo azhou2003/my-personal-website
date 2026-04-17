@@ -439,7 +439,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             }}
           >
             <textPath href={`#${clickMeArcId}`} startOffset="50%" textAnchor="middle">
-              Click on Me!
+              Click Me!
             </textPath>
           </text>
         </svg>
