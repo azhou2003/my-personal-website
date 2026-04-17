@@ -246,8 +246,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const halfSvgSize = svgSize / 2;
   const sceneCenterY = "50%";
   const clickMeArcId = React.useId().replace(/:/g, "");
-  const portraitWidth = dimensions.centralRadius * 2.30;
-  const portraitHeight = dimensions.centralRadius * 2.52;
+  const portraitWidth = dimensions.centralRadius * 1.93;
+  const portraitHeight = dimensions.centralRadius * 2.42;
   const portraitHeightScale = portraitHeight / dimensions.centralRadius;
   const portraitCutoffPercent =
     ((portraitHeightScale - 2 + PORTRAIT_CUTOFF * 2) / portraitHeightScale) * 100;
@@ -320,11 +320,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       )}
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(earthPos, '/flat-cartoon-earth.jpg', orbitConfig.earth.rotationSpeed)}
+        {renderPlanet(earthPos, '/earthy-earth.jpg', orbitConfig.earth.rotationSpeed)}
       </div>
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(marsPos, '/flat-cartoon-mars.jpg', orbitConfig.mars.rotationSpeed)}
+        {renderPlanet(marsPos, '/earthy-mars.jpg', orbitConfig.mars.rotationSpeed)}
       </div>
       <div
         className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
@@ -362,7 +362,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             }}
           >
             <Image
-              src="/portrait1.png"
+              src="/art-headshot.png"
               alt=""
               aria-hidden
               width={600}
@@ -379,7 +379,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             style={{ clipPath: `inset(${PORTRAIT_CUTOFF * 100}% 0 0 0)` }}
           >
             <Image
-              src="/portrait1.png"
+              src="/art-headshot.png"
               alt=""
               aria-hidden
               width={600}
@@ -439,7 +439,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             }}
           >
             <textPath href={`#${clickMeArcId}`} startOffset="50%" textAnchor="middle">
-              Click on Me!
+              Click Me!
             </textPath>
           </text>
         </svg>

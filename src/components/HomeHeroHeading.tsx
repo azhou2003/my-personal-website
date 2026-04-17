@@ -30,7 +30,7 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
           </span>
           <span className="hidden lg:inline">{"\u00A0"}</span>
           <span className="block lg:inline whitespace-nowrap">
-            {Array.from("to My World.").map((char, i) => (
+            {Array.from("to My World").map((char, i) => (
               <span
                 key={`world-${i}`}
                 className={`inline-block transition-[opacity,transform,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${

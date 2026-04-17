@@ -184,16 +184,16 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, isActive, scrollBySlide]);
 
   React.useEffect(() => {
-    if (!isExpanded || !isActive || activeSlideIndex === undefined || aboutSlides.length === 0) return;
+    if (!isExpanded || activeSlideIndex === undefined || aboutSlides.length === 0) return;
     scrollToSlide(activeSlideIndex, "auto");
-  }, [isExpanded, isActive, activeSlideIndex, aboutSlides.length, scrollToSlide]);
+  }, [isExpanded, activeSlideIndex, aboutSlides.length, scrollToSlide]);
 
   if (!isExpanded) {
     return (
       <div
         className={`w-full flex justify-center px-3 sm:px-4 pt-1.5 sm:pt-2 transition-all ${animateIn ? 'duration-1000' : 'duration-200'} ease-out ${showCompactText ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
       >
-        <div className="w-[min(92vw,23rem)] lg:w-[min(74vw,30rem)] bg-background-light/96 dark:bg-background-dark/96 border border-[var(--color-tab-border)] rounded-full px-3.5 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 shadow-[0_8px_22px_rgba(43,34,24,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.34)] backdrop-blur-[2px]">
+        <div className="w-[min(92vw,23rem)] lg:w-[min(74vw,30rem)] bg-[var(--color-compact-pill-bg)] border border-[var(--color-compact-pill-border)] rounded-full px-3.5 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 shadow-[var(--color-compact-pill-shadow)]">
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-1.5 sm:gap-3 lg:gap-4">
             <div className="flex gap-1 sm:gap-2.5 lg:gap-3 flex-shrink-0">
               {compactLinksToRender.map((link) => (
@@ -204,19 +204,20 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   rel={link.external ? "noopener noreferrer" : undefined}
                   aria-label={link.label}
                   className="scale-95 sm:scale-100"
+                  iconClassName="!text-[var(--color-compact-pill-icon)] hover:!text-[var(--color-compact-pill-icon-hover)] hover:scale-110"
                   icon={iconByKey[link.icon]}
                 />
               ))}
             </div>
             <div className="flex-1 min-w-0 text-center leading-none">
-              <p className="text-[0.58rem] sm:text-[0.63rem] lg:text-[0.7rem] uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-0.5 font-medium">
+              <p className="text-[0.58rem] sm:text-[0.63rem] lg:text-[0.7rem] uppercase tracking-[0.2em] text-[var(--color-compact-pill-kicker)] mb-0.5 font-medium">
                 Scroll To
               </p>
-              <h3 className="text-[0.95rem] sm:text-[1.05rem] lg:text-[1.18rem] font-semibold tracking-[0.015em] text-foreground-light dark:text-foreground-dark whitespace-nowrap">
+              <h3 className="text-[0.95rem] sm:text-[1.05rem] lg:text-[1.18rem] font-semibold tracking-[0.015em] text-[var(--color-compact-pill-title)] whitespace-nowrap">
                 {compactPillText}
               </h3>
             </div>
-            <div className="text-foreground-light dark:text-foreground-dark text-[1.05rem] sm:text-[1.2rem] lg:text-[1.35rem] font-bold drop-shadow-sm animate-bounce-slow [animation-duration:3.1s] sm:[animation-duration:2.4s] flex-shrink-0">
+            <div className="text-[var(--color-compact-pill-arrow)] text-[1.05rem] sm:text-[1.2rem] lg:text-[1.35rem] font-bold opacity-85 flex-shrink-0">
               <FaChevronDown className="w-[1.05rem] h-[1.05rem] sm:w-[1.2rem] sm:h-[1.2rem] lg:w-[1.35rem] lg:h-[1.35rem]" aria-hidden="true" />
             </div>
           </div>
@@ -310,7 +311,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           height={480}
                           quality={95}
                           sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
+                          className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
                           style={{ objectPosition: slide.imagePosition ?? "center" }}
                           draggable="false"
                         />
@@ -322,7 +323,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         )}
                       </div>
                     ) : (
-                      <div className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
+                      <div className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
                         <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
                           {slide.imageAlt}
                         </span>
@@ -352,7 +353,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                     </div>
 
-                    <div className="space-y-2.5 sm:space-y-5 text-[0.9rem] sm:text-lg leading-[1.45] sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-xl mx-auto xl:mx-0">
+                    <div className="space-y-2.5 sm:space-y-5 text-[0.98rem] sm:text-lg leading-7 sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-[34ch] sm:max-w-xl mx-auto xl:mx-0">
                       {slide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}

@@ -39,6 +39,14 @@
   --color-blog-panel-border-tinted: rgba(122, 90, 54, 0.48);
   --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(58, 41, 24, 0.24);
   --color-orbit-menu-bg: linear-gradient(170deg, rgba(254, 250, 224, 0.98) 0%, rgba(247, 239, 213, 0.98) 100%);
+  --color-compact-pill-bg: #ece7d5;
+  --color-compact-pill-border: #d7c9ab;
+  --color-compact-pill-kicker: #7a5a36;
+  --color-compact-pill-title: #5f4a34;
+  --color-compact-pill-arrow: #7a5a36;
+  --color-compact-pill-shadow: 0 8px 20px rgba(43, 34, 24, 0.12);
+  --color-compact-pill-icon: #6b5438;
+  --color-compact-pill-icon-hover: #5f4a34;
 }
 
 .dark {
@@ -71,6 +79,14 @@
   --color-blog-panel-border-tinted: rgba(132, 120, 104, 0.74);
   --color-blog-panel-shadow-tinted: 0 -12px 24px rgba(0, 0, 0, 0.45);
   --color-orbit-menu-bg: linear-gradient(170deg, rgba(51, 47, 43, 0.98) 0%, rgba(41, 37, 34, 0.98) 100%);
+  --color-compact-pill-bg: #23201c;
+  --color-compact-pill-border: #5f574d;
+  --color-compact-pill-kicker: #b9a68d;
+  --color-compact-pill-title: #d9c8ad;
+  --color-compact-pill-arrow: #d8c7ab;
+  --color-compact-pill-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  --color-compact-pill-icon: #c8b59b;
+  --color-compact-pill-icon-hover: #d9c8ad;
 }
 
 body {
@@ -84,6 +100,25 @@ body {
 body.dark {
   background: var(--color-bg);
   color: var(--color-fg);
+}
+
+@keyframes globalStarTwinkle {
+  0%, 100% {
+    opacity: 0.12;
+    transform: scale(0.82);
+  }
+  20% {
+    opacity: var(--star-max-opacity, 0.64);
+    transform: scale(1);
+  }
+  58% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  76% {
+    opacity: calc(var(--star-max-opacity, 0.64) - 0.1);
+    transform: scale(1.08);
+  }
 }
 
 h1, h2, h3, h4 {
