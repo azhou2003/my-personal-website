@@ -193,7 +193,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
       <div
         className={`w-full flex justify-center px-3 sm:px-4 pt-1.5 sm:pt-2 transition-all ${animateIn ? 'duration-1000' : 'duration-200'} ease-out ${showCompactText ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
       >
-        <div className="w-[min(92vw,23rem)] lg:w-[min(74vw,30rem)] bg-background-light/96 dark:bg-background-dark/96 border border-[var(--color-tab-border)] rounded-full px-3.5 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 shadow-[0_8px_22px_rgba(43,34,24,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.34)] backdrop-blur-[2px]">
+        <div className="w-[min(92vw,23rem)] lg:w-[min(74vw,30rem)] bg-[var(--color-compact-pill-bg)] border border-[var(--color-compact-pill-border)] rounded-full px-3.5 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 shadow-[var(--color-compact-pill-shadow)]">
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-1.5 sm:gap-3 lg:gap-4">
             <div className="flex gap-1 sm:gap-2.5 lg:gap-3 flex-shrink-0">
               {compactLinksToRender.map((link) => (
@@ -204,19 +204,20 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   rel={link.external ? "noopener noreferrer" : undefined}
                   aria-label={link.label}
                   className="scale-95 sm:scale-100"
+                  iconClassName="!text-[var(--color-compact-pill-icon)] hover:!text-[var(--color-compact-pill-icon-hover)] hover:scale-110"
                   icon={iconByKey[link.icon]}
                 />
               ))}
             </div>
             <div className="flex-1 min-w-0 text-center leading-none">
-              <p className="text-[0.58rem] sm:text-[0.63rem] lg:text-[0.7rem] uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-0.5 font-medium">
+              <p className="text-[0.58rem] sm:text-[0.63rem] lg:text-[0.7rem] uppercase tracking-[0.2em] text-[var(--color-compact-pill-kicker)] mb-0.5 font-medium">
                 Scroll To
               </p>
-              <h3 className="text-[0.95rem] sm:text-[1.05rem] lg:text-[1.18rem] font-semibold tracking-[0.015em] text-foreground-light dark:text-foreground-dark whitespace-nowrap">
+              <h3 className="text-[0.95rem] sm:text-[1.05rem] lg:text-[1.18rem] font-semibold tracking-[0.015em] text-[var(--color-compact-pill-title)] whitespace-nowrap">
                 {compactPillText}
               </h3>
             </div>
-            <div className="text-foreground-light dark:text-foreground-dark text-[1.05rem] sm:text-[1.2rem] lg:text-[1.35rem] font-bold drop-shadow-sm animate-bounce-slow [animation-duration:3.1s] sm:[animation-duration:2.4s] flex-shrink-0">
+            <div className="text-[var(--color-compact-pill-arrow)] text-[1.05rem] sm:text-[1.2rem] lg:text-[1.35rem] font-bold opacity-85 flex-shrink-0">
               <FaChevronDown className="w-[1.05rem] h-[1.05rem] sm:w-[1.2rem] sm:h-[1.2rem] lg:w-[1.35rem] lg:h-[1.35rem]" aria-hidden="true" />
             </div>
           </div>
