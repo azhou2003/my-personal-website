@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import GlobalStars from "../components/GlobalStars";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +32,10 @@ export default function RootLayout({
         {/* Remove all favicon links. You will add your own favicon code here. */}
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative isolate`}
       >
-        {children}
+        <GlobalStars />
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

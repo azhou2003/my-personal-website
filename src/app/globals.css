@@ -86,6 +86,25 @@ body.dark {
   color: var(--color-fg);
 }
 
+@keyframes globalStarTwinkle {
+  0%, 100% {
+    opacity: 0.12;
+    transform: scale(0.82);
+  }
+  20% {
+    opacity: var(--star-max-opacity, 0.64);
+    transform: scale(1);
+  }
+  58% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  76% {
+    opacity: calc(var(--star-max-opacity, 0.64) - 0.1);
+    transform: scale(1.08);
+  }
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
   font-weight: 700;
