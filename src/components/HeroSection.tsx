@@ -320,11 +320,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       )}
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(earthPos, '/flat-cartoon-earth.jpg', orbitConfig.earth.rotationSpeed)}
+        {renderPlanet(earthPos, '/earthy-earth.jpg', orbitConfig.earth.rotationSpeed)}
       </div>
 
       <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(marsPos, '/flat-cartoon-mars.jpg', orbitConfig.mars.rotationSpeed)}
+        {renderPlanet(marsPos, '/earthy-mars.jpg', orbitConfig.mars.rotationSpeed)}
       </div>
       <div
         className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
