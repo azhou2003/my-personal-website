@@ -184,9 +184,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, isActive, scrollBySlide]);
 
   React.useEffect(() => {
-    if (!isExpanded || !isActive || activeSlideIndex === undefined || aboutSlides.length === 0) return;
+    if (!isExpanded || activeSlideIndex === undefined || aboutSlides.length === 0) return;
     scrollToSlide(activeSlideIndex, "auto");
-  }, [isExpanded, isActive, activeSlideIndex, aboutSlides.length, scrollToSlide]);
+  }, [isExpanded, activeSlideIndex, aboutSlides.length, scrollToSlide]);
 
   if (!isExpanded) {
     return (
