@@ -310,7 +310,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           height={480}
                           quality={95}
                           sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
+                          className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
                           style={{ objectPosition: slide.imagePosition ?? "center" }}
                           draggable="false"
                         />
@@ -322,7 +322,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         )}
                       </div>
                     ) : (
-                      <div className="w-48 sm:w-64 lg:w-72 xl:w-[22rem] h-60 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
+                      <div className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
                         <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
                           {slide.imageAlt}
                         </span>
@@ -352,7 +352,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                     </div>
 
-                    <div className="space-y-2.5 sm:space-y-5 text-[0.9rem] sm:text-lg leading-[1.45] sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-xl mx-auto xl:mx-0">
+                    <div className="space-y-2.5 sm:space-y-5 text-[0.98rem] sm:text-lg leading-7 sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-[34ch] sm:max-w-xl mx-auto xl:mx-0">
                       {slide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}
