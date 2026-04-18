@@ -6,7 +6,7 @@ Personal website built with Next.js 15.5.15, featuring a markdown-powered blog a
 ## Commands
 - `npm run dev` - Start development server
 - `npm run build` - Production build
-- `npm run lint` - ESLint (only validation available)
+- `npm run lint` - ESLint CLI (`eslint .`)
 - No `typecheck` or `test` scripts exist
 
 ## Content Structure
@@ -59,6 +59,7 @@ image: "/path/to/image.png"
 - Keep interactive feature logic inside its feature folder when possible (for example, timeline logic under `src/features/portfolio/components`).
 - Keep `src/app/*Client.tsx` files focused on orchestration (filters/props/wiring) and move heavy UI/scroll logic into feature components.
 - Use semantic interactive elements (`button`, `a`) for controls (including filter tags), and include `aria-pressed` for toggle-like controls.
+- When implementation changes behavior, architecture, or workflow commands, update corresponding documentation in the same pass (at minimum `AGENTS.md` and any related docs like `docs/markdown-guide.md`).
 
 ## Deployment
 Vercel (configured in `.vercel/` ignored by git). No CI/CD workflows exist.
