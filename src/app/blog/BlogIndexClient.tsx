@@ -3,16 +3,11 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import StaticTagList from "../../components/StaticTagList";
-import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
-import { useIsDarkMode } from "../../hooks/useIsDarkMode";
-import SearchBar from "../../components/SearchBar";
-import SortSwitch from "../../components/SortSwitch";
-import TypingAnimation from "../../components/TypingAnimation";
-import { formatDate } from "../../lib/formatDate";
-import type { BlogMeta } from "../../lib/types";
-import Tag from "../../components/Tag";
-import FadeInSection from "../../components/FadeInSection";
+import { FadeInSection, SearchBar, SortSwitch, TypingAnimation } from "@/components/ui";
+import { accentClasses } from "@/components/ui/styles";
+import { StaticTagList, Tag } from "@/components/ui/tags";
+import { formatDate } from "@/lib/formatDate";
+import type { BlogMeta } from "@/lib/types";
 
 export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   const [search, setSearch] = useState("");
@@ -24,8 +19,6 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
   const [peekHeights, setPeekHeights] = useState<Record<string, number>>({});
   const cardRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const titleRowRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  const isDarkMode = useIsDarkMode();
 
   const allTags = useMemo(
     () => Array.from(new Set(posts.flatMap((p) => p.tags))).sort(),
@@ -208,13 +201,13 @@ export default function BlogIndexClient({ posts }: { posts: BlogMeta[] }) {
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
           {allTags.map((tag, i) => (
-            <Tag
-              key={tag}
-              label={tag}
-              colorClass={(isDarkMode ? accentClassesDark : accentClassesLight)[i % accentClassesLight.length]}
-              onClick={() => handleTagClick(tag)}
-              className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
-            />
+              <Tag
+                key={tag}
+                label={tag}
+                colorClass={accentClasses[i % accentClasses.length]}
+                onClick={() => handleTagClick(tag)}
+                className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
+              />
           ))}
         </div>
       </div>

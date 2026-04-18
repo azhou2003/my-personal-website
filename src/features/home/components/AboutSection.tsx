@@ -1,8 +1,8 @@
 import React from "react";
 import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGoodreadsG, FaPenNib, FaSteam } from "react-icons/fa";
 import Image from "next/image";
-import IconLink from "./IconLink";
-import type { AboutSlide, AboutSlideLink } from "../lib/types";
+import { IconLink } from "@/components/ui";
+import type { AboutSlide, AboutSlideLink } from "@/lib/types";
 
 interface AboutSectionProps {
   isExpanded: boolean;

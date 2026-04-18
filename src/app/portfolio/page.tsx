@@ -1,8 +1,8 @@
-import PageLayout from "../../components/layout/PageLayout";
-import { getAllProjects } from "../../lib/portfolio";
-import type { PortfolioProject } from "../../lib/types";
+import { PageLayout } from "@/components/layout";
+import { getAllProjects } from "@/lib/portfolio";
+import type { PortfolioProject } from "@/lib/types";
 import PortfolioClient from "./PortfolioClient";
-import { portfolioMetadata } from "../../lib/metadata";
+import { portfolioMetadata } from "@/lib/metadata";
 
 export const metadata = portfolioMetadata;
 

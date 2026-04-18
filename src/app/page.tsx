@@ -1,6 +1,6 @@
 import HomeClient from "./HomeClient";
-import { homeMetadata } from "../lib/metadata";
-import { getAllAboutSlides } from "../lib/aboutSlides";
+import { homeMetadata } from "@/lib/metadata";
+import { getAllAboutSlides } from "@/lib/aboutSlides";
 
 export const metadata = homeMetadata;
 

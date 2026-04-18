@@ -1,7 +1,7 @@
-import PageLayout from "../../components/layout/PageLayout";
-import { getAllBlogPosts } from "../../lib/markdown";
+import { PageLayout } from "@/components/layout";
+import { getAllBlogPosts } from "@/lib/markdown";
 import BlogIndexClient from "./BlogIndexClient";
-import { blogMetadata } from "../../lib/metadata";
+import { blogMetadata } from "@/lib/metadata";
 
 export const metadata = blogMetadata;
 

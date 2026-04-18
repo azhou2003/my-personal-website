@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import ThemeToggle from '../theme/ThemeToggle';
+import { ThemeToggle } from "@/components/theme";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 

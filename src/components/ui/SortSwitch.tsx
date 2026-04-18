@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { designTokens } from "../lib/designTokens";
+import { designTokens } from "@/lib/designTokens";
 
 interface SortSwitchProps {
   value: "desc" | "asc";

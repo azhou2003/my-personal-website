@@ -1,15 +1,11 @@
 "use client";
-import type { PortfolioProject } from "../../lib/types";
+import type { PortfolioProject } from "@/lib/types";
 import { useState, useMemo, useEffect, useRef } from "react";
-import SearchBar from "../../components/SearchBar";
-import { formatDate } from "../../lib/formatDate";
+import { FadeInSection, SearchBar, SortSwitch } from "@/components/ui";
+import { accentClasses } from "@/components/ui/styles";
+import { StaticTagList, Tag } from "@/components/ui/tags";
+import { formatDate } from "@/lib/formatDate";
 import Image from "next/image";
-import SortSwitch from "../../components/SortSwitch";
-import { accentClassesLight, accentClassesDark } from "../../components/styles/tagColors";
-import { useIsDarkMode } from "../../hooks/useIsDarkMode";
-import Tag from "../../components/Tag";
-import StaticTagList from "../../components/StaticTagList";
-import FadeInSection from "../../components/FadeInSection";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};
@@ -35,8 +31,6 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
   const lastScrollYRef = useRef(0);
   const lastSnapAtRef = useRef(0);
   const wheelBurstRef = useRef({ lastTs: 0, accumulated: 0 });
-  const isDarkMode = useIsDarkMode();
-
   const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
 
   const allTags = useMemo(() => {
@@ -418,13 +412,13 @@ export default function PortfolioClient({ projects }: { projects: PortfolioProje
       <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
         <div className="flex flex-wrap gap-2 justify-center">
           {allTags.map((tag, i) => (
-            <Tag
-              key={tag}
-              label={tag}
-              colorClass={(isDarkMode ? accentClassesDark : accentClassesLight)[i % accentClassesLight.length]}
-              onClick={() => handleTagClick(tag)}
-              className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
-            >
+              <Tag
+                key={tag}
+                label={tag}
+                colorClass={accentClasses[i % accentClasses.length]}
+                onClick={() => handleTagClick(tag)}
+                className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
+              >
               {`${tag}: ${tagFrequency[tag]}`}
             </Tag>
           ))}

@@ -1,15 +1,17 @@
-import { getAllBlogPosts, getBlogPostBySlug } from "../../../lib/markdown";
+import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPrevNextPosts } from "../../../lib/utils";
-import { formatDate } from "../../../lib/formatDate";
-import StaticTagList from "../../../components/StaticTagList";
-import ShareButton from "../../../features/blog/components/ShareButton";
-import MarkdownContent from "../../../features/blog/components/MarkdownContent";
-import ReadingProgress from "../../../features/blog/components/ReadingProgress";
-import BackToTopButton from "../../../features/blog/components/BackToTopButton";
-import ReaderComfortToggle from "../../../features/blog/components/ReaderComfortToggle";
+import { getPrevNextPosts } from "@/lib/utils";
+import { formatDate } from "@/lib/formatDate";
+import { StaticTagList } from "@/components/ui/tags";
+import {
+  BackToTopButton,
+  MarkdownContent,
+  ReaderComfortToggle,
+  ReadingProgress,
+  ShareButton,
+} from "@/features/blog/components";
 
 type BlogPageParams = Promise<{ slug: string }>;
 

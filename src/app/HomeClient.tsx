@@ -1,13 +1,10 @@
 "use client";
 
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import HeroSection from "../components/HeroSection";
-import AboutSection from "../components/AboutSection";
-import HomeHeroHeading from "../components/HomeHeroHeading";
+import { Footer, Navbar } from "@/components/layout";
+import { AboutSection, HeroSection, HomeHeroHeading } from "@/features/home/components";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HOME_ANIMATION_TIMINGS } from "../lib/motion";
-import type { AboutSlide } from "../lib/types";
+import { HOME_ANIMATION_TIMINGS } from "@/lib/motion";
+import type { AboutSlide } from "@/lib/types";
 
 interface HomeClientProps {
   aboutSlides: AboutSlide[];

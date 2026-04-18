@@ -1,4 +1,3 @@
-// src/components/IconLink.tsx
 import React from "react";
 import { iconLinkClasses } from "./styles/iconLinkStyles";
 
