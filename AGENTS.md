@@ -57,6 +57,7 @@ image: "/path/to/image.png"
 - For theme-dependent colors, use CSS variables in `src/app/globals.css` (`:root` + `.dark`) instead of duplicating light/dark JS logic.
 - Avoid per-component DOM theme observers or localStorage theme toggles; use `next-themes`.
 - Keep interactive feature logic inside its feature folder when possible (for example, timeline logic under `src/features/portfolio/components`).
+- Keep `src/app/*Client.tsx` files focused on orchestration (filters/props/wiring) and move heavy UI/scroll logic into feature components.
 
 ## Deployment
 Vercel (configured in `.vercel/` ignored by git). No CI/CD workflows exist.
