@@ -59,6 +59,7 @@ image: "/path/to/image.png"
 - Keep interactive feature logic inside its feature folder when possible (for example, timeline logic under `src/features/portfolio/components`).
 - Keep `src/app/*Client.tsx` files focused on orchestration (filters/props/wiring) and move heavy UI/scroll logic into feature components.
 - Use semantic interactive elements (`button`, `a`) for controls (including filter tags), and include `aria-pressed` for toggle-like controls.
+- Preserve keyboard parity for interactive navigation (section snapping, slide navigation, timeline navigation) when refactoring these components.
 - When implementation changes behavior, architecture, or workflow commands, update corresponding documentation in the same pass (at minimum `AGENTS.md` and any related docs like `docs/markdown-guide.md`).
 
 ## Deployment

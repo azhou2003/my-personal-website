@@ -22,6 +22,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
   const lastScrollYRef = useRef(0);
   const lastSnapAtRef = useRef(0);
   const wheelBurstRef = useRef({ lastTs: 0, accumulated: 0 });
+  const holdActiveUntilRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,6 +74,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
       const maxTop = document.documentElement.scrollHeight - window.innerHeight;
       const clampedTop = Math.max(0, Math.min(targetTop, maxTop));
 
+      holdActiveUntilRef.current = window.performance.now() + 260;
       window.scrollTo({ top: clampedTop, behavior: "auto" });
       setActiveDesktopIndex(targetIndex);
     };
@@ -122,10 +124,34 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
       scrollToIndex(targetIndex);
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isTypingTarget =
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTypingTarget) return;
+
+      event.preventDefault();
+
+      const currentIndex = activeDesktopIndex ?? getClosestIndexToViewportCenter();
+      if (currentIndex === null) return;
+
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const targetIndex = Math.max(0, Math.min(currentIndex + direction, projects.length - 1));
+      if (targetIndex === currentIndex) return;
+      scrollToIndex(targetIndex);
+    };
+
     window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isMobile, projects, activeDesktopIndex]);
 
@@ -234,6 +260,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
       const viewportCenterY = window.innerHeight / 2;
       const influenceDistance = window.innerHeight * 0.55;
       const nextScaleByIndex: Record<number, number> = {};
+      const distanceByIndex: Record<number, number> = {};
       let closestIndex: number | null = null;
       let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -244,6 +271,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
         const rect = row.getBoundingClientRect();
         const rowCenterY = rect.top + rect.height / 2;
         const distance = Math.abs(rowCenterY - viewportCenterY);
+        distanceByIndex[idx] = distance;
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = idx;
@@ -265,7 +293,30 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
         return prev;
       });
 
-      setActiveDesktopIndex((prev) => (prev === closestIndex ? prev : closestIndex));
+      let candidateIndex = closestIndex;
+      const nearTop = window.scrollY <= 20;
+      const nearBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 20;
+
+      if (nearTop && projects.length > 0) {
+        candidateIndex = 0;
+      } else if (nearBottom && projects.length > 0) {
+        candidateIndex = projects.length - 1;
+      }
+
+      const now = window.performance.now();
+      setActiveDesktopIndex((prev) => {
+        if (candidateIndex === null) return prev;
+        if (prev === candidateIndex) return prev;
+        if (prev === null) return candidateIndex;
+        if (now < holdActiveUntilRef.current) return prev;
+
+        const prevDistance = distanceByIndex[prev] ?? Number.POSITIVE_INFINITY;
+        const nextDistance = distanceByIndex[candidateIndex] ?? Number.POSITIVE_INFINITY;
+        const switchThreshold = 12;
+
+        return nextDistance + switchThreshold < prevDistance ? candidateIndex : prev;
+      });
     };
 
     const requestUpdate = () => {
