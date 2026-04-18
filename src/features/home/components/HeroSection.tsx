@@ -332,8 +332,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           top: sceneCenterY,
           width: `${Math.floor(dimensions.centralRadius * 2.7)}px`,
           height: `${Math.floor(dimensions.centralRadius * 2.7)}px`,
-          background:
-            "radial-gradient(circle, rgba(255, 214, 157, 0.28) 0%, rgba(255, 214, 157, 0.12) 38%, rgba(255, 214, 157, 0) 72%)",
+          background: "var(--color-hero-halo)",
           filter: "blur(2px)",
         }}
       />
@@ -450,8 +449,12 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         >
           <div
             ref={orbitMenuMobileRef}
-            className="mx-auto w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.28)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)] p-3 space-y-3"
-            style={{ background: "var(--color-orbit-menu-bg)" }}
+            className="mx-auto w-full max-w-md rounded-2xl border text-foreground-light dark:text-foreground-dark p-3 space-y-3"
+            style={{
+              background: "var(--color-orbit-menu-bg)",
+              borderColor: "var(--color-orbit-menu-border)",
+              boxShadow: "var(--color-orbit-menu-shadow)",
+            }}
           >
             {renderOrbitMenuContent()}
           </div>
@@ -461,8 +464,12 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       {isOrbitMenuOpen && (
         <div
           ref={orbitMenuDesktopRef}
-          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-2xl border border-[#d7c9ab] dark:border-[#5f574d] text-foreground-light dark:text-foreground-dark shadow-[0_18px_40px_rgba(43,34,24,0.22)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.38)] p-4 space-y-3"
-          style={{ background: "var(--color-orbit-menu-bg)" }}
+          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-2xl border text-foreground-light dark:text-foreground-dark p-4 space-y-3"
+          style={{
+            background: "var(--color-orbit-menu-bg)",
+            borderColor: "var(--color-orbit-menu-border)",
+            boxShadow: "var(--color-orbit-menu-shadow-soft)",
+          }}
         >
           {renderOrbitMenuContent()}
         </div>

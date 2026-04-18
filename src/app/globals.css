@@ -17,6 +17,7 @@
   --color-orbit-mars-front: #7f90a37a;
   --color-hero-core-bg: #ff9f80;
   --color-hero-core-border: #d4501f;
+  --color-hero-halo: radial-gradient(circle, rgba(255, 214, 157, 0.28) 0%, rgba(255, 214, 157, 0.12) 38%, rgba(255, 214, 157, 0) 72%);
   --color-hero-click-hint: #7a4d2f;
   --color-tab-border: #9a8d6b;
   --color-tab-border-dark: #5f574d;
@@ -25,6 +26,8 @@
   --color-switch-thumb: #fefae0;
   --color-switch-thumb-border: #b7c7a3;
   --color-switch-ring: 0 0 0 4px rgba(183, 199, 163, 0.3);
+  --color-switch-shadow-active: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --color-switch-shadow-idle: 0 1px 4px rgba(0, 0, 0, 0.1);
   --color-timeline-line: #23201c;
   --color-timeline-fill: #23201c;
   --color-card-muted-bg: #ece7d5;
@@ -57,6 +60,18 @@
   --color-compact-pill-shadow: 0 8px 20px rgba(43, 34, 24, 0.12);
   --color-compact-pill-icon: #6b5438;
   --color-compact-pill-icon-hover: #5f4a34;
+  --color-star-dot: rgba(255, 249, 232, 0.9);
+  --color-star-glow: 0 0 8px rgba(255, 235, 186, 0.68);
+  --color-hero-title-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  --color-gradient-text-fallback: #7a5a36;
+  --color-about-placeholder-gradient: linear-gradient(135deg, rgba(255, 224, 102, 0.3), rgba(246, 238, 200, 1), rgba(255, 179, 133, 0.4));
+  --color-status-pill-border: rgba(122, 90, 54, 0.28);
+  --color-status-pill-bg: rgba(183, 199, 163, 0.12);
+  --color-status-ping: rgba(183, 199, 163, 0.3);
+  --color-status-dot: #b7c7a3;
+  --color-orbit-menu-border: #d7c9ab;
+  --color-orbit-menu-shadow: 0 18px 40px rgba(43, 34, 24, 0.28);
+  --color-orbit-menu-shadow-soft: 0 18px 40px rgba(43, 34, 24, 0.22);
 }
 
 .dark {
@@ -70,6 +85,7 @@
   --color-hero-kicker: #d8c7ab;
   --color-hero-subtitle: #d9c8ad;
   --color-hero-click-hint: #f0dbc0;
+  --color-hero-halo: radial-gradient(circle, rgba(255, 214, 157, 0.18) 0%, rgba(255, 214, 157, 0.08) 38%, rgba(255, 214, 157, 0) 72%);
   --color-tab-border: #5f574d;
   --color-tab-border-dark: #5f574d;
   --color-switch-track-off: #3f3b36;
@@ -77,6 +93,8 @@
   --color-switch-thumb: #f5f5f5;
   --color-switch-thumb-border: #3f3b36;
   --color-switch-ring: 0 0 0 4px rgba(63, 74, 54, 0.3);
+  --color-switch-shadow-active: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --color-switch-shadow-idle: 0 1px 4px rgba(0, 0, 0, 0.22);
   --color-timeline-line: #ece7d5;
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;
@@ -107,6 +125,18 @@
   --color-compact-pill-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
   --color-compact-pill-icon: #c8b59b;
   --color-compact-pill-icon-hover: #d9c8ad;
+  --color-star-dot: rgba(255, 249, 232, 0.85);
+  --color-star-glow: 0 0 8px rgba(255, 235, 186, 0.5);
+  --color-hero-title-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+  --color-gradient-text-fallback: #d8c7ab;
+  --color-about-placeholder-gradient: linear-gradient(135deg, rgba(255, 224, 102, 0.2), rgba(65, 55, 46, 1), rgba(255, 179, 133, 0.2));
+  --color-status-pill-border: rgba(216, 199, 171, 0.24);
+  --color-status-pill-bg: rgba(183, 199, 163, 0.16);
+  --color-status-ping: rgba(183, 199, 163, 0.34);
+  --color-status-dot: #b7c7a3;
+  --color-orbit-menu-border: #5f574d;
+  --color-orbit-menu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --color-orbit-menu-shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.38);
 }
 
 body {

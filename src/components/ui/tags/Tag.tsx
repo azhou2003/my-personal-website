@@ -15,7 +15,7 @@ const Tag: React.FC<TagProps> = ({ onClick, ...props }) => (
     {...props}
     onClick={onClick}
     cursor="pointer"
-    hoverEffects={true}
+    hoverEffects
   />
 );
 

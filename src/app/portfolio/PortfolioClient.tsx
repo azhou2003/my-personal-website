@@ -27,6 +27,7 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
   const [triggerKey, setTriggerKey] = useState(0);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const normalizedSearch = search.trim().toLowerCase();
 
   const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
 
@@ -45,9 +46,9 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
         .filter((project) => {
           const matchesSearch =
             (typeof project.title === "string" &&
-              project.title.toLowerCase().includes(search.toLowerCase())) ||
+              project.title.toLowerCase().includes(normalizedSearch)) ||
             (typeof project.description === "string" &&
-              project.description.toLowerCase().includes(search.toLowerCase()));
+              project.description.toLowerCase().includes(normalizedSearch));
 
           const matchesTags =
             Array.isArray(project.tags) &&
@@ -61,7 +62,7 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
           }
           return new Date(a.date).getTime() - new Date(b.date).getTime();
         }),
-    [projects, search, selectedTags, sortOrder]
+    [projects, normalizedSearch, selectedTags, sortOrder]
   );
 
   useEffect(() => {
@@ -146,6 +147,7 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
               label={tag}
               colorClass={accentClasses[index % accentClasses.length]}
               onClick={() => handleTagClick(tag)}
+              pressed={selectedTags.includes(tag)}
               className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
             >
               {`${tag}: ${tagFrequency[tag]}`}

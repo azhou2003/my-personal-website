@@ -162,7 +162,7 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
               }}
               href={`/blog/${post.slug}`}
               style={{ borderColor: "var(--color-blog-panel-border-tinted)" }}
-              className="group relative block w-full h-80 rounded-lg border bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300"
+              className="group relative block w-full h-80 rounded-lg border bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow"
             >
               <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]">
                 {post.image && (

@@ -22,8 +22,9 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded focus:outline-none bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-transform duration-200 hover:scale-110 cursor-pointer border-none hover:bg-accent-yellow/20 dark:hover:bg-accent-sage/20 relative"
-      aria-label="Toggle dark mode"
+      className="p-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-transform duration-200 hover:scale-110 cursor-pointer border-none hover:bg-accent-yellow/20 dark:hover:bg-accent-sage/20 relative"
+      aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={isDarkMode}
       type="button"
       onMouseEnter={() => setHovered(true)}

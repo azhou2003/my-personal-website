@@ -16,6 +16,7 @@ export default function BlogIndexClient({ posts }: BlogIndexClientProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [triggerKey, setTriggerKey] = useState(0);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const normalizedSearch = search.trim().toLowerCase();
 
   const allTags = useMemo(
     () => Array.from(new Set(posts.flatMap((post) => post.tags))).sort(),
@@ -27,8 +28,8 @@ export default function BlogIndexClient({ posts }: BlogIndexClientProps) {
       posts
         .filter((post) => {
           const matchesSearch =
-            post.title.toLowerCase().includes(search.toLowerCase()) ||
-            post.summary.toLowerCase().includes(search.toLowerCase());
+            post.title.toLowerCase().includes(normalizedSearch) ||
+            post.summary.toLowerCase().includes(normalizedSearch);
           const matchesTags =
             selectedTags.length === 0 || selectedTags.every((tag) => post.tags.includes(tag));
           return matchesSearch && matchesTags;
@@ -39,7 +40,7 @@ export default function BlogIndexClient({ posts }: BlogIndexClientProps) {
           }
           return new Date(a.date).getTime() - new Date(b.date).getTime();
         }),
-    [posts, search, selectedTags, sortOrder]
+    [posts, normalizedSearch, selectedTags, sortOrder]
   );
 
   useEffect(() => {
@@ -75,6 +76,7 @@ export default function BlogIndexClient({ posts }: BlogIndexClientProps) {
               label={tag}
               colorClass={accentClasses[index % accentClasses.length]}
               onClick={() => handleTagClick(tag)}
+              pressed={selectedTags.includes(tag)}
               className={selectedTags.includes(tag) ? "ring-2 ring-accent-yellow" : ""}
             />
           ))}

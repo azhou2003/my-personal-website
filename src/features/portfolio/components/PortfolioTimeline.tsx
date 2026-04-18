@@ -349,8 +349,8 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           href={project.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="focus:outline-none"
-                          tabIndex={0}
+                          className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
+                          aria-label={`Open ${project.title} project`}
                         >
                           <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                             {isTransparentAsset && (
@@ -390,8 +390,8 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           href={project.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="focus:outline-none"
-                          tabIndex={0}
+                          className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
+                          aria-label={`Open ${project.title} project`}
                         >
                           <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
                             {isTransparentAsset && (
@@ -419,9 +419,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                       </div>
                     </div>
                   ) : (
-                    <span className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
-                      tabIndex={0}
-                    >
+                    <span className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}>
                       {formatDate(project.date, "MMMM yyyy")}
                     </span>
                   )}

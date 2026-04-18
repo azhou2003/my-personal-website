@@ -7,4 +7,6 @@ export const designTokens = {
   switchThumb: "var(--color-switch-thumb)",
   switchThumbBorder: "var(--color-switch-thumb-border)",
   switchRing: "var(--color-switch-ring)",
+  switchShadowActive: "var(--color-switch-shadow-active)",
+  switchShadowIdle: "var(--color-switch-shadow-idle)",
 } as const;

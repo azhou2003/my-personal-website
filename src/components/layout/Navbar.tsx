@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
 
   // Helper function to get link classes based on active state
   const getLinkClasses = (href: string) => {
-    const baseClasses = "inline-flex h-10 items-center justify-center whitespace-nowrap leading-none transition-colors duration-200";
+    const baseClasses = "inline-flex h-10 items-center justify-center whitespace-nowrap leading-none transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-sm";
     const isActive = isActivePage(href);
     
     if (isActive) {

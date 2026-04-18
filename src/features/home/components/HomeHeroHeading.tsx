@@ -12,7 +12,7 @@ export default function HomeHeroHeading({ showWelcome, showToMyWorld }: HomeHero
         <p className={`section-kicker mb-2 sm:mb-3 transition-all duration-700 ${showWelcome ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
           Anjie Zhou
         </p>
-        <h1 className="hero-title font-extrabold text-foreground-light dark:text-foreground-dark drop-shadow-[0_6px_24px_rgba(0,0,0,0.22)] select-none leading-[1.1] tracking-[-0.02em] lg:whitespace-nowrap">
+        <h1 className="hero-title font-extrabold text-foreground-light dark:text-foreground-dark select-none leading-[1.1] tracking-[-0.02em] lg:whitespace-nowrap" style={{ textShadow: "var(--color-hero-title-shadow)" }}>
           <span className="block lg:inline">
             {Array.from("Welcome").map((char, i) => (
               <span
