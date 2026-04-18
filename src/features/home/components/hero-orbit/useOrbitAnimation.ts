@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ORBIT_ANIMATION } from "../../lib/motion";
+import { ORBIT_ANIMATION } from "@/lib/motion";
 import { type OrbitConfig, type OrbitDimensions } from "./types";
 
 const getDefaultOrbitDimensions = (): OrbitDimensions => ({

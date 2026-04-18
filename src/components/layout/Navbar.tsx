@@ -1,8 +1,8 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import DarkModeToggle from './DarkModeToggle';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/theme";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -12,15 +12,15 @@ const Navbar: React.FC = () => {
 
   // Helper function to determine if a link is active
   const isActivePage = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
+    if (href === "/") {
+      return pathname === "/";
     }
     return pathname.startsWith(href);
   };
 
   // Helper function to get link classes based on active state
   const getLinkClasses = (href: string) => {
-    const baseClasses = "inline-flex h-10 items-center justify-center whitespace-nowrap leading-none transition-colors duration-200";
+    const baseClasses = "inline-flex h-10 items-center justify-center whitespace-nowrap leading-none transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-sm";
     const isActive = isActivePage(href);
     
     if (isActive) {
@@ -79,25 +79,25 @@ const Navbar: React.FC = () => {
               width={40}
               height={40}
               className="h-10 w-10 object-contain"
-              style={{ display: 'inline-block' }}
+              style={{ display: "inline-block" }}
               priority
             />
           </span>
           <span className="sr-only">Home</span>
         </Link>
         <div className="flex h-10 items-center justify-center space-x-4">
-          <Link href="/" className={getLinkClasses('/')}>
+          <Link href="/" className={getLinkClasses("/")}>
             Home
           </Link>
-          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+          <Link href="/portfolio" className={getLinkClasses("/portfolio")}>
             Portfolio
           </Link>
-          <Link href="/blog" className={getLinkClasses('/blog')}>
+          <Link href="/blog" className={getLinkClasses("/blog")}>
             Blog
           </Link>
         </div>
         <div className="flex h-10 w-10 items-center justify-center justify-self-end">
-          <DarkModeToggle />
+          <ThemeToggle />
         </div>
       </div>
 
@@ -111,7 +111,7 @@ const Navbar: React.FC = () => {
                 width={40}
                 height={40}
                 className="h-10 w-10 object-contain"
-                style={{ display: 'inline-block' }}
+                style={{ display: "inline-block" }}
                 priority
               />
             </span>
@@ -119,16 +119,16 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
         <div className="flex h-10 items-center space-x-6">
-          <Link href="/" className={getLinkClasses('/')}>
+          <Link href="/" className={getLinkClasses("/")}>
             Home
           </Link>
-          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+          <Link href="/portfolio" className={getLinkClasses("/portfolio")}>
             Portfolio
           </Link>
-          <Link href="/blog" className={getLinkClasses('/blog')}>
+          <Link href="/blog" className={getLinkClasses("/blog")}>
             Blog
           </Link>
-          <DarkModeToggle />
+          <ThemeToggle />
         </div>
       </div>
     </nav>

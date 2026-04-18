@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import { useIsDarkMode } from "../hooks/useIsDarkMode";
-import { designTokens } from "../lib/designTokens";
+import { designTokens } from "@/lib/designTokens";
 
 interface SortSwitchProps {
   value: "desc" | "asc";
@@ -10,7 +9,6 @@ interface SortSwitchProps {
 }
 
 export default function SortSwitch({ value, onChange, className = "" }: SortSwitchProps) {
-  const isDarkMode = useIsDarkMode();
   const trackOff = designTokens.switchTrackOff;
   const trackOn = designTokens.switchTrackOn;
   const thumbColor = designTokens.switchThumb;
@@ -26,7 +24,7 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
   };
 
   const [isActive, setIsActive] = React.useState(false);
-  const ringColor = isDarkMode ? designTokens.switchRing.dark : designTokens.switchRing.light;
+  const ringColor = designTokens.switchRing;
 
   const switchStyle = {
     width: "var(--switch-w)",
@@ -41,15 +39,15 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
   const activeScale = isActive ? " scale(1.08)" : "";
   const knobStyle = {
     boxShadow: isActive
-      ? `0 2px 8px rgba(0,0,0,0.15), ${ringColor}`
-      : '0 1px 4px rgba(0,0,0,0.10)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    top: '50%',
-    left: 'var(--switch-p)',
-    width: 'calc(var(--switch-h) - (var(--switch-p) * 2))',
-    height: 'calc(var(--switch-h) - (var(--switch-p) * 2))',
-    position: 'absolute' as const,
-    display: 'block',
+      ? `${designTokens.switchShadowActive}, ${ringColor}`
+      : designTokens.switchShadowIdle,
+    transition: "transform 0.2s, box-shadow 0.2s",
+    top: "50%",
+    left: "var(--switch-p)",
+    width: "calc(var(--switch-h) - (var(--switch-p) * 2))",
+    height: "calc(var(--switch-h) - (var(--switch-p) * 2))",
+    position: "absolute" as const,
+    display: "block",
     background: getThumbColor(),
     border: `1px solid ${designTokens.switchThumbBorder}`,
     transform: baseTransform + activeScale,
@@ -64,9 +62,9 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
       </span>
       <button
         type="button"
-        className={`relative rounded-full border-2 shadow flex-shrink-0 transition-colors duration-200 focus:outline-none min-h-0 min-w-0 [--switch-w:3rem] [--switch-h:1.625rem] sm:[--switch-w:3.5rem] sm:[--switch-h:1.75rem]`}
+        className={`relative rounded-full border-2 shadow flex-shrink-0 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow min-h-0 min-w-0 [--switch-w:3rem] [--switch-h:1.625rem] sm:[--switch-w:3.5rem] sm:[--switch-h:1.75rem]`}
         aria-pressed={value === "asc"}
-        aria-label="Toggle sort order"
+        aria-label={`Sort by ${value === "desc" ? "oldest" : "newest"} first`}
         onClick={() => onChange(value === "desc" ? "asc" : "desc")}
         style={{
           ...switchStyle,

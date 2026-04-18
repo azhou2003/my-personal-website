@@ -5,10 +5,11 @@ interface SearchBarProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder, className = "" }) => (
+const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder, ariaLabel, className = "" }) => (
   <div className="relative w-full max-w-md">
     <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-border-light dark:text-border-dark" aria-hidden="true">
       <svg
@@ -29,6 +30,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder, cla
       value={value}
       onChange={onChange}
       placeholder={placeholder}
+      aria-label={ariaLabel ?? placeholder ?? "Search"}
       className={searchBarClasses + (className ? " " + className : "")}
     />
   </div>

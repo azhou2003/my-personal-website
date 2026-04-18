@@ -1,8 +1,8 @@
 import React from "react";
 import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGoodreadsG, FaPenNib, FaSteam } from "react-icons/fa";
 import Image from "next/image";
-import IconLink from "./IconLink";
-import type { AboutSlide, AboutSlideLink } from "../lib/types";
+import { IconLink } from "@/components/ui";
+import type { AboutSlide, AboutSlideLink } from "@/lib/types";
 
 interface AboutSectionProps {
   isExpanded: boolean;
@@ -240,7 +240,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         }
         .gradient-text-name {
           display: inline;
-          color: #7a5a36;
+          color: var(--color-gradient-text-fallback);
           background: var(--color-about-gradient);
           background-size: 300% 100%;
           -webkit-background-clip: text;
@@ -323,7 +323,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         )}
                       </div>
                     ) : (
-                      <div className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl bg-gradient-to-br from-accent-yellow/30 via-[#f6eec8] to-accent-orange/40 dark:from-accent-yellow/20 dark:via-[#41372e] dark:to-accent-orange/20 p-4 sm:p-6 flex flex-col justify-between">
+                      <div className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)" }}>
                         <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
                           {slide.imageAlt}
                         </span>

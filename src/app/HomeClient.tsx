@@ -1,13 +1,10 @@
 "use client";
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import HeroSection from "../components/HeroSection";
-import AboutSection from "../components/AboutSection";
-import HomeHeroHeading from "../components/HomeHeroHeading";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HOME_ANIMATION_TIMINGS } from "../lib/motion";
-import type { AboutSlide } from "../lib/types";
+import { Footer, Navbar } from "@/components/layout";
+import { AboutSection, HeroSection, HomeHeroHeading } from "@/features/home/components";
+import { HOME_ANIMATION_TIMINGS } from "@/lib/motion";
+import type { AboutSlide } from "@/lib/types";
 
 interface HomeClientProps {
   aboutSlides: AboutSlide[];
@@ -175,10 +172,37 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isTypingTarget =
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTypingTarget) return;
+
+      event.preventDefault();
+
+      if (isSnappingRef.current) {
+        return;
+      }
+
+      if (event.key === "ArrowDown" && activeSectionRef.current === "hero") {
+        event.preventDefault();
+        snapToSection("about");
+      } else if (event.key === "ArrowUp" && activeSectionRef.current === "about") {
+        event.preventDefault();
+        snapToSection("hero");
+      }
+    };
+
     scrollRoot.addEventListener("scroll", handleScroll, { passive: true });
     scrollRoot.addEventListener("wheel", handleWheel, { passive: false });
     scrollRoot.addEventListener("touchstart", handleTouchStart, { passive: true });
     scrollRoot.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("keydown", handleKeyDown);
     handleScroll();
 
     return () => {
@@ -189,6 +213,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
       scrollRoot.removeEventListener("wheel", handleWheel);
       scrollRoot.removeEventListener("touchstart", handleTouchStart);
       scrollRoot.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [getTargetTop, snapToSection]);
 

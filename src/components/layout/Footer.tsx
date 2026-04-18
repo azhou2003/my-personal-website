@@ -124,17 +124,23 @@ const Footer: React.FC = () => {
         <div className="order-1 md:order-2 flex h-full flex-col items-center justify-center gap-2 text-center text-border-light dark:text-border-dark">
           <div
             aria-label="Current status"
-            className="inline-flex items-center gap-2 rounded-full border border-[rgba(122,90,54,0.28)] dark:border-[rgba(216,199,171,0.24)] bg-[rgba(183,199,163,0.12)] dark:bg-[rgba(183,199,163,0.16)] px-3 py-1 text-border-light dark:text-border-dark"
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-border-light dark:text-border-dark"
+            style={{
+              borderColor: "var(--color-status-pill-border)",
+              background: "var(--color-status-pill-bg)",
+            }}
           >
             <span className="text-[10px] uppercase tracking-[0.16em] opacity-80">Status</span>
             <span className="relative flex h-3 w-3 items-center justify-center">
               <span
                 aria-hidden="true"
-                className="absolute inline-flex h-3 w-3 rounded-full bg-[rgba(183,199,163,0.3)] dark:bg-[rgba(183,199,163,0.34)] motion-safe:animate-ping"
+                className="absolute inline-flex h-3 w-3 rounded-full motion-safe:animate-ping"
+                style={{ background: "var(--color-status-ping)" }}
               />
               <span
                 aria-hidden="true"
-                className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#b7c7a3]"
+                className="relative inline-flex h-2.5 w-2.5 rounded-full"
+                style={{ background: "var(--color-status-dot)" }}
               />
             </span>
             <span>Waiting for NiKo to win a Major</span>
