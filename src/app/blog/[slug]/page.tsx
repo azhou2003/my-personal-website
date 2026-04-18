@@ -1,9 +1,6 @@
-import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/markdown";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPrevNextPosts } from "@/lib/utils";
-import { formatDate } from "@/lib/formatDate";
+import { notFound } from "next/navigation";
 import { StaticTagList } from "@/components/ui/tags";
 import {
   BackToTopButton,
@@ -12,6 +9,9 @@ import {
   ReadingProgress,
   ShareButton,
 } from "@/features/blog/components";
+import { formatDate } from "@/lib/formatDate";
+import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/markdown";
+import { getPrevNextPosts } from "@/lib/utils";
 
 type BlogPageParams = Promise<{ slug: string }>;
 

@@ -14,7 +14,7 @@ export interface TagBaseProps {
  */
 const TagBase: React.FC<TagBaseProps & { 
   onClick?: () => void;
-  cursor?: 'pointer' | 'default';
+  cursor?: "pointer" | "default";
   hoverEffects?: boolean;
 }> = ({ 
   label, 
@@ -22,12 +22,12 @@ const TagBase: React.FC<TagBaseProps & {
   onClick, 
   className = "", 
   children, 
-  cursor = 'default',
+  cursor = "default",
   hoverEffects = false
 }) => {
   const baseClasses = "inline-block px-3 py-1 rounded-full border text-xs font-semibold transition-colors duration-200 select-none";
-  const cursorClass = cursor === 'pointer' ? 'cursor-pointer' : 'cursor-default';
-  const hoverClasses = hoverEffects ? 'hover:brightness-110 hover:scale-105' : '';
+  const cursorClass = cursor === "pointer" ? "cursor-pointer" : "cursor-default";
+  const hoverClasses = hoverEffects ? "hover:brightness-110 hover:scale-105" : "";
   
   return (
     <span

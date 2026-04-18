@@ -1,11 +1,11 @@
 "use client";
-import type { PortfolioProject } from "@/lib/types";
 import { useState, useMemo, useEffect, useRef } from "react";
+import Image from "next/image";
 import { FadeInSection, SearchBar, SortSwitch } from "@/components/ui";
 import { accentClasses } from "@/components/ui/styles";
 import { StaticTagList, Tag } from "@/components/ui/tags";
 import { formatDate } from "@/lib/formatDate";
-import Image from "next/image";
+import type { PortfolioProject } from "@/lib/types";
 
 function getTagFrequency(projects: PortfolioProject[]) {
   const freq: Record<string, number> = {};

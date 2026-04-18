@@ -1,8 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Footer, Navbar } from "@/components/layout";
 import { AboutSection, HeroSection, HomeHeroHeading } from "@/features/home/components";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { HOME_ANIMATION_TIMINGS } from "@/lib/motion";
 import type { AboutSlide } from "@/lib/types";
 

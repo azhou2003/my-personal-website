@@ -1,7 +1,7 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -12,8 +12,8 @@ const Navbar: React.FC = () => {
 
   // Helper function to determine if a link is active
   const isActivePage = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
+    if (href === "/") {
+      return pathname === "/";
     }
     return pathname.startsWith(href);
   };
@@ -79,20 +79,20 @@ const Navbar: React.FC = () => {
               width={40}
               height={40}
               className="h-10 w-10 object-contain"
-              style={{ display: 'inline-block' }}
+              style={{ display: "inline-block" }}
               priority
             />
           </span>
           <span className="sr-only">Home</span>
         </Link>
         <div className="flex h-10 items-center justify-center space-x-4">
-          <Link href="/" className={getLinkClasses('/')}>
+          <Link href="/" className={getLinkClasses("/")}>
             Home
           </Link>
-          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+          <Link href="/portfolio" className={getLinkClasses("/portfolio")}>
             Portfolio
           </Link>
-          <Link href="/blog" className={getLinkClasses('/blog')}>
+          <Link href="/blog" className={getLinkClasses("/blog")}>
             Blog
           </Link>
         </div>
@@ -111,7 +111,7 @@ const Navbar: React.FC = () => {
                 width={40}
                 height={40}
                 className="h-10 w-10 object-contain"
-                style={{ display: 'inline-block' }}
+                style={{ display: "inline-block" }}
                 priority
               />
             </span>
@@ -119,13 +119,13 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
         <div className="flex h-10 items-center space-x-6">
-          <Link href="/" className={getLinkClasses('/')}>
+          <Link href="/" className={getLinkClasses("/")}>
             Home
           </Link>
-          <Link href="/portfolio" className={getLinkClasses('/portfolio')}>
+          <Link href="/portfolio" className={getLinkClasses("/portfolio")}>
             Portfolio
           </Link>
-          <Link href="/blog" className={getLinkClasses('/blog')}>
+          <Link href="/blog" className={getLinkClasses("/blog")}>
             Blog
           </Link>
           <ThemeToggle />
