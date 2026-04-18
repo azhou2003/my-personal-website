@@ -6,7 +6,7 @@ Personal website built with Next.js 15.5.15, featuring a markdown-powered blog a
 ## Commands
 - `npm run dev` - Start development server
 - `npm run build` - Production build
-- `npm run lint` - ESLint CLI (`eslint .`)
+- `npm run lint` - ESLint CLI (`eslint src`)
 - No `typecheck` or `test` scripts exist
 
 ## Content Structure
