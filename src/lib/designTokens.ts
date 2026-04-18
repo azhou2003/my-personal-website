@@ -6,8 +6,5 @@ export const designTokens = {
   switchTrackOn: "var(--color-switch-track-on)",
   switchThumb: "var(--color-switch-thumb)",
   switchThumbBorder: "var(--color-switch-thumb-border)",
-  switchRing: {
-    light: "0 0 0 4px rgba(183, 199, 163, 0.3)",
-    dark: "0 0 0 4px rgba(63, 74, 54, 0.3)",
-  },
+  switchRing: "var(--color-switch-ring)",
 } as const;

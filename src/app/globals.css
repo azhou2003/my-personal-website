@@ -24,6 +24,7 @@
   --color-switch-track-on: #b7c7a3;
   --color-switch-thumb: #fefae0;
   --color-switch-thumb-border: #b7c7a3;
+  --color-switch-ring: 0 0 0 4px rgba(183, 199, 163, 0.3);
   --color-timeline-line: #23201c;
   --color-timeline-fill: #23201c;
   --color-card-muted-bg: #ece7d5;
@@ -66,6 +67,7 @@
   --color-switch-track-on: #3f4a36;
   --color-switch-thumb: #f5f5f5;
   --color-switch-thumb-border: #3f3b36;
+  --color-switch-ring: 0 0 0 4px rgba(63, 74, 54, 0.3);
   --color-timeline-line: #ece7d5;
   --color-timeline-fill: #ece7d5;
   --color-card-muted-bg: #23201c;

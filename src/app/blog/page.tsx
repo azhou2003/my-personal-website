@@ -1,4 +1,4 @@
-import PageLayout from "../../components/PageLayout";
+import PageLayout from "../../components/layout/PageLayout";
 import { getAllBlogPosts } from "../../lib/markdown";
 import BlogIndexClient from "./BlogIndexClient";
 import { blogMetadata } from "../../lib/metadata";

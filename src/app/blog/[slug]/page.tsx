@@ -5,11 +5,11 @@ import Link from "next/link";
 import { getPrevNextPosts } from "../../../lib/utils";
 import { formatDate } from "../../../lib/formatDate";
 import StaticTagList from "../../../components/StaticTagList";
-import ShareButton from "../../../components/ShareButton";
-import MarkdownContent from "../../../components/MarkdownContent";
-import ReadingProgress from "../../../components/ReadingProgress";
-import BackToTopButton from "../../../components/BackToTopButton";
-import ReaderComfortToggle from "../../../components/ReaderComfortToggle";
+import ShareButton from "../../../features/blog/components/ShareButton";
+import MarkdownContent from "../../../features/blog/components/MarkdownContent";
+import ReadingProgress from "../../../features/blog/components/ReadingProgress";
+import BackToTopButton from "../../../features/blog/components/BackToTopButton";
+import ReaderComfortToggle from "../../../features/blog/components/ReaderComfortToggle";
 
 type BlogPageParams = Promise<{ slug: string }>;
 

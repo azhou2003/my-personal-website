@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeToggle from '../theme/ThemeToggle';
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
         <div className="flex h-10 w-10 items-center justify-center justify-self-end">
-          <DarkModeToggle />
+          <ThemeToggle />
         </div>
       </div>
 
@@ -128,7 +128,7 @@ const Navbar: React.FC = () => {
           <Link href="/blog" className={getLinkClasses('/blog')}>
             Blog
           </Link>
-          <DarkModeToggle />
+          <ThemeToggle />
         </div>
       </div>
     </nav>

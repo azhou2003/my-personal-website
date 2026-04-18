@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { useIsDarkMode } from "../hooks/useIsDarkMode";
 import { designTokens } from "../lib/designTokens";
 
 interface SortSwitchProps {
@@ -10,7 +9,6 @@ interface SortSwitchProps {
 }
 
 export default function SortSwitch({ value, onChange, className = "" }: SortSwitchProps) {
-  const isDarkMode = useIsDarkMode();
   const trackOff = designTokens.switchTrackOff;
   const trackOn = designTokens.switchTrackOn;
   const thumbColor = designTokens.switchThumb;
@@ -26,7 +24,7 @@ export default function SortSwitch({ value, onChange, className = "" }: SortSwit
   };
 
   const [isActive, setIsActive] = React.useState(false);
-  const ringColor = isDarkMode ? designTokens.switchRing.dark : designTokens.switchRing.light;
+  const ringColor = designTokens.switchRing;
 
   const switchStyle = {
     width: "var(--switch-w)",
