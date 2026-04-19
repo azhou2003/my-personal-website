@@ -369,6 +369,13 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
           const popupPositionClass = isLeft
             ? "left-full ml-10 origin-left"
             : "right-full mr-10 origin-right";
+          const desktopInfoPanelClass = `absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[250px] max-w-[80vw] sm:min-w-[300px] sm:max-w-sm rounded-[1.75rem] border p-5 sm:p-6 transition-all duration-300 z-30 flex flex-col items-center text-center ${popupVisibilityClass}`;
+          const mobileInfoPanelClass = "relative z-30 rounded-[1.75rem] border p-4 sm:p-5 flex flex-col items-center text-center";
+          const infoPanelStyle = {
+            background: "var(--color-about-surface-bg)",
+            borderColor: "var(--color-about-surface-border)",
+            boxShadow: "var(--color-about-surface-shadow-card)",
+          };
 
           return (
             <FadeInSection key={`${triggerKey}-${idx}`} delay={idx * 40}>
@@ -419,15 +426,20 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                             />
                           </div>
                         </a>
-                        <div
-                          className={`absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[240px] max-w-[78vw] sm:min-w-[280px] sm:max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-5 sm:p-6 transition-all duration-300 z-30 flex flex-col items-center ${popupVisibilityClass}`}
-                          tabIndex={-1}
-                        >
-                          <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
-                          <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                            <StaticTagList tags={project.tags} className="mb-2 justify-center" />
+                        <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
+                          <p className="text-[0.62rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
+                            {formatDate(project.date, "MMMM yyyy")}
+                          </p>
+                          <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
+                            {project.title}
+                          </h2>
+                          <div className="w-14 border-t-2 border-dotted mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
+                          <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                            <StaticTagList tags={project.tags} className="mb-0 justify-center" />
                           </div>
-                          <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
+                          <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
+                            {project.description}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -460,12 +472,20 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                             />
                           </div>
                         </a>
-                        <div className={`absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[240px] max-w-[78vw] sm:min-w-[280px] sm:max-w-sm bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl shadow-lg p-5 sm:p-6 transition-all duration-300 z-30 flex flex-col items-center ${popupVisibilityClass}`}>
-                          <h2 className="text-lg font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">{project.title}</h2>
-                          <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                            <StaticTagList tags={project.tags} className="mb-2 justify-center" />
+                        <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
+                          <p className="text-[0.62rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
+                            {formatDate(project.date, "MMMM yyyy")}
+                          </p>
+                          <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
+                            {project.title}
+                          </h2>
+                          <div className="w-14 border-t-2 border-dotted mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
+                          <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                            <StaticTagList tags={project.tags} className="mb-0 justify-center" />
                           </div>
-                          <p className="text-sm mb-2 text-center text-foreground-light dark:text-foreground-dark">{project.description}</p>
+                          <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
+                            {project.description}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -484,15 +504,19 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 }`}
               >
                 <div className="relative mx-3">
-                  <div className="absolute inset-0 rounded-xl bg-[var(--color-bg)] z-20" aria-hidden="true" />
-                  <div className="relative z-30 bg-[var(--color-bg)] border border-border-light dark:border-border-dark rounded-xl shadow-lg p-4 flex flex-col items-center">
-                    <h2 className="text-base font-semibold font-sans mb-2 text-foreground-light dark:text-foreground-dark text-center">
+                  <div className="absolute inset-0 rounded-[1.75rem] z-20" style={{ background: "var(--color-about-surface-bg)" }} aria-hidden="true" />
+                  <div className={mobileInfoPanelClass} style={infoPanelStyle}>
+                    <p className="text-[0.6rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
+                      {formatDate(project.date, "MMMM yyyy")}
+                    </p>
+                    <h2 className="text-base sm:text-lg font-semibold font-sans mb-2 text-[var(--color-about-surface-title)] leading-tight">
                       {project.title}
                     </h2>
-                    <div className="flex flex-wrap gap-2 mb-2 justify-center">
-                      <StaticTagList tags={project.tags} className="mb-2 justify-center" />
+                    <div className="w-12 border-t-2 border-dotted mb-2" style={{ borderColor: "var(--color-about-surface-divider)" }} />
+                    <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                      <StaticTagList tags={project.tags} className="mb-0 justify-center" />
                     </div>
-                    <p className="text-sm text-center text-foreground-light dark:text-foreground-dark">
+                    <p className="text-sm text-center text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
                       {project.description}
                     </p>
                   </div>
