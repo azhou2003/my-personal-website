@@ -335,131 +335,176 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   data-about-slide
                   className={`snap-center snap-always px-1.5 sm:px-2.5 transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
-                  <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
-                  <article
-                    className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:p-10 min-h-[27.5rem] sm:min-h-[33rem]"
-                    style={{
-                      background: "var(--color-about-surface-bg)",
-                      borderColor: "var(--color-about-surface-border)",
-                    }}
-                  >
-                <div className="grid xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-3.5 sm:gap-8 lg:gap-10 xl:items-center">
-                  <div className="order-1 xl:hidden text-center">
-                    <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
-                      {slide.eyebrow}
-                    </p>
-                    <h2 className="text-[1.52rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-1.5 sm:mb-4 pb-[0.04em] text-[var(--color-about-surface-title)] leading-[1.1]">
-                      {index === 0 ? (
-                        <>
-                          Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
-                        </>
+                  <div className="lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
+                    <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
+                      {slide.imageSrc ? (
+                        <div
+                          className="relative rounded-3xl overflow-hidden border"
+                          style={{
+                            borderColor: "var(--color-about-image-frame)",
+                            background: "color-mix(in srgb, var(--color-about-surface-bg) 88%, transparent)",
+                            boxShadow: "var(--color-about-surface-shadow-card)",
+                          }}
+                        >
+                          <Image
+                            src={slide.imageSrc}
+                            alt={slide.imageAlt}
+                            width={352}
+                            height={480}
+                            quality={95}
+                            sizes="(min-width: 1280px) 22rem, 18rem"
+                            className="w-[21rem] h-[29rem] object-cover select-none"
+                            style={{ objectPosition: slide.imagePosition ?? "center" }}
+                            draggable="false"
+                          />
+                          {index === 0 && (
+                            <>
+                              <div className="absolute -top-4 -right-4 w-8 h-8 bg-accent-yellow rounded-full opacity-80"></div>
+                              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-accent-yellow/60 rounded-full"></div>
+                            </>
+                          )}
+                        </div>
                       ) : (
-                        slide.title
+                        <div className="w-[22rem] h-[30rem] rounded-3xl p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                          <span className="text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
+                            {slide.imageAlt}
+                          </span>
+                          <div className="space-y-3">
+                            <div className="h-3 rounded-full bg-foreground-light/30 dark:bg-foreground-dark/30"></div>
+                            <div className="h-3 rounded-full bg-foreground-light/25 dark:bg-foreground-dark/25 w-10/12"></div>
+                            <div className="h-3 rounded-full bg-foreground-light/20 dark:bg-foreground-dark/20 w-7/12"></div>
+                          </div>
+                        </div>
                       )}
-                    </h2>
-                    <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-0 sm:mb-1 mx-auto"></div>
-                  </div>
+                    </div>
 
-                  <div className="flex flex-col items-center order-2 xl:order-1">
-                    {slide.imageSrc ? (
-                      <div
-                        className="relative rounded-3xl overflow-hidden border"
+                    <div className="relative z-10">
+                    <div className="lg:hidden flex justify-center mb-3 sm:mb-6">
+                      {slide.imageSrc ? (
+                        <div
+                          className="relative rounded-3xl overflow-hidden border"
+                          style={{
+                            borderColor: "var(--color-about-image-frame)",
+                            background: "color-mix(in srgb, var(--color-about-surface-bg) 88%, transparent)",
+                            boxShadow: "var(--color-about-surface-shadow-card)",
+                          }}
+                        >
+                          <Image
+                            src={slide.imageSrc}
+                            alt={slide.imageAlt}
+                            width={352}
+                            height={480}
+                            quality={95}
+                            sizes="(min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
+                            className="w-56 sm:w-64 lg:w-[19rem] h-72 sm:h-80 lg:h-[24rem] object-cover select-none"
+                            style={{ objectPosition: slide.imagePosition ?? "center" }}
+                            draggable="false"
+                          />
+                          {index === 0 && (
+                            <>
+                              <div className="absolute -top-1 sm:-top-4 -right-1 sm:-right-4 w-3 sm:w-8 h-3 sm:h-8 bg-accent-yellow rounded-full opacity-80"></div>
+                              <div className="absolute -bottom-1 sm:-bottom-4 -left-1 sm:-left-4 w-2.5 sm:w-6 h-2.5 sm:h-6 bg-accent-yellow/60 rounded-full"></div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-56 sm:w-64 lg:w-72 h-72 sm:h-80 lg:h-[24rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                          <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
+                            {slide.imageAlt}
+                          </span>
+                          <div className="space-y-2 sm:space-y-3">
+                            <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/30 dark:bg-foreground-dark/30"></div>
+                            <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/25 dark:bg-foreground-dark/25 w-10/12"></div>
+                            <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/20 dark:bg-foreground-dark/20 w-7/12"></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="w-full lg:max-w-[44rem] xl:max-w-[46rem] rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                      <article
+                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-10 xl:px-12 min-h-[20rem] sm:min-h-[25rem] xl:min-h-[33rem]"
                         style={{
-                          borderColor: "var(--color-about-image-frame)",
-                          background: "color-mix(in srgb, var(--color-about-surface-bg) 88%, transparent)",
-                          boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.06)",
+                          background: "var(--color-about-surface-bg)",
+                          borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        <Image
-                          src={slide.imageSrc}
-                          alt={slide.imageAlt}
-                          width={352}
-                          height={480}
-                          quality={95}
-                          sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-56 sm:w-64 lg:w-[19rem] xl:w-[21rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[29rem] object-cover select-none"
-                          style={{ objectPosition: slide.imagePosition ?? "center" }}
-                          draggable="false"
-                        />
-                        {index === 0 && (
-                          <>
-                            <div className="absolute -top-1 sm:-top-4 -right-1 sm:-right-4 w-3 sm:w-8 h-3 sm:h-8 bg-accent-yellow rounded-full opacity-80"></div>
-                            <div className="absolute -bottom-1 sm:-bottom-4 -left-1 sm:-left-4 w-2.5 sm:w-6 h-2.5 sm:h-6 bg-accent-yellow/60 rounded-full"></div>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)" }}>
-                        <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
-                          {slide.imageAlt}
-                        </span>
-                        <div className="space-y-2 sm:space-y-3">
-                          <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/30 dark:bg-foreground-dark/30"></div>
-                          <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/25 dark:bg-foreground-dark/25 w-10/12"></div>
-                          <div className="h-2.5 sm:h-3 rounded-full bg-foreground-light/20 dark:bg-foreground-dark/20 w-7/12"></div>
+                        <div className={`space-y-2.5 sm:space-y-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                          <div className="xl:hidden text-center">
+                            <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
+                              {slide.eyebrow}
+                            </p>
+                            <h2 className="text-[1.52rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-1.5 sm:mb-4 pb-[0.04em] text-[var(--color-about-surface-title)] leading-[1.1]">
+                              {index === 0 ? (
+                                <>
+                                  Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
+                                </>
+                              ) : (
+                                slide.title
+                              )}
+                            </h2>
+                            <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-0 sm:mb-1 mx-auto"></div>
+                          </div>
+
+                          <div className="hidden xl:block">
+                            <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
+                              {slide.eyebrow}
+                            </p>
+                            <h2 className="text-[1.7rem] sm:text-4xl lg:text-[2.7rem] font-bold mb-3 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.1]">
+                              {index === 0 ? (
+                                <>
+                                  Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
+                                </>
+                              ) : (
+                                slide.title
+                              )}
+                            </h2>
+                            <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
+                          </div>
+
+                          <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-[52ch] xl:max-w-none mx-auto xl:mx-0">
+                            {slide.paragraphs.map((paragraph) => (
+                              <p key={paragraph}>{paragraph}</p>
+                            ))}
+                          </div>
+
+                          {linksToRender.length > 0 && (
+                            <>
+                              <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
+                              <div className="flex flex-wrap gap-2.5 sm:gap-4 justify-center xl:justify-start">
+                                {linksToRender.map((link) => (
+                                  <IconLink
+                                    key={`${slide.id}-${link.label}-${link.href}`}
+                                    href={link.href}
+                                    target={link.external ? "_blank" : undefined}
+                                    rel={link.external ? "noopener noreferrer" : undefined}
+                                    aria-label={link.label}
+                                    iconClassName="!w-6 !h-6 transform-gpu will-change-transform !text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
+                                    icon={iconByKey[link.icon]}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
 
-                  <div className={`space-y-2.5 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
-                    <div className="hidden xl:block">
-                      <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
-                        {slide.eyebrow}
-                      </p>
-                      <h2 className="text-[1.7rem] sm:text-4xl lg:text-[2.7rem] font-bold mb-3 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.1]">
-                        {index === 0 ? (
-                          <>
-                            Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
-                          </>
-                        ) : (
-                          slide.title
+                        {showNavControls && (
+                          <div className="sm:hidden pointer-events-none absolute left-1/2 bottom-0 z-20 -translate-x-1/2 translate-y-1/2 inline-flex items-center gap-1 rounded-full border px-2 py-[0.28rem] text-[0.56rem] uppercase tracking-[0.18em] text-[var(--color-about-surface-kicker)] opacity-95"
+                            style={{
+                              background: "var(--color-about-surface-bg)",
+                              borderColor: "var(--color-about-surface-border)",
+                              boxShadow: "0 0 0 2px var(--color-about-surface-bg)",
+                            }}
+                          >
+                            <FaChevronLeft className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
+                            <span className="leading-none">Swipe</span>
+                            <FaChevronRight className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
+                          </div>
                         )}
-                      </h2>
-                      <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
+                      </article>
                     </div>
-
-                    <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] mx-auto xl:mx-0">
-                      {slide.paragraphs.map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
-                      ))}
                     </div>
-
-                    {linksToRender.length > 0 && (
-                      <>
-                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
-                        <div className="flex flex-wrap gap-2.5 sm:gap-4 justify-center xl:justify-start">
-                          {linksToRender.map((link) => (
-                            <IconLink
-                              key={`${slide.id}-${link.label}-${link.href}`}
-                              href={link.href}
-                              target={link.external ? "_blank" : undefined}
-                              rel={link.external ? "noopener noreferrer" : undefined}
-                              aria-label={link.label}
-                              iconClassName="!w-6 !h-6 transform-gpu will-change-transform !text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
-                              icon={iconByKey[link.icon]}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
                   </div>
-                </div>
-                {showNavControls && (
-                  <div className="sm:hidden pointer-events-none absolute left-1/2 bottom-0 z-20 -translate-x-1/2 translate-y-1/2 inline-flex items-center gap-1 rounded-full border px-2 py-[0.28rem] text-[0.56rem] uppercase tracking-[0.18em] text-[var(--color-about-surface-kicker)] opacity-95"
-                    style={{
-                      background: "var(--color-about-surface-bg)",
-                      borderColor: "var(--color-about-surface-border)",
-                      boxShadow: "0 0 0 2px var(--color-about-surface-bg)",
-                    }}
-                  >
-                    <FaChevronLeft className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
-                    <span className="leading-none">Swipe</span>
-                    <FaChevronRight className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
-                  </div>
-                )}
-                </article>
-                </div>
                 </div>
               );
             })}
