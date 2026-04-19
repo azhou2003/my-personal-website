@@ -322,7 +322,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
         <div
           ref={scrollRef}
-          className="overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-proximity pb-4 sm:pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-proximity pb-2 sm:pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="grid grid-flow-col auto-cols-[100%] gap-3 sm:gap-5 lg:gap-6">
             {aboutSlides.map((slide, index) => {
@@ -333,7 +333,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 <div
                   key={slide.id}
                   data-about-slide
-                  className={`snap-center snap-always px-1.5 sm:px-2.5 transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                  className={`snap-center snap-always px-1.5 sm:px-2.5 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
                   <div className="lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
@@ -396,7 +396,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             height={480}
                             quality={95}
                             sizes="(min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                            className="w-56 sm:w-64 lg:w-[19rem] h-72 sm:h-80 lg:h-[24rem] object-cover select-none"
+                            className="w-56 sm:w-64 lg:w-[19rem] h-64 sm:h-72 lg:h-[24rem] object-cover select-none"
                             style={{ objectPosition: slide.imagePosition ?? "center" }}
                             draggable="false"
                           />
@@ -408,7 +408,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           )}
                         </div>
                       ) : (
-                        <div className="w-56 sm:w-64 lg:w-72 h-72 sm:h-80 lg:h-[24rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                        <div className="w-56 sm:w-64 lg:w-72 h-64 sm:h-72 lg:h-[24rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
                           <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
                             {slide.imageAlt}
                           </span>
@@ -423,7 +423,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
-                        className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
+                        className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-[18.5rem] sm:min-h-[24rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
                           background: "var(--color-about-surface-bg)",
                           borderColor: "var(--color-about-surface-border)",
