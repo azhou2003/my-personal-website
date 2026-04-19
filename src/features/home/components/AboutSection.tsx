@@ -27,6 +27,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const slideNavLockRef = React.useRef(false);
   const slideNavUnlockTimerRef = React.useRef<number | null>(null);
   const isActiveRef = React.useRef(isActive);
+  const descriptionTouchYRef = React.useRef<number | null>(null);
+  const bodyOverflowRef = React.useRef<string | null>(null);
+  const htmlOverflowRef = React.useRef<string | null>(null);
 
   const defaultSlideLinks: AboutSlideLink[] = [
     {
@@ -155,6 +158,66 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const compactLinksToRender = activeSlide?.links ?? defaultSlideLinks;
   const showNavControls = aboutSlides.length > 1;
 
+  const handleDescriptionWheel = React.useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+    const el = event.currentTarget;
+    if (el.scrollHeight <= el.clientHeight) {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    el.scrollTop += event.deltaY;
+  }, []);
+
+  const handleDescriptionTouchStart = React.useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    descriptionTouchYRef.current = event.touches[0]?.clientY ?? null;
+
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+    if (typeof document === "undefined") return;
+
+    if (bodyOverflowRef.current === null) {
+      bodyOverflowRef.current = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    }
+    if (htmlOverflowRef.current === null) {
+      htmlOverflowRef.current = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = "hidden";
+    }
+  }, []);
+
+  const handleDescriptionTouchMove = React.useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    const el = event.currentTarget;
+    const currentY = event.touches[0]?.clientY;
+    const previousY = descriptionTouchYRef.current;
+    if (currentY === undefined || previousY === null) return;
+
+    if (el.scrollHeight <= el.clientHeight) {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    el.scrollTop += previousY - currentY;
+    descriptionTouchYRef.current = currentY;
+  }, []);
+
+  const handleDescriptionTouchEnd = React.useCallback(() => {
+    descriptionTouchYRef.current = null;
+
+    if (typeof document === "undefined") return;
+    if (bodyOverflowRef.current !== null) {
+      document.body.style.overflow = bodyOverflowRef.current;
+      bodyOverflowRef.current = null;
+    }
+    if (htmlOverflowRef.current !== null) {
+      document.documentElement.style.overflow = htmlOverflowRef.current;
+      htmlOverflowRef.current = null;
+    }
+  }, []);
+
   React.useEffect(() => {
     if (!isExpanded && animateIn) {
       // Only delay on initial load
@@ -225,6 +288,17 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     return () => {
       if (slideNavUnlockTimerRef.current !== null) {
         window.clearTimeout(slideNavUnlockTimerRef.current);
+      }
+
+      if (typeof document !== "undefined") {
+        if (bodyOverflowRef.current !== null) {
+          document.body.style.overflow = bodyOverflowRef.current;
+          bodyOverflowRef.current = null;
+        }
+        if (htmlOverflowRef.current !== null) {
+          document.documentElement.style.overflow = htmlOverflowRef.current;
+          htmlOverflowRef.current = null;
+        }
       }
     };
   }, []);
@@ -338,7 +412,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 <div
                   key={slide.id}
                   data-about-slide
-                  className={`snap-center snap-always px-1.5 sm:px-2.5 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                  className={`snap-center snap-always px-1.5 sm:px-2.5 py-4 sm:py-5 lg:py-0 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
                   <div className="w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
@@ -401,7 +475,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             height={480}
                             quality={95}
                             sizes="(min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                            className="w-56 sm:w-64 lg:w-[19rem] h-64 sm:h-72 lg:h-[24rem] object-cover select-none"
+                            className="w-56 sm:w-64 lg:w-[19rem] h-[clamp(10.5rem,28svh,16rem)] sm:h-[clamp(12rem,30svh,18rem)] lg:h-[24rem] object-cover select-none"
                             style={{ objectPosition: slide.imagePosition ?? "center" }}
                             draggable="false"
                           />
@@ -413,7 +487,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           )}
                         </div>
                       ) : (
-                        <div className="w-56 sm:w-64 lg:w-72 h-64 sm:h-72 lg:h-[24rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                        <div className="w-56 sm:w-64 lg:w-72 h-[clamp(10.5rem,28svh,16rem)] sm:h-[clamp(12rem,30svh,18rem)] lg:h-[24rem] rounded-3xl p-4 sm:p-6 flex flex-col justify-between" style={{ background: "var(--color-about-placeholder-gradient)", boxShadow: "var(--color-about-surface-shadow-card)" }}>
                           <span className="text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
                             {slide.imageAlt}
                           </span>
@@ -428,13 +502,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
-                        className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-[18.5rem] sm:min-h-[24rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
+                        className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-0 h-[clamp(15rem,40svh,20rem)] sm:h-[clamp(16.5rem,41svh,22rem)] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
                           background: "var(--color-about-surface-bg)",
                           borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        <div className={`h-full space-y-2.5 sm:space-y-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                        <div className={`h-full flex flex-col gap-2.5 sm:gap-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                           <div className="xl:hidden text-center">
                             <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
                               {slide.eyebrow}
@@ -467,7 +541,16 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                           </div>
 
-                          <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-none mx-auto xl:mx-0">
+                          <div
+                            onWheel={handleDescriptionWheel}
+                            onWheelCapture={(event) => event.stopPropagation()}
+                            onTouchStart={handleDescriptionTouchStart}
+                            onTouchMove={handleDescriptionTouchMove}
+                            onTouchMoveCapture={(event) => event.stopPropagation()}
+                            onTouchEnd={handleDescriptionTouchEnd}
+                            onTouchCancel={handleDescriptionTouchEnd}
+                            className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-none pr-1 space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-none mx-auto xl:mx-0 lg:flex-none lg:overflow-visible lg:overscroll-auto lg:touch-auto lg:pr-0"
+                          >
                             {slide.paragraphs.map((paragraph) => (
                               <p key={paragraph}>{paragraph}</p>
                             ))}
