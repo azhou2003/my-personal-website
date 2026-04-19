@@ -85,10 +85,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     const slideWidth = firstSlide?.getBoundingClientRect().width ?? scrollEl.clientWidth;
     const gapValue = trackEl ? window.getComputedStyle(trackEl).columnGap || window.getComputedStyle(trackEl).gap : "0";
     const gap = Number.parseFloat(gapValue) || 0;
+    const startOffset = firstSlide?.offsetLeft ?? 0;
 
     return {
       slideWidth,
       gap,
+      startOffset,
     };
   }, []);
 
@@ -98,7 +100,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     if (!scrollEl || !metrics || aboutSlides.length === 0) return;
 
     const snapDistance = metrics.slideWidth + metrics.gap;
-    const rawIndex = Math.round(scrollEl.scrollLeft / snapDistance);
+    const rawIndex = Math.round((scrollEl.scrollLeft - metrics.startOffset) / snapDistance);
     const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, rawIndex));
     setResolvedActiveSlideIndex(nextIndex);
   }, [aboutSlides.length, getSlideMetrics, setResolvedActiveSlideIndex]);
@@ -112,7 +114,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     const snapDistance = metrics.slideWidth + metrics.gap;
 
     scrollEl.scrollTo({
-      left: nextIndex * snapDistance,
+      left: metrics.startOffset + nextIndex * snapDistance,
       behavior,
     });
   }, [aboutSlides.length, getSlideMetrics]);
@@ -132,6 +134,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const activeSlide = aboutSlides[resolvedActiveSlideIndex];
   const compactPillText = activeSlide?.pillText?.trim() || "Meet Anjie";
   const compactLinksToRender = activeSlide?.links ?? defaultSlideLinks;
+  const showNavControls = aboutSlides.length > 1;
 
   React.useEffect(() => {
     if (!isExpanded && animateIn) {
@@ -231,7 +234,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }
 
   return (
-    <section className="w-full max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-7 lg:py-10">
+    <section className="w-full max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-7 lg:py-10">
       <style jsx>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -252,23 +255,37 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         }
       `}</style>
 
-      <div className="relative px-5 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
-        <button
-          type="button"
-          onClick={() => scrollBySlide(-1)}
-          aria-label="Previous section"
-          className="absolute left-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity hover:opacity-100 opacity-75 cursor-pointer"
-        >
-          <FaChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollBySlide(1)}
-          aria-label="Next section"
-          className="absolute right-0 top-1/2 z-20 -translate-y-1/2 text-foreground-light/65 dark:text-foreground-dark/65 transition-opacity hover:opacity-100 opacity-75 cursor-pointer"
-        >
-          <FaChevronRight className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
-        </button>
+      <div className="relative px-1 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
+        {showNavControls && (
+          <>
+            <button
+              type="button"
+              onClick={() => scrollBySlide(-1)}
+              aria-label="Previous section"
+              className="hidden sm:flex absolute -left-6 lg:-left-8 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-90 cursor-pointer"
+              style={{
+                background: "var(--color-about-control-bg)",
+                borderColor: "var(--color-about-control-border)",
+                boxShadow: "var(--color-about-control-shadow)",
+              }}
+            >
+              <FaChevronLeft className="w-4 h-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollBySlide(1)}
+              aria-label="Next section"
+              className="hidden sm:flex absolute -right-6 lg:-right-8 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-90 cursor-pointer"
+              style={{
+                background: "var(--color-about-control-bg)",
+                borderColor: "var(--color-about-control-border)",
+                boxShadow: "var(--color-about-control-shadow)",
+              }}
+            >
+              <FaChevronRight className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </>
+        )}
 
         <div
           ref={scrollRef}
@@ -279,17 +296,21 @@ const AboutSection: React.FC<AboutSectionProps> = ({
               const linksToRender = slide.links ?? defaultSlideLinks;
 
               return (
-                <article
-                  key={slide.id}
-                  data-about-slide
-                  className="snap-center snap-always rounded-[1.75rem] bg-background-light/80 dark:bg-background-dark/80 p-4 sm:p-6 lg:p-8 min-h-[30rem] sm:min-h-[34rem]"
-                >
+                <div key={slide.id} data-about-slide className="snap-center snap-always px-1.5 sm:px-2.5">
+                  <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                  <article
+                    className="rounded-[1.75rem] border p-4 sm:p-6 lg:p-8 min-h-[29rem] sm:min-h-[34rem]"
+                    style={{
+                      background: "var(--color-about-surface-bg)",
+                      borderColor: "var(--color-about-surface-border)",
+                    }}
+                  >
                 <div className="grid xl:grid-cols-2 gap-4 sm:gap-7 lg:gap-10 xl:items-center">
                   <div className="order-1 xl:hidden text-center">
-                    <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-1.5 sm:mb-2.5 font-medium">
+                    <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1.5 sm:mb-2.5 font-medium">
                       {slide.eyebrow}
                     </p>
-                    <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-foreground-light dark:text-foreground-dark leading-[1.15]">
+                    <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.15]">
                       {index === 0 ? (
                         <>
                           Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -338,10 +359,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                   <div className="space-y-3 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left">
                     <div className="hidden xl:block">
-                      <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-foreground-light/65 dark:text-foreground-dark/65 mb-1.5 sm:mb-2.5 font-medium">
+                      <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1.5 sm:mb-2.5 font-medium">
                         {slide.eyebrow}
                       </p>
-                      <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-foreground-light dark:text-foreground-dark leading-[1.15]">
+                      <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.15]">
                         {index === 0 ? (
                           <>
                             Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -361,7 +382,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     {linksToRender.length > 0 && (
                       <>
-                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted border-gray-400 dark:border-gray-600 mx-auto xl:mx-0"></div>
+                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
                         <div className="flex gap-3 sm:gap-6 justify-center xl:justify-start">
                           {linksToRender.map((link) => (
                             <IconLink
@@ -370,6 +391,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               target={link.external ? "_blank" : undefined}
                               rel={link.external ? "noopener noreferrer" : undefined}
                               aria-label={link.label}
+                              iconClassName="!text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
                               icon={iconByKey[link.icon]}
                             />
                           ))}
@@ -379,10 +401,27 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   </div>
                 </div>
                 </article>
+                </div>
+                </div>
               );
             })}
           </div>
         </div>
+
+        {showNavControls && (
+          <div className="sm:hidden mt-1 flex items-center justify-center">
+            <div className="pointer-events-none inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.58rem] uppercase tracking-[0.16em] text-[var(--color-about-surface-kicker)] opacity-75"
+            style={{
+              background: "var(--color-about-control-bg)",
+              borderColor: "var(--color-about-control-border)",
+            }}
+          >
+            <FaChevronLeft className="h-2.5 w-2.5" aria-hidden="true" />
+            <span>Swipe</span>
+            <FaChevronRight className="h-2.5 w-2.5" aria-hidden="true" />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

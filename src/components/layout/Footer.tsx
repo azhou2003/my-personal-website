@@ -114,7 +114,7 @@ const Footer: React.FC = () => {
   const WeatherIcon = weatherDisplay.icon;
 
   return (
-    <footer className="w-full border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark py-6 text-xs">
+    <footer className="w-full border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark py-3 sm:py-6 text-xs">
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-4 px-4 md:grid-cols-3">
         <div className="hidden md:order-1 md:flex md:h-full md:flex-col md:justify-center md:text-left text-border-light dark:text-border-dark">
           <p className="italic">&ldquo;{activeQuote.text}&rdquo;</p>
