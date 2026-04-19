@@ -406,7 +406,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 <div className="w-1/2 flex justify-end pr-6 sm:pr-6 md:pr-8 lg:pr-10 pl-6 sm:pl-6 md:pl-8 lg:pl-10">
                   {isLeft ? (
                     <span
-                      className={`text-[0.95rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.04em] select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
+                      className={`text-[0.88rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.03em] sm:tracking-[0.04em] leading-none select-none whitespace-nowrap transition-all duration-300 sm:group-hover:scale-110 sm:group-focus:scale-110 ${isFocused ? "sm:scale-110" : ""}`}
                     >
                       {formatDate(project.date, "MMMM yyyy")}
                     </span>
@@ -494,7 +494,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                       </div>
                     </div>
                   ) : (
-                    <span className={`text-[0.95rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.04em] select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}>
+                    <span className={`text-[0.88rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.03em] sm:tracking-[0.04em] leading-none select-none whitespace-nowrap transition-all duration-300 sm:group-hover:scale-110 sm:group-focus:scale-110 ${isFocused ? "sm:scale-110" : ""}`}>
                       {formatDate(project.date, "MMMM yyyy")}
                     </span>
                   )}
