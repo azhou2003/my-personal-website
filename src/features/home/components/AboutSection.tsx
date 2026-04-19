@@ -170,9 +170,14 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isActive]);
 
   React.useEffect(() => {
-    if (!isExpanded || !isActive || activeSlideIndex !== undefined) return;
+    if (!isExpanded || !isActive) return;
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
+
+    const isControlled = activeSlideIndex !== undefined;
+    const allowControlledScrollSync =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches;
+    if (isControlled && !allowControlledScrollSync) return;
 
     updateActiveSlideIndex();
     scrollEl.addEventListener("scroll", updateActiveSlideIndex, { passive: true });
@@ -333,9 +338,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 <div
                   key={slide.id}
                   data-about-slide
-                  className={`snap-center snap-always px-1.5 sm:px-2.5 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                  className={`snap-center snap-always px-1.5 sm:px-2.5 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
-                  <div className="lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
+                  <div className="w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
                       {slide.imageSrc ? (
                         <div
