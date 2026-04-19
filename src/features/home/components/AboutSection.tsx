@@ -234,7 +234,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }
 
   return (
-    <section className="w-full max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-7 lg:py-10">
+    <section className="w-full max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-7 lg:py-10 min-h-[calc(100svh-72px)] sm:min-h-0 flex items-center">
       <style jsx>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -255,34 +255,34 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         }
       `}</style>
 
-      <div className="relative px-1 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
+      <div className="relative w-full px-1 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
         {showNavControls && (
           <>
             <button
               type="button"
               onClick={() => scrollBySlide(-1)}
               aria-label="Previous section"
-              className="hidden sm:flex absolute -left-6 lg:-left-8 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-90 cursor-pointer"
+              className="hidden sm:flex absolute -left-10 md:-left-12 lg:-left-14 top-1/2 z-20 -translate-y-1/2 h-11 w-11 lg:h-12 lg:w-12 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-75 cursor-pointer"
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "var(--color-about-control-shadow)",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.16)",
               }}
             >
-              <FaChevronLeft className="w-4 h-4" aria-hidden="true" />
+              <FaChevronLeft className="w-5 h-5" aria-hidden="true" />
             </button>
             <button
               type="button"
               onClick={() => scrollBySlide(1)}
               aria-label="Next section"
-              className="hidden sm:flex absolute -right-6 lg:-right-8 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-90 cursor-pointer"
+              className="hidden sm:flex absolute -right-10 md:-right-12 lg:-right-14 top-1/2 z-20 -translate-y-1/2 h-11 w-11 lg:h-12 lg:w-12 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-75 cursor-pointer"
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "var(--color-about-control-shadow)",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.16)",
               }}
             >
-              <FaChevronRight className="w-4 h-4" aria-hidden="true" />
+              <FaChevronRight className="w-5 h-5" aria-hidden="true" />
             </button>
           </>
         )}
@@ -299,7 +299,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 <div key={slide.id} data-about-slide className="snap-center snap-always px-1.5 sm:px-2.5">
                   <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                   <article
-                    className="rounded-[1.75rem] border p-4 sm:p-6 lg:p-8 min-h-[29rem] sm:min-h-[34rem]"
+                    className="relative rounded-[1.75rem] border p-4 pb-7 sm:p-6 lg:p-8 min-h-[29rem] sm:min-h-[34rem]"
                     style={{
                       background: "var(--color-about-surface-bg)",
                       borderColor: "var(--color-about-surface-border)",
@@ -324,7 +324,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                   <div className="flex flex-col items-center order-2 xl:order-1">
                     {slide.imageSrc ? (
-                      <div className="relative">
+                      <div
+                        className="relative rounded-3xl overflow-hidden border"
+                        style={{
+                          borderColor: "var(--color-about-image-frame)",
+                          boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.12)",
+                        }}
+                      >
                         <Image
                           src={slide.imageSrc}
                           alt={slide.imageAlt}
@@ -332,7 +338,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           height={480}
                           quality={95}
                           sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover rounded-3xl select-none"
+                          className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover select-none"
                           style={{ objectPosition: slide.imagePosition ?? "center" }}
                           draggable="false"
                         />
@@ -400,6 +406,19 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                     )}
                   </div>
                 </div>
+                {showNavControls && (
+                  <div className="sm:hidden pointer-events-none absolute left-1/2 bottom-0 z-20 -translate-x-1/2 translate-y-1/2 inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.58rem] uppercase tracking-[0.16em] text-[var(--color-about-surface-kicker)] opacity-95"
+                    style={{
+                      background: "var(--color-about-surface-bg)",
+                      borderColor: "var(--color-about-surface-border)",
+                      boxShadow: "0 0 0 2px var(--color-about-surface-bg)",
+                    }}
+                  >
+                    <FaChevronLeft className="h-2.5 w-2.5" aria-hidden="true" />
+                    <span>Swipe</span>
+                    <FaChevronRight className="h-2.5 w-2.5" aria-hidden="true" />
+                  </div>
+                )}
                 </article>
                 </div>
                 </div>
@@ -408,20 +427,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({
           </div>
         </div>
 
-        {showNavControls && (
-          <div className="sm:hidden mt-1 flex items-center justify-center">
-            <div className="pointer-events-none inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.58rem] uppercase tracking-[0.16em] text-[var(--color-about-surface-kicker)] opacity-75"
-            style={{
-              background: "var(--color-about-control-bg)",
-              borderColor: "var(--color-about-control-border)",
-            }}
-          >
-            <FaChevronLeft className="h-2.5 w-2.5" aria-hidden="true" />
-            <span>Swipe</span>
-            <FaChevronRight className="h-2.5 w-2.5" aria-hidden="true" />
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
