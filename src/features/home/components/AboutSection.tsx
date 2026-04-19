@@ -337,7 +337,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 >
                   <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                   <article
-                    className="relative rounded-[1.75rem] border p-5 pb-8 sm:p-8 lg:p-10 min-h-[28.5rem] sm:min-h-[33rem]"
+                    className="relative rounded-[1.75rem] border p-4 pb-7 sm:p-8 lg:p-10 min-h-[28.5rem] sm:min-h-[33rem]"
                     style={{
                       background: "var(--color-about-surface-bg)",
                       borderColor: "var(--color-about-surface-border)",
@@ -436,7 +436,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               target={link.external ? "_blank" : undefined}
                               rel={link.external ? "noopener noreferrer" : undefined}
                               aria-label={link.label}
-                              iconClassName="!w-[1.1rem] !h-[1.1rem] transform-gpu will-change-transform !text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
+                              iconClassName="!w-6 !h-6 transform-gpu will-change-transform !text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
                               icon={iconByKey[link.icon]}
                             />
                           ))}
