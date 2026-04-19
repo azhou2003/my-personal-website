@@ -149,9 +149,9 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
         const isActiveOnMobile = isMobile && activeMobileSlug === post.slug;
         const peekHeight = peekHeights[post.slug] ?? 78;
         const panelStyle: CSSProperties = {
-          background: "var(--color-blog-panel-bg-tinted)",
-          borderTopColor: "var(--color-blog-panel-border-tinted)",
-          boxShadow: "var(--color-blog-panel-shadow-tinted)",
+          background: "var(--color-about-surface-bg)",
+          borderTopColor: "var(--color-about-surface-border)",
+          boxShadow: "var(--color-about-surface-shadow-card)",
         };
 
         return (
@@ -161,7 +161,7 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
                 cardRefs.current[post.slug] = node;
               }}
               href={`/blog/${post.slug}`}
-              style={{ borderColor: "var(--color-blog-panel-border-tinted)" }}
+              style={{ borderColor: "var(--color-about-surface-border)" }}
               className="group relative block w-full h-80 rounded-lg border bg-background-light dark:bg-background-dark shadow-md hover:shadow-2xl transition-all overflow-hidden transform-gpu sm:hover:scale-[1.02] sm:focus:scale-[1.02] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow"
             >
               <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]">
@@ -190,12 +190,12 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
                   }}
                   className="px-4 pt-3 pb-2"
                 >
-                  <h2 className="text-xl font-bold font-sans text-foreground-light dark:text-foreground-dark leading-tight">
+                  <p className="text-[0.6rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-1.5">
+                    {formatDate(post.date)}
+                  </p>
+                  <h2 className="text-xl font-semibold font-sans text-[var(--color-about-surface-title)] leading-tight">
                     {post.title}
                   </h2>
-                  <span className="mt-0.5 block text-xs text-border-light dark:text-border-dark">
-                    {formatDate(post.date)}
-                  </span>
                 </div>
 
                 <div
@@ -205,8 +205,8 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
                       : "opacity-0 translate-y-2 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:group-focus-within:opacity-100 sm:group-focus-within:translate-y-0"
                   }`}
                 >
-                  <StaticTagList tags={post.tags} className="mt-1 mb-1" />
-                  <p className="text-sm text-foreground-light dark:text-foreground-dark line-clamp-3 mt-1">
+                  <StaticTagList tags={post.tags} className="mt-1 mb-2" />
+                  <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 line-clamp-3 mt-1 leading-relaxed">
                     {post.summary}
                   </p>
                 </div>
