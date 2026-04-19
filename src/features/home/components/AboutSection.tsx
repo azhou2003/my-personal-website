@@ -324,7 +324,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
           ref={scrollRef}
           className="overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-proximity pb-4 sm:pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div className="grid grid-flow-col auto-cols-[100%] gap-4 sm:gap-5 lg:gap-6">
+          <div className="grid grid-flow-col auto-cols-[100%] gap-3 sm:gap-5 lg:gap-6">
             {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
               const isCurrentSlide = index === resolvedActiveSlideIndex;
@@ -337,18 +337,18 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 >
                   <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                   <article
-                    className="relative rounded-[1.75rem] border p-4 pb-7 sm:p-8 lg:p-10 min-h-[28.5rem] sm:min-h-[33rem]"
+                    className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:p-10 min-h-[27.5rem] sm:min-h-[33rem]"
                     style={{
                       background: "var(--color-about-surface-bg)",
                       borderColor: "var(--color-about-surface-border)",
                     }}
                   >
-                <div className="grid xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-5 sm:gap-8 lg:gap-10 xl:items-center">
+                <div className="grid xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-3.5 sm:gap-8 lg:gap-10 xl:items-center">
                   <div className="order-1 xl:hidden text-center">
-                    <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
+                    <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
                       {slide.eyebrow}
                     </p>
-                    <h2 className="text-[1.62rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2.5 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.12]">
+                    <h2 className="text-[1.52rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-1.5 sm:mb-4 pb-[0.04em] text-[var(--color-about-surface-title)] leading-[1.1]">
                       {index === 0 ? (
                         <>
                           Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -357,7 +357,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         slide.title
                       )}
                     </h2>
-                    <div className="w-14 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-0.5 sm:mb-1 mx-auto"></div>
+                    <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-0 sm:mb-1 mx-auto"></div>
                   </div>
 
                   <div className="flex flex-col items-center order-2 xl:order-1">
@@ -402,7 +402,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                     )}
                   </div>
 
-                  <div className={`space-y-4 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                  <div className={`space-y-2.5 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                     <div className="hidden xl:block">
                       <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
                         {slide.eyebrow}
@@ -419,7 +419,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                     </div>
 
-                    <div className="space-y-3 sm:space-y-5 text-[0.98rem] sm:text-[1.02rem] lg:text-lg leading-7 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] mx-auto xl:mx-0">
+                    <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] mx-auto xl:mx-0">
                       {slide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}
@@ -427,8 +427,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     {linksToRender.length > 0 && (
                       <>
-                        <div className="w-16 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
-                        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center xl:justify-start">
+                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
+                        <div className="flex flex-wrap gap-2.5 sm:gap-4 justify-center xl:justify-start">
                           {linksToRender.map((link) => (
                             <IconLink
                               key={`${slide.id}-${link.label}-${link.href}`}
