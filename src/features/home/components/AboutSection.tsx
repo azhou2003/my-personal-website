@@ -24,6 +24,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [internalActiveSlideIndex, setInternalActiveSlideIndex] = React.useState(0);
+  const slideNavLockRef = React.useRef(false);
+  const slideNavUnlockTimerRef = React.useRef<number | null>(null);
+  const isActiveRef = React.useRef(isActive);
 
   const defaultSlideLinks: AboutSlideLink[] = [
     {
@@ -76,51 +79,67 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     }
   }, [aboutSlides.length, resolvedActiveSlideIndex, setResolvedActiveSlideIndex]);
 
-  const getSlideMetrics = React.useCallback(() => {
+  const getSlideElements = React.useCallback(() => {
     const scrollEl = scrollRef.current;
-    if (!scrollEl) return null;
-
+    if (!scrollEl) return [];
     const trackEl = scrollEl.firstElementChild as HTMLElement | null;
-    const firstSlide = trackEl?.querySelector<HTMLElement>("[data-about-slide]");
-    const slideWidth = firstSlide?.getBoundingClientRect().width ?? scrollEl.clientWidth;
-    const gapValue = trackEl ? window.getComputedStyle(trackEl).columnGap || window.getComputedStyle(trackEl).gap : "0";
-    const gap = Number.parseFloat(gapValue) || 0;
-    const startOffset = firstSlide?.offsetLeft ?? 0;
-
-    return {
-      slideWidth,
-      gap,
-      startOffset,
-    };
+    if (!trackEl) return [];
+    return Array.from(trackEl.querySelectorAll<HTMLElement>("[data-about-slide]"));
   }, []);
 
   const updateActiveSlideIndex = React.useCallback(() => {
     const scrollEl = scrollRef.current;
-    const metrics = getSlideMetrics();
-    if (!scrollEl || !metrics || aboutSlides.length === 0) return;
+    const slideEls = getSlideElements();
+    if (!scrollEl || slideEls.length === 0 || aboutSlides.length === 0) return;
 
-    const snapDistance = metrics.slideWidth + metrics.gap;
-    const rawIndex = Math.round((scrollEl.scrollLeft - metrics.startOffset) / snapDistance);
-    const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, rawIndex));
+    const viewportCenter = scrollEl.scrollLeft + scrollEl.clientWidth / 2;
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    slideEls.forEach((slideEl, index) => {
+      const slideCenter = slideEl.offsetLeft + slideEl.offsetWidth / 2;
+      const distance = Math.abs(viewportCenter - slideCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, closestIndex));
     setResolvedActiveSlideIndex(nextIndex);
-  }, [aboutSlides.length, getSlideMetrics, setResolvedActiveSlideIndex]);
+  }, [aboutSlides.length, getSlideElements, setResolvedActiveSlideIndex]);
 
   const scrollToSlide = React.useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const scrollEl = scrollRef.current;
-    const metrics = getSlideMetrics();
-    if (!scrollEl || !metrics || aboutSlides.length === 0) return;
+    const slideEls = getSlideElements();
+    if (!scrollEl || slideEls.length === 0 || aboutSlides.length === 0) return;
 
     const nextIndex = ((index % aboutSlides.length) + aboutSlides.length) % aboutSlides.length;
-    const snapDistance = metrics.slideWidth + metrics.gap;
+    const targetSlide = slideEls[nextIndex];
+    if (!targetSlide) return;
+
+    const centeredLeft = targetSlide.offsetLeft - (scrollEl.clientWidth - targetSlide.offsetWidth) / 2;
+    const maxScrollLeft = Math.max(0, scrollEl.scrollWidth - scrollEl.clientWidth);
+    const clampedLeft = Math.max(0, Math.min(maxScrollLeft, centeredLeft));
 
     scrollEl.scrollTo({
-      left: metrics.startOffset + nextIndex * snapDistance,
+      left: clampedLeft,
       behavior,
     });
-  }, [aboutSlides.length, getSlideMetrics]);
+  }, [aboutSlides.length, getSlideElements]);
 
   const scrollBySlide = React.useCallback((direction: -1 | 1) => {
     if (aboutSlides.length === 0) return;
+    if (slideNavLockRef.current) return;
+
+    slideNavLockRef.current = true;
+    if (slideNavUnlockTimerRef.current !== null) {
+      window.clearTimeout(slideNavUnlockTimerRef.current);
+    }
+    slideNavUnlockTimerRef.current = window.setTimeout(() => {
+      slideNavLockRef.current = false;
+      slideNavUnlockTimerRef.current = null;
+    }, 320);
 
     const nextIndex =
       direction === 1
@@ -147,6 +166,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, animateIn]);
 
   React.useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
+
+  React.useEffect(() => {
     if (!isExpanded || !isActive || activeSlideIndex !== undefined) return;
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
@@ -162,9 +185,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, isActive, activeSlideIndex, updateActiveSlideIndex]);
 
   React.useEffect(() => {
-    if (!isExpanded || !isActive) return;
+    if (!isExpanded) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isActiveRef.current) return;
+
       const target = event.target as HTMLElement | null;
       const tagName = target?.tagName;
       const isTypingTarget =
@@ -184,12 +209,20 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isExpanded, isActive, scrollBySlide]);
+  }, [isExpanded, scrollBySlide]);
 
   React.useEffect(() => {
     if (!isExpanded || activeSlideIndex === undefined || aboutSlides.length === 0) return;
     scrollToSlide(activeSlideIndex, "auto");
   }, [isExpanded, activeSlideIndex, aboutSlides.length, scrollToSlide]);
+
+  React.useEffect(() => {
+    return () => {
+      if (slideNavUnlockTimerRef.current !== null) {
+        window.clearTimeout(slideNavUnlockTimerRef.current);
+      }
+    };
+  }, []);
 
   if (!isExpanded) {
     return (
@@ -234,7 +267,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }
 
   return (
-    <section className="w-full max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-7 lg:py-10 min-h-[calc(100svh-72px)] sm:min-h-0 flex items-center">
+    <section className="w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-8 lg:py-12 min-h-[calc(100svh-72px)] sm:min-h-0 flex items-center">
       <style jsx>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -255,62 +288,67 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         }
       `}</style>
 
-      <div className="relative w-full px-1 sm:px-8" data-active-slide={resolvedActiveSlideIndex}>
+      <div className="relative w-full px-0 sm:px-10" data-active-slide={resolvedActiveSlideIndex}>
         {showNavControls && (
           <>
             <button
               type="button"
               onClick={() => scrollBySlide(-1)}
               aria-label="Previous section"
-              className="hidden sm:flex absolute -left-10 md:-left-12 lg:-left-14 top-1/2 z-20 -translate-y-1/2 h-11 w-11 lg:h-12 lg:w-12 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-75 cursor-pointer"
+              className="hidden sm:flex absolute -left-11 md:-left-14 lg:-left-[4.25rem] top-1/2 z-20 -translate-y-1/2 h-12 w-12 lg:h-14 lg:w-14 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:scale-105 hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-80 cursor-pointer backdrop-blur-sm"
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.16)",
+                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <FaChevronLeft className="w-5 h-5" aria-hidden="true" />
+              <FaChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" aria-hidden="true" />
             </button>
             <button
               type="button"
               onClick={() => scrollBySlide(1)}
               aria-label="Next section"
-              className="hidden sm:flex absolute -right-10 md:-right-12 lg:-right-14 top-1/2 z-20 -translate-y-1/2 h-11 w-11 lg:h-12 lg:w-12 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-75 cursor-pointer"
+              className="hidden sm:flex absolute -right-11 md:-right-14 lg:-right-[4.25rem] top-1/2 z-20 -translate-y-1/2 h-12 w-12 lg:h-14 lg:w-14 items-center justify-center rounded-full border text-[var(--color-about-surface-icon)] transition-all hover:scale-105 hover:text-[var(--color-about-surface-icon-hover)] hover:opacity-100 opacity-80 cursor-pointer backdrop-blur-sm"
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.16)",
+                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <FaChevronRight className="w-5 h-5" aria-hidden="true" />
+              <FaChevronRight className="w-5 h-5 lg:w-6 lg:h-6" aria-hidden="true" />
             </button>
           </>
         )}
 
         <div
           ref={scrollRef}
-          className="overflow-x-auto scroll-smooth snap-x snap-mandatory pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-proximity pb-4 sm:pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div className="grid grid-flow-col auto-cols-[100%] gap-4 sm:gap-6">
+          <div className="grid grid-flow-col auto-cols-[100%] gap-4 sm:gap-5 lg:gap-6">
             {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
+              const isCurrentSlide = index === resolvedActiveSlideIndex;
 
               return (
-                <div key={slide.id} data-about-slide className="snap-center snap-always px-1.5 sm:px-2.5">
+                <div
+                  key={slide.id}
+                  data-about-slide
+                  className={`snap-center snap-always px-1.5 sm:px-2.5 transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                >
                   <div className="rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                   <article
-                    className="relative rounded-[1.75rem] border p-4 pb-7 sm:p-6 lg:p-8 min-h-[29rem] sm:min-h-[34rem]"
+                    className="relative rounded-[1.75rem] border p-5 pb-8 sm:p-8 lg:p-10 min-h-[28.5rem] sm:min-h-[33rem]"
                     style={{
                       background: "var(--color-about-surface-bg)",
                       borderColor: "var(--color-about-surface-border)",
                     }}
                   >
-                <div className="grid xl:grid-cols-2 gap-4 sm:gap-7 lg:gap-10 xl:items-center">
+                <div className="grid xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-5 sm:gap-8 lg:gap-10 xl:items-center">
                   <div className="order-1 xl:hidden text-center">
-                    <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1.5 sm:mb-2.5 font-medium">
+                    <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
                       {slide.eyebrow}
                     </p>
-                    <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.15]">
+                    <h2 className="text-[1.62rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2.5 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.12]">
                       {index === 0 ? (
                         <>
                           Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -319,7 +357,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         slide.title
                       )}
                     </h2>
-                    <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-1 sm:mb-2 mx-auto"></div>
+                    <div className="w-14 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-0.5 sm:mb-1 mx-auto"></div>
                   </div>
 
                   <div className="flex flex-col items-center order-2 xl:order-1">
@@ -328,7 +366,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                         className="relative rounded-3xl overflow-hidden border"
                         style={{
                           borderColor: "var(--color-about-image-frame)",
-                          boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.12)",
+                          background: "color-mix(in srgb, var(--color-about-surface-bg) 88%, transparent)",
+                          boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.06)",
                         }}
                       >
                         <Image
@@ -338,7 +377,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           height={480}
                           quality={95}
                           sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                          className="w-56 sm:w-64 lg:w-72 xl:w-[22rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[30rem] object-cover select-none"
+                          className="w-56 sm:w-64 lg:w-[19rem] xl:w-[21rem] h-72 sm:h-80 lg:h-[24rem] xl:h-[29rem] object-cover select-none"
                           style={{ objectPosition: slide.imagePosition ?? "center" }}
                           draggable="false"
                         />
@@ -363,12 +402,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                     )}
                   </div>
 
-                  <div className="space-y-3 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left">
+                  <div className={`space-y-4 sm:space-y-7 order-3 xl:order-2 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                     <div className="hidden xl:block">
-                      <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1.5 sm:mb-2.5 font-medium">
+                      <p className="text-[0.64rem] sm:text-xs uppercase tracking-[0.22em] text-[var(--color-about-surface-kicker)] mb-2 sm:mb-3 font-medium">
                         {slide.eyebrow}
                       </p>
-                      <h2 className="text-[1.55rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-2 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.15]">
+                      <h2 className="text-[1.7rem] sm:text-4xl lg:text-[2.7rem] font-bold mb-3 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.1]">
                         {index === 0 ? (
                           <>
                             Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
@@ -377,10 +416,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           slide.title
                         )}
                       </h2>
-                      <div className="w-12 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
+                      <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                     </div>
 
-                    <div className="space-y-2.5 sm:space-y-5 text-[0.98rem] sm:text-lg leading-7 sm:leading-relaxed text-foreground-light dark:text-foreground-dark max-w-[34ch] sm:max-w-xl mx-auto xl:mx-0">
+                    <div className="space-y-3 sm:space-y-5 text-[0.98rem] sm:text-[1.02rem] lg:text-lg leading-7 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] mx-auto xl:mx-0">
                       {slide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}
@@ -388,8 +427,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     {linksToRender.length > 0 && (
                       <>
-                        <div className="w-14 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
-                        <div className="flex gap-3 sm:gap-6 justify-center xl:justify-start">
+                        <div className="w-16 sm:w-24 lg:w-32 border-t-2 border-dotted mx-auto xl:mx-0" style={{ borderColor: "var(--color-about-surface-divider)" }}></div>
+                        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center xl:justify-start">
                           {linksToRender.map((link) => (
                             <IconLink
                               key={`${slide.id}-${link.label}-${link.href}`}
@@ -397,7 +436,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               target={link.external ? "_blank" : undefined}
                               rel={link.external ? "noopener noreferrer" : undefined}
                               aria-label={link.label}
-                              iconClassName="!text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
+                              iconClassName="!w-[1.1rem] !h-[1.1rem] transform-gpu will-change-transform !text-[var(--color-about-surface-icon)] hover:!text-[var(--color-about-surface-icon-hover)] hover:scale-110"
                               icon={iconByKey[link.icon]}
                             />
                           ))}
@@ -407,16 +446,16 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   </div>
                 </div>
                 {showNavControls && (
-                  <div className="sm:hidden pointer-events-none absolute left-1/2 bottom-0 z-20 -translate-x-1/2 translate-y-1/2 inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.58rem] uppercase tracking-[0.16em] text-[var(--color-about-surface-kicker)] opacity-95"
+                  <div className="sm:hidden pointer-events-none absolute left-1/2 bottom-0 z-20 -translate-x-1/2 translate-y-1/2 inline-flex items-center gap-1 rounded-full border px-2 py-[0.28rem] text-[0.56rem] uppercase tracking-[0.18em] text-[var(--color-about-surface-kicker)] opacity-95"
                     style={{
                       background: "var(--color-about-surface-bg)",
                       borderColor: "var(--color-about-surface-border)",
                       boxShadow: "0 0 0 2px var(--color-about-surface-bg)",
                     }}
                   >
-                    <FaChevronLeft className="h-2.5 w-2.5" aria-hidden="true" />
-                    <span>Swipe</span>
-                    <FaChevronRight className="h-2.5 w-2.5" aria-hidden="true" />
+                    <FaChevronLeft className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
+                    <span className="leading-none">Swipe</span>
+                    <FaChevronRight className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
                   </div>
                 )}
                 </article>
