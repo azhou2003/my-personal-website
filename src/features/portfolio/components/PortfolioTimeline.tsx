@@ -125,7 +125,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp" && event.key !== "Enter") return;
 
       const target = event.target as HTMLElement | null;
       const tagName = target?.tagName;
@@ -135,10 +135,20 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
         target?.isContentEditable;
       if (isTypingTarget) return;
 
-      event.preventDefault();
+      if (event.key === "Enter" && event.repeat) return;
 
       const currentIndex = activeDesktopIndex ?? getClosestIndexToViewportCenter();
       if (currentIndex === null) return;
+
+      if (event.key === "Enter") {
+        const focusedProject = projects[currentIndex];
+        if (!focusedProject?.link) return;
+        event.preventDefault();
+        window.open(focusedProject.link, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      event.preventDefault();
 
       const direction = event.key === "ArrowDown" ? 1 : -1;
       const targetIndex = Math.max(0, Math.min(currentIndex + direction, projects.length - 1));
@@ -396,7 +406,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 <div className="w-1/2 flex justify-end pr-6 sm:pr-6 md:pr-8 lg:pr-10 pl-6 sm:pl-6 md:pl-8 lg:pl-10">
                   {isLeft ? (
                     <span
-                      className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
+                      className={`text-[0.95rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.04em] select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}
                     >
                       {formatDate(project.date, "MMMM yyyy")}
                     </span>
@@ -427,9 +437,6 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           </div>
                         </a>
                         <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
-                          <p className="text-[0.62rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
-                            {formatDate(project.date, "MMMM yyyy")}
-                          </p>
                           <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
                             {project.title}
                           </h2>
@@ -473,9 +480,6 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           </div>
                         </a>
                         <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
-                          <p className="text-[0.62rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
-                            {formatDate(project.date, "MMMM yyyy")}
-                          </p>
                           <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
                             {project.title}
                           </h2>
@@ -490,7 +494,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                       </div>
                     </div>
                   ) : (
-                    <span className={`text-base sm:text-lg text-foreground-light dark:text-foreground-dark font-sans select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}>
+                    <span className={`text-[0.95rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.04em] select-none whitespace-nowrap transition-all duration-300 group-hover:scale-110 group-focus:scale-110 ${isFocused ? "scale-110" : ""}`}>
                       {formatDate(project.date, "MMMM yyyy")}
                     </span>
                   )}
@@ -506,9 +510,6 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 <div className="relative mx-3">
                   <div className="absolute inset-0 rounded-[1.75rem] z-20" style={{ background: "var(--color-about-surface-bg)" }} aria-hidden="true" />
                   <div className={mobileInfoPanelClass} style={infoPanelStyle}>
-                    <p className="text-[0.6rem] uppercase tracking-[0.2em] font-medium text-[var(--color-about-surface-kicker)] mb-2">
-                      {formatDate(project.date, "MMMM yyyy")}
-                    </p>
                     <h2 className="text-base sm:text-lg font-semibold font-sans mb-2 text-[var(--color-about-surface-title)] leading-tight">
                       {project.title}
                     </h2>

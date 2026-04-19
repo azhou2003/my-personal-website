@@ -205,7 +205,6 @@ export default function BlogPostGrid({ posts, triggerKey }: BlogPostGridProps) {
                       : "opacity-0 translate-y-2 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:group-focus-within:opacity-100 sm:group-focus-within:translate-y-0"
                   }`}
                 >
-                  <div className="w-12 border-t-2 border-dotted mb-2" style={{ borderColor: "var(--color-about-surface-divider)" }} />
                   <StaticTagList tags={post.tags} className="mt-1 mb-2" />
                   <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 line-clamp-3 mt-1 leading-relaxed">
                     {post.summary}

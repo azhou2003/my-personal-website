@@ -28,8 +28,9 @@
   --color-switch-ring: 0 0 0 4px rgba(183, 199, 163, 0.3);
   --color-switch-shadow-active: 0 2px 8px rgba(0, 0, 0, 0.15);
   --color-switch-shadow-idle: 0 1px 4px rgba(0, 0, 0, 0.1);
-  --color-timeline-line: #23201c;
-  --color-timeline-fill: #23201c;
+  --color-timeline-line: #6e5439;
+  --color-timeline-fill: #f7ead3;
+  --color-timeline-date: #6a4f34;
   --color-card-muted-bg: #ece7d5;
   --color-portfolio-present: #ffe066;
   --color-portfolio-past: #ffb385;
@@ -109,8 +110,9 @@
   --color-switch-ring: 0 0 0 4px rgba(63, 74, 54, 0.3);
   --color-switch-shadow-active: 0 2px 8px rgba(0, 0, 0, 0.3);
   --color-switch-shadow-idle: 0 1px 4px rgba(0, 0, 0, 0.22);
-  --color-timeline-line: #ece7d5;
-  --color-timeline-fill: #ece7d5;
+  --color-timeline-line: #d8c7ab;
+  --color-timeline-fill: #2e2a27;
+  --color-timeline-date: #d8c7ab;
   --color-card-muted-bg: #23201c;
   --color-portfolio-present: #8a6110;
   --color-portfolio-past: #b96534;
