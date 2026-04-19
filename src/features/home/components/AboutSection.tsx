@@ -379,7 +379,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                     </div>
 
                     <div className="relative z-10">
-                    <div className="lg:hidden flex justify-center mb-3 sm:mb-6">
+                    <div className="lg:hidden relative z-20 flex justify-center mb-[-0.95rem] sm:mb-[-1.2rem]">
                       {slide.imageSrc ? (
                         <div
                           className="relative rounded-3xl overflow-hidden border"
@@ -423,13 +423,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
-                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-[2.75rem] xl:px-[3.25rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-hidden"
+                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-[2.75rem] xl:px-[3.25rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
                           background: "var(--color-about-surface-bg)",
                           borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        <div className={`h-full space-y-2.5 sm:space-y-7 text-center xl:text-left lg:overflow-y-auto lg:pr-1 transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                        <div className={`h-full space-y-2.5 sm:space-y-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                           <div className="xl:hidden text-center">
                             <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
                               {slide.eyebrow}
