@@ -299,7 +299,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.18)",
+                boxShadow: "var(--color-about-control-shadow-left)",
               }}
             >
               <FaChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" aria-hidden="true" />
@@ -312,7 +312,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
               style={{
                 background: "var(--color-about-control-bg)",
                 borderColor: "var(--color-about-control-border)",
-                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.18)",
+                boxShadow: "var(--color-about-control-shadow-right)",
               }}
             >
               <FaChevronRight className="w-5 h-5 lg:w-6 lg:h-6" aria-hidden="true" />
