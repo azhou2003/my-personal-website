@@ -421,15 +421,15 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       )}
                     </div>
 
-                    <div className="w-full lg:max-w-[44rem] xl:max-w-[46rem] rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                    <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
-                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-10 xl:px-12 min-h-[20rem] sm:min-h-[25rem] xl:min-h-[33rem]"
+                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-[2.75rem] xl:px-[3.25rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-hidden"
                         style={{
                           background: "var(--color-about-surface-bg)",
                           borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        <div className={`space-y-2.5 sm:space-y-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                        <div className={`h-full space-y-2.5 sm:space-y-7 text-center xl:text-left lg:overflow-y-auto lg:pr-1 transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                           <div className="xl:hidden text-center">
                             <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
                               {slide.eyebrow}
@@ -462,7 +462,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             <div className="w-16 sm:w-20 lg:w-24 h-1 bg-accent-yellow rounded-full mb-2 sm:mb-4 xl:mb-0 mx-auto xl:mx-0"></div>
                           </div>
 
-                          <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-[52ch] xl:max-w-none mx-auto xl:mx-0">
+                          <div className="space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-none mx-auto xl:mx-0">
                             {slide.paragraphs.map((paragraph) => (
                               <p key={paragraph}>{paragraph}</p>
                             ))}
