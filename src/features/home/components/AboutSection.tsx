@@ -423,7 +423,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
                     <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
-                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:px-[2.75rem] xl:px-[3.25rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
+                        className="relative rounded-[1.75rem] border p-3.5 pb-6 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-[20rem] sm:min-h-[25rem] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
                           background: "var(--color-about-surface-bg)",
                           borderColor: "var(--color-about-surface-border)",
