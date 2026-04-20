@@ -90,10 +90,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     return Array.from(trackEl.querySelectorAll<HTMLElement>("[data-about-slide]"));
   }, []);
 
-  const updateActiveSlideIndex = React.useCallback(() => {
+  const getClosestSlideIndex = React.useCallback(() => {
     const scrollEl = scrollRef.current;
     const slideEls = getSlideElements();
-    if (!scrollEl || slideEls.length === 0 || aboutSlides.length === 0) return;
+    if (!scrollEl || slideEls.length === 0 || aboutSlides.length === 0) return null;
 
     const viewportCenter = scrollEl.scrollLeft + scrollEl.clientWidth / 2;
     let closestIndex = 0;
@@ -108,9 +108,14 @@ const AboutSection: React.FC<AboutSectionProps> = ({
       }
     });
 
-    const nextIndex = Math.max(0, Math.min(aboutSlides.length - 1, closestIndex));
+    return Math.max(0, Math.min(aboutSlides.length - 1, closestIndex));
+  }, [aboutSlides.length, getSlideElements]);
+
+  const updateActiveSlideIndex = React.useCallback(() => {
+    const nextIndex = getClosestSlideIndex();
+    if (nextIndex === null) return;
     setResolvedActiveSlideIndex(nextIndex);
-  }, [aboutSlides.length, getSlideElements, setResolvedActiveSlideIndex]);
+  }, [getClosestSlideIndex, setResolvedActiveSlideIndex]);
 
   const scrollToSlide = React.useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const scrollEl = scrollRef.current;
@@ -340,6 +345,22 @@ const AboutSection: React.FC<AboutSectionProps> = ({
           line-height: 1.15;
           animation: gradient 6s ease infinite;
         }
+        .about-mobile-description-preview {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 4;
+          overflow: hidden;
+        }
+        @media (max-height: 860px) {
+          .about-mobile-description-preview {
+            -webkit-line-clamp: 3;
+          }
+        }
+        @media (max-height: 760px) {
+          .about-mobile-description-preview {
+            -webkit-line-clamp: 2;
+          }
+        }
       `}</style>
 
       <div className="relative w-full px-0 sm:px-10" data-active-slide={resolvedActiveSlideIndex}>
@@ -528,7 +549,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               setDescriptionModalSlideId(slide.id);
                             }}
                           >
-                            <p className="text-[0.95rem] sm:text-[1.02rem] leading-6 sm:leading-relaxed whitespace-normal break-words line-clamp-4">
+                            <p className="about-mobile-description-preview text-[0.95rem] sm:text-[1.02rem] leading-6 sm:leading-relaxed whitespace-normal break-words">
                               {slide.paragraphs.join(" ")}
                             </p>
                             <button
