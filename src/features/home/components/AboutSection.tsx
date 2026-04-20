@@ -1,6 +1,7 @@
 import React from "react";
 import { FaGithub, FaLinkedin, FaEnvelope, FaChevronDown, FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGoodreadsG, FaPenNib, FaSteam } from "react-icons/fa";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { IconLink } from "@/components/ui";
 import type { AboutSlide, AboutSlideLink } from "@/lib/types";
 
@@ -24,12 +25,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [internalActiveSlideIndex, setInternalActiveSlideIndex] = React.useState(0);
+  const [descriptionModalSlideId, setDescriptionModalSlideId] = React.useState<string | null>(null);
   const slideNavLockRef = React.useRef(false);
   const slideNavUnlockTimerRef = React.useRef<number | null>(null);
   const isActiveRef = React.useRef(isActive);
-  const descriptionTouchYRef = React.useRef<number | null>(null);
-  const bodyOverflowRef = React.useRef<string | null>(null);
-  const htmlOverflowRef = React.useRef<string | null>(null);
+  const readFullTriggerRefs = React.useRef<Record<string, HTMLButtonElement | null>>({});
 
   const defaultSlideLinks: AboutSlideLink[] = [
     {
@@ -158,64 +158,17 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const compactLinksToRender = activeSlide?.links ?? defaultSlideLinks;
   const showNavControls = aboutSlides.length > 1;
 
-  const handleDescriptionWheel = React.useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    const el = event.currentTarget;
-    if (el.scrollHeight <= el.clientHeight) {
-      event.preventDefault();
-      return;
-    }
+  const modalSlide = aboutSlides.find((slide) => slide.id === descriptionModalSlideId) ?? null;
 
-    event.preventDefault();
-    event.stopPropagation();
-    el.scrollTop += event.deltaY;
-  }, []);
-
-  const handleDescriptionTouchStart = React.useCallback((event: React.TouchEvent<HTMLDivElement>) => {
-    descriptionTouchYRef.current = event.touches[0]?.clientY ?? null;
-
-    if (typeof window === "undefined") return;
-    if (!window.matchMedia("(max-width: 1023px)").matches) return;
-    if (typeof document === "undefined") return;
-
-    if (bodyOverflowRef.current === null) {
-      bodyOverflowRef.current = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-    }
-    if (htmlOverflowRef.current === null) {
-      htmlOverflowRef.current = document.documentElement.style.overflow;
-      document.documentElement.style.overflow = "hidden";
-    }
-  }, []);
-
-  const handleDescriptionTouchMove = React.useCallback((event: React.TouchEvent<HTMLDivElement>) => {
-    const el = event.currentTarget;
-    const currentY = event.touches[0]?.clientY;
-    const previousY = descriptionTouchYRef.current;
-    if (currentY === undefined || previousY === null) return;
-
-    if (el.scrollHeight <= el.clientHeight) {
-      event.preventDefault();
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    el.scrollTop += previousY - currentY;
-    descriptionTouchYRef.current = currentY;
-  }, []);
-
-  const handleDescriptionTouchEnd = React.useCallback(() => {
-    descriptionTouchYRef.current = null;
-
-    if (typeof document === "undefined") return;
-    if (bodyOverflowRef.current !== null) {
-      document.body.style.overflow = bodyOverflowRef.current;
-      bodyOverflowRef.current = null;
-    }
-    if (htmlOverflowRef.current !== null) {
-      document.documentElement.style.overflow = htmlOverflowRef.current;
-      htmlOverflowRef.current = null;
-    }
+  const closeDescriptionModal = React.useCallback(() => {
+    setDescriptionModalSlideId((currentSlideId) => {
+      if (currentSlideId && typeof window !== "undefined") {
+        window.requestAnimationFrame(() => {
+          readFullTriggerRefs.current[currentSlideId]?.focus();
+        });
+      }
+      return null;
+    });
   }, []);
 
   React.useEffect(() => {
@@ -285,20 +238,42 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, activeSlideIndex, aboutSlides.length, scrollToSlide]);
 
   React.useEffect(() => {
+    if (!isExpanded) {
+      setDescriptionModalSlideId(null);
+    }
+  }, [isExpanded]);
+
+  React.useEffect(() => {
+    if (!descriptionModalSlideId || typeof document === "undefined") return;
+
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, [descriptionModalSlideId]);
+
+  React.useEffect(() => {
+    if (!descriptionModalSlideId) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      closeDescriptionModal();
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [closeDescriptionModal, descriptionModalSlideId]);
+
+  React.useEffect(() => {
     return () => {
       if (slideNavUnlockTimerRef.current !== null) {
         window.clearTimeout(slideNavUnlockTimerRef.current);
-      }
-
-      if (typeof document !== "undefined") {
-        if (bodyOverflowRef.current !== null) {
-          document.body.style.overflow = bodyOverflowRef.current;
-          bodyOverflowRef.current = null;
-        }
-        if (htmlOverflowRef.current !== null) {
-          document.documentElement.style.overflow = htmlOverflowRef.current;
-          htmlOverflowRef.current = null;
-        }
       }
     };
   }, []);
@@ -542,15 +517,33 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           </div>
 
                           <div
-                            onWheel={handleDescriptionWheel}
-                            onWheelCapture={(event) => event.stopPropagation()}
-                            onTouchStart={handleDescriptionTouchStart}
-                            onTouchMove={handleDescriptionTouchMove}
-                            onTouchMoveCapture={(event) => event.stopPropagation()}
-                            onTouchEnd={handleDescriptionTouchEnd}
-                            onTouchCancel={handleDescriptionTouchEnd}
-                            className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-none pr-1 space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-none mx-auto xl:mx-0 lg:flex-none lg:overflow-visible lg:overscroll-auto lg:touch-auto lg:pr-0"
+                            className="lg:hidden mx-auto max-w-[36ch] sm:max-w-[46ch] text-foreground-light/95 dark:text-foreground-dark/95 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Open full description for ${slide.title}`}
+                            onClick={() => setDescriptionModalSlideId(slide.id)}
+                            onKeyDown={(event) => {
+                              if (event.key !== "Enter" && event.key !== " ") return;
+                              event.preventDefault();
+                              setDescriptionModalSlideId(slide.id);
+                            }}
                           >
+                            <p className="text-[0.95rem] sm:text-[1.02rem] leading-6 sm:leading-relaxed whitespace-normal break-words line-clamp-4">
+                              {slide.paragraphs.join(" ")}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setDescriptionModalSlideId(slide.id)}
+                              ref={(node) => {
+                                readFullTriggerRefs.current[slide.id] = node;
+                              }}
+                              className="mt-[-1px] inline-flex h-[0.62rem] items-center p-0 m-0 border-0 bg-transparent align-top text-[0.58rem] leading-none uppercase tracking-[0.14em] font-medium text-[var(--color-about-surface-kicker)] transition-all hover:text-[var(--color-about-surface-title)]"
+                            >
+                              <span className="leading-none">Read More</span>
+                            </button>
+                          </div>
+
+                          <div className="hidden lg:block pr-1 space-y-2 sm:space-y-5 text-[0.95rem] sm:text-[1.02rem] lg:text-lg leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 max-w-[36ch] sm:max-w-[46ch] lg:max-w-none mx-auto xl:mx-0 whitespace-normal break-words lg:pr-0">
                             {slide.paragraphs.map((paragraph) => (
                               <p key={paragraph}>{paragraph}</p>
                             ))}
@@ -600,6 +593,50 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         </div>
 
       </div>
+      {modalSlide && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[120] flex items-center justify-center bg-[rgba(18,14,10,0.66)] backdrop-blur-[2px] p-6 sm:p-8 lg:hidden"
+            onClick={closeDescriptionModal}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${modalSlide.title} full description`}
+              onClick={(event) => event.stopPropagation()}
+              className="w-full max-w-[23rem] sm:max-w-[28rem] max-h-[min(84svh,37rem)] rounded-[1.6rem] border overflow-hidden flex flex-col"
+              style={{
+                background: "var(--color-about-surface-bg)",
+                borderColor: "var(--color-about-surface-border)",
+                boxShadow: "var(--color-about-surface-shadow-card)",
+              }}
+            >
+              <div className="px-6 sm:px-7 pt-5 sm:pt-6 pb-2">
+                <p className="text-[0.72rem] uppercase tracking-[0.18em] font-medium text-[var(--color-about-surface-kicker)]">
+                  {modalSlide.eyebrow}
+                </p>
+              </div>
+
+              <div className="px-6 sm:px-7 py-3.5 sm:py-4 overflow-y-auto space-y-3 text-[0.95rem] sm:text-[1.02rem] leading-6 sm:leading-relaxed text-foreground-light/95 dark:text-foreground-dark/95 whitespace-normal break-words [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {modalSlide.paragraphs.map((paragraph) => (
+                  <p key={`${modalSlide.id}-${paragraph.slice(0, 24)}`}>{paragraph}</p>
+                ))}
+              </div>
+
+              <div className="px-6 sm:px-7 py-2.5">
+                <button
+                  type="button"
+                  onClick={closeDescriptionModal}
+                  className="w-full rounded-full border px-3 py-2 text-[0.64rem] uppercase tracking-[0.16em] font-medium text-[var(--color-about-surface-kicker)] transition-colors hover:text-[var(--color-about-surface-title)]"
+                  style={{ borderColor: "var(--color-about-surface-border)" }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </section>
   );
 };
