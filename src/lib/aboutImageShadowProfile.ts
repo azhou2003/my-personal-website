@@ -12,6 +12,14 @@ type Region = {
   endY: number;
 };
 
+type CandidateBucket = {
+  rSum: number;
+  gSum: number;
+  bSum: number;
+  score: number;
+  count: number;
+};
+
 const profileCache = new Map<string, AboutSlideShadowProfile>();
 
 const FALLBACK_PROFILE: AboutSlideShadowProfile = {
@@ -156,7 +164,7 @@ function dominantColorFromRegion(
   const startY = clamp(region.startY, 0, height);
   const endY = clamp(region.endY, 0, height);
 
-  const buckets = new Map<string, { rSum: number; gSum: number; bSum: number; score: number; count: number }>();
+  const buckets = new Map<string, CandidateBucket>();
 
   for (let y = startY; y < endY; y += 1) {
     for (let x = startX; x < endX; x += 1) {
@@ -188,9 +196,9 @@ function dominantColorFromRegion(
     }
   }
 
-  let bestSafe: { rSum: number; gSum: number; bSum: number; score: number; count: number } | null = null;
-  let bestOverall: { rSum: number; gSum: number; bSum: number; score: number; count: number } | null = null;
-  buckets.forEach((candidate) => {
+  let bestSafe: CandidateBucket | null = null;
+  let bestOverall: CandidateBucket | null = null;
+  for (const candidate of buckets.values()) {
     const averaged: RGB = {
       r: Math.round(candidate.rSum / candidate.count),
       g: Math.round(candidate.gSum / candidate.count),
@@ -204,8 +212,9 @@ function dominantColorFromRegion(
     if (isShadowSafeColor(averaged) && (!bestSafe || candidate.score > bestSafe.score)) {
       bestSafe = candidate;
     }
-  });
+  }
 
+  if (!bestSafe && !bestOverall) return normalizeShadowColor(fallback, fallback);
   const selected = bestSafe ?? bestOverall;
   if (!selected || selected.count === 0) return normalizeShadowColor(fallback, fallback);
 
