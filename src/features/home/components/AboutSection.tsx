@@ -405,6 +405,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({
             {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
               const isCurrentSlide = index === resolvedActiveSlideIndex;
+              const currentSlideLabel = String(index + 1).padStart(2, "0");
+              const totalSlidesLabel = String(aboutSlides.length).padStart(2, "0");
               const desktopShadowColors = slide.shadowProfile?.desktopColors ?? fallbackShadowColors;
               const mobileShadowColors = slide.shadowProfile?.mobileColors ?? fallbackShadowColors;
               const [desktopTopColor, desktopMiddleColor, desktopBottomColor] = desktopShadowColors;
@@ -512,7 +514,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       )}
                     </div>
 
-                    <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                    <div className="w-full lg:max-w-[31.5rem] xl:max-w-[33.5rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
                         className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-0 h-[clamp(15rem,40svh,20rem)] sm:h-[clamp(16.5rem,41svh,22rem)] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
@@ -641,6 +643,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               </div>
                             </>
                           )}
+                        </div>
+
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none inline-flex absolute left-1/2 -translate-x-1/2 bottom-7 sm:bottom-8 lg:left-auto lg:translate-x-0 lg:right-5 xl:right-6 lg:bottom-4 xl:bottom-5 items-center text-[0.56rem] sm:text-[0.58rem] lg:text-[0.62rem] uppercase tracking-[0.18em] font-medium text-[var(--color-about-surface-kicker)] opacity-70"
+                        >
+                          {currentSlideLabel}/{totalSlidesLabel}
                         </div>
 
                         {showNavControls && (
