@@ -41,8 +41,16 @@ export interface AboutSlide {
   imageAlt: string;
   imageSrc?: string;
   imagePosition?: string;
+  shadowProfile?: AboutSlideShadowProfile;
   paragraphs: string[];
   links?: AboutSlideLink[];
+}
+
+export interface AboutSlideShadowProfile {
+  desktopColors: [string, string, string];
+  mobileColors: [string, string, string];
+  textureColor: string;
+  opacity: number;
 }
 
 export interface AboutSlideLink {
