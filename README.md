@@ -1,5 +1,3 @@
-[Live Site](https://www.anjiezhou.dev/)
-
 # My Personal Website
 
 Personal website built with Next.js App Router, featuring:
