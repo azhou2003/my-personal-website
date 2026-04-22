@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getAboutImageShadowProfile } from "./aboutImageShadowProfile";
 import { ABOUT_SLIDES_DIR } from "./contentPaths";
 import type { AboutSlide, AboutSlideLink } from "./types";
 
@@ -45,7 +46,7 @@ export async function getAllAboutSlides(): Promise<AboutSlide[]> {
     .filter((file) => file.endsWith(".json"))
     .sort((a, b) => a.localeCompare(b));
 
-  const slides = files.flatMap((file) => {
+  const parsedSlides = files.flatMap((file) => {
     const filePath = path.join(ABOUT_SLIDES_DIR, file);
     const raw = fs.readFileSync(filePath, "utf-8");
     const parsed = JSON.parse(raw) as unknown;
@@ -56,6 +57,17 @@ export async function getAllAboutSlides(): Promise<AboutSlide[]> {
 
     return [parsed];
   });
+
+  const slides = await Promise.all(
+    parsedSlides.map(async (slide) => {
+      if (!slide.imageSrc) return slide;
+      const shadowProfile = await getAboutImageShadowProfile(slide.imageSrc);
+      return {
+        ...slide,
+        shadowProfile,
+      };
+    })
+  );
 
   return slides;
 }

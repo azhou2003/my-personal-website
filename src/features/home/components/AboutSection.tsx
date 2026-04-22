@@ -162,6 +162,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const compactPillText = activeSlide?.pillText?.trim() || "Meet Anjie";
   const compactLinksToRender = activeSlide?.links ?? defaultSlideLinks;
   const showNavControls = aboutSlides.length > 1;
+  const fallbackShadowColors = ["rgba(224, 158, 108, 1)", "rgba(171, 118, 82, 1)", "rgba(117, 136, 112, 1)"];
+  const fallbackTextureColor = "rgba(143, 126, 102, 1)";
 
   const modalSlide = aboutSlides.find((slide) => slide.id === descriptionModalSlideId) ?? null;
 
@@ -403,6 +405,22 @@ const AboutSection: React.FC<AboutSectionProps> = ({
             {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
               const isCurrentSlide = index === resolvedActiveSlideIndex;
+              const currentSlideLabel = String(index + 1).padStart(2, "0");
+              const totalSlidesLabel = String(aboutSlides.length).padStart(2, "0");
+              const desktopShadowColors = slide.shadowProfile?.desktopColors ?? fallbackShadowColors;
+              const mobileShadowColors = slide.shadowProfile?.mobileColors ?? fallbackShadowColors;
+              const [desktopTopColor, desktopMiddleColor, desktopBottomColor] = desktopShadowColors;
+              const [mobileLeftColor, mobileMiddleColor, mobileRightColor] = mobileShadowColors;
+              const textureColor = slide.shadowProfile?.textureColor ?? fallbackTextureColor;
+              const desktopTopBlendColor = `color-mix(in srgb, ${desktopTopColor} 50%, ${desktopMiddleColor})`;
+              const desktopBottomBlendColor = `color-mix(in srgb, ${desktopMiddleColor} 50%, ${desktopBottomColor})`;
+              const mobileLeftBlendColor = `color-mix(in srgb, ${mobileLeftColor} 50%, ${mobileMiddleColor})`;
+              const mobileRightBlendColor = `color-mix(in srgb, ${mobileMiddleColor} 50%, ${mobileRightColor})`;
+              const baseShadowOpacity = Math.max(0.16, Math.min(0.58, slide.shadowProfile?.opacity ?? 0.38));
+              const strongShadowPercent = Math.round(baseShadowOpacity * 100);
+              const midShadowPercent = Math.round(baseShadowOpacity * 82);
+              const softShadowPercent = Math.round(baseShadowOpacity * 66);
+              const textureShadowPercent = Math.round(baseShadowOpacity * 28);
 
               return (
                 <div
@@ -410,7 +428,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                   data-about-slide
                   className={`snap-center snap-always px-1.5 sm:px-2.5 py-4 sm:py-5 lg:py-0 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
-                  <div className="w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
+                  <div className="relative isolate w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
                       {slide.imageSrc ? (
                         <div
@@ -496,7 +514,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                       )}
                     </div>
 
-                    <div className="w-full lg:max-w-[34rem] xl:max-w-[36rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
+                    <div className="w-full lg:max-w-[31.5rem] xl:max-w-[33.5rem] lg:justify-self-start rounded-[1.75rem]" style={{ boxShadow: "var(--color-about-surface-shadow-card)" }}>
                       <article
                         className="relative rounded-[1.75rem] border p-3.5 pt-5 pb-4 sm:p-8 lg:py-10 lg:pl-[2.75rem] lg:pr-[0.5rem] xl:pl-[3.25rem] xl:pr-[1.5rem] min-h-0 h-[clamp(15rem,40svh,20rem)] sm:h-[clamp(16.5rem,41svh,22rem)] lg:h-[31rem] xl:h-[33rem] overflow-visible lg:overflow-hidden"
                         style={{
@@ -504,7 +522,44 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        <div className={`h-full flex flex-col gap-2.5 sm:gap-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
+                        {slide.imageSrc && (
+                          <>
+                            <div
+                              aria-hidden="true"
+                              className="pointer-events-none absolute inset-0 rounded-[1.75rem] lg:hidden"
+                              style={{
+                                background: `linear-gradient(90deg, color-mix(in srgb, ${mobileLeftColor} ${midShadowPercent}%, transparent) 0%, color-mix(in srgb, ${mobileLeftBlendColor} ${midShadowPercent}%, transparent) 32%, color-mix(in srgb, ${mobileMiddleColor} ${softShadowPercent}%, transparent) 50%, color-mix(in srgb, ${mobileRightBlendColor} ${midShadowPercent}%, transparent) 68%, color-mix(in srgb, ${mobileRightColor} ${midShadowPercent}%, transparent) 100%), radial-gradient(88% 56% at 18% 6%, color-mix(in srgb, ${mobileLeftColor} ${softShadowPercent}%, transparent) 0%, transparent 72%), radial-gradient(74% 52% at 50% 8%, color-mix(in srgb, ${mobileMiddleColor} ${softShadowPercent}%, transparent) 0%, transparent 74%), radial-gradient(86% 58% at 82% 10%, color-mix(in srgb, ${mobileRightColor} ${softShadowPercent}%, transparent) 0%, transparent 72%)`,
+                                filter: "blur(20px)",
+                                maskImage: "radial-gradient(120% 72% at 50% -4%, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.52) 42%, transparent 80%)",
+                                WebkitMaskImage: "radial-gradient(120% 72% at 50% -4%, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.52) 42%, transparent 80%)",
+                              }}
+                            />
+                            <div
+                              aria-hidden="true"
+                              className="pointer-events-none absolute inset-0 rounded-[1.75rem] hidden lg:block"
+                              style={{
+                                background: `linear-gradient(180deg, color-mix(in srgb, ${desktopTopColor} ${midShadowPercent}%, transparent) 0%, color-mix(in srgb, ${desktopTopBlendColor} ${midShadowPercent}%, transparent) 32%, color-mix(in srgb, ${desktopMiddleColor} ${softShadowPercent}%, transparent) 50%, color-mix(in srgb, ${desktopBottomBlendColor} ${midShadowPercent}%, transparent) 68%, color-mix(in srgb, ${desktopBottomColor} ${midShadowPercent}%, transparent) 100%), radial-gradient(122% 66% at 0% 18%, color-mix(in srgb, ${desktopTopColor} ${strongShadowPercent}%, transparent) 0%, transparent 72%), radial-gradient(126% 68% at 0% 50%, color-mix(in srgb, ${desktopMiddleColor} ${midShadowPercent}%, transparent) 0%, transparent 74%), radial-gradient(120% 66% at 0% 82%, color-mix(in srgb, ${desktopBottomColor} ${softShadowPercent}%, transparent) 0%, transparent 74%)`,
+                                filter: "blur(26px)",
+                                transform: "translateX(-3%)",
+                                maskImage: "radial-gradient(98% 90% at 6% 50%, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.54) 43%, transparent 78%)",
+                                WebkitMaskImage: "radial-gradient(98% 90% at 6% 50%, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.54) 43%, transparent 78%)",
+                              }}
+                            />
+                            <div
+                              aria-hidden="true"
+                              className="pointer-events-none absolute inset-0 rounded-[1.75rem] hidden lg:block"
+                              style={{
+                                background: `radial-gradient(circle at 14% 22%, color-mix(in srgb, ${textureColor} ${textureShadowPercent}%, transparent) 0 1.2px, transparent 1.2px 100%), radial-gradient(circle at 68% 38%, color-mix(in srgb, ${textureColor} ${Math.max(8, textureShadowPercent - 4)}%, transparent) 0 1px, transparent 1px 100%), radial-gradient(circle at 36% 72%, color-mix(in srgb, ${textureColor} ${Math.max(7, textureShadowPercent - 6)}%, transparent) 0 1.1px, transparent 1.1px 100%)`,
+                                backgroundSize: "12px 12px, 14px 14px, 16px 16px",
+                                maskImage: "radial-gradient(94% 86% at 10% 50%, rgba(0, 0, 0, 0.58), transparent 78%)",
+                                WebkitMaskImage: "radial-gradient(94% 86% at 10% 50%, rgba(0, 0, 0, 0.58), transparent 78%)",
+                                opacity: 0.42,
+                                transform: "translateX(-2%)",
+                              }}
+                            />
+                          </>
+                        )}
+                        <div className={`relative z-10 h-full flex flex-col gap-2.5 sm:gap-7 text-center xl:text-left transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-95"}`}>
                           <div className="xl:hidden text-center">
                             <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--color-about-surface-kicker)] mb-1 sm:mb-3 font-medium">
                               {slide.eyebrow}
@@ -588,6 +643,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                               </div>
                             </>
                           )}
+                        </div>
+
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none inline-flex absolute left-1/2 -translate-x-1/2 bottom-7 sm:bottom-8 lg:left-auto lg:translate-x-0 lg:right-5 xl:right-6 lg:bottom-4 xl:bottom-5 items-center text-[0.56rem] sm:text-[0.58rem] lg:text-[0.62rem] uppercase tracking-[0.18em] font-medium text-[var(--color-about-surface-kicker)] opacity-70"
+                        >
+                          {currentSlideLabel}/{totalSlidesLabel}
                         </div>
 
                         {showNavControls && (
