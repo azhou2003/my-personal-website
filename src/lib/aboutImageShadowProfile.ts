@@ -21,20 +21,91 @@ const FALLBACK_PROFILE: AboutSlideShadowProfile = {
   opacity: 0.38,
 };
 
+const MIN_SELECTION_LIGHTNESS = 0.24;
+const MIN_SELECTION_SATURATION = 0.16;
+const MIN_SHADOW_LIGHTNESS = 0.3;
+const MIN_SHADOW_SATURATION = 0.18;
+const TARGET_LIFT_LIGHTNESS = 0.36;
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function rgbToHsl({ r, g, b }: RGB): { s: number; l: number } {
+function rgbToHsl({ r, g, b }: RGB): { h: number; s: number; l: number } {
   const rr = r / 255;
   const gg = g / 255;
   const bb = b / 255;
   const max = Math.max(rr, gg, bb);
   const min = Math.min(rr, gg, bb);
   const delta = max - min;
+
+  let h = 0;
+  if (delta > 0) {
+    if (max === rr) {
+      h = ((gg - bb) / delta) % 6;
+    } else if (max === gg) {
+      h = (bb - rr) / delta + 2;
+    } else {
+      h = (rr - gg) / delta + 4;
+    }
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+
   const l = (max + min) / 2;
   const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-  return { s, l };
+  return { h, s, l };
+}
+
+function hslToRgb(h: number, s: number, l: number): RGB {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const hPrime = h / 60;
+  const x = c * (1 - Math.abs((hPrime % 2) - 1));
+
+  let rPrime = 0;
+  let gPrime = 0;
+  let bPrime = 0;
+
+  if (hPrime >= 0 && hPrime < 1) {
+    rPrime = c;
+    gPrime = x;
+  } else if (hPrime >= 1 && hPrime < 2) {
+    rPrime = x;
+    gPrime = c;
+  } else if (hPrime >= 2 && hPrime < 3) {
+    gPrime = c;
+    bPrime = x;
+  } else if (hPrime >= 3 && hPrime < 4) {
+    gPrime = x;
+    bPrime = c;
+  } else if (hPrime >= 4 && hPrime < 5) {
+    rPrime = x;
+    bPrime = c;
+  } else {
+    rPrime = c;
+    bPrime = x;
+  }
+
+  const m = l - c / 2;
+  return {
+    r: Math.round((rPrime + m) * 255),
+    g: Math.round((gPrime + m) * 255),
+    b: Math.round((bPrime + m) * 255),
+  };
+}
+
+function isShadowSafeColor(color: RGB): boolean {
+  const { s, l } = rgbToHsl(color);
+  return l >= MIN_SELECTION_LIGHTNESS && s >= MIN_SELECTION_SATURATION;
+}
+
+function normalizeShadowColor(color: RGB, fallback: RGB): RGB {
+  const { h, s, l } = rgbToHsl(color);
+  const fallbackHsl = rgbToHsl(fallback);
+  const normalizedHue = Number.isFinite(h) ? h : fallbackHsl.h;
+  const normalizedSaturation = clamp(Math.max(s, MIN_SHADOW_SATURATION), MIN_SHADOW_SATURATION, 0.86);
+  const normalizedLightness = clamp(l < MIN_SHADOW_LIGHTNESS ? TARGET_LIFT_LIGHTNESS : l, MIN_SHADOW_LIGHTNESS, 0.76);
+  return hslToRgb(normalizedHue, normalizedSaturation, normalizedLightness);
 }
 
 function quantize(value: number): number {
@@ -117,20 +188,35 @@ function dominantColorFromRegion(
     }
   }
 
-  let best: { rSum: number; gSum: number; bSum: number; score: number; count: number } | null = null;
+  let bestSafe: { rSum: number; gSum: number; bSum: number; score: number; count: number } | null = null;
+  let bestOverall: { rSum: number; gSum: number; bSum: number; score: number; count: number } | null = null;
   buckets.forEach((candidate) => {
-    if (!best || candidate.score > best.score) {
-      best = candidate;
+    const averaged: RGB = {
+      r: Math.round(candidate.rSum / candidate.count),
+      g: Math.round(candidate.gSum / candidate.count),
+      b: Math.round(candidate.bSum / candidate.count),
+    };
+
+    if (!bestOverall || candidate.score > bestOverall.score) {
+      bestOverall = candidate;
+    }
+
+    if (isShadowSafeColor(averaged) && (!bestSafe || candidate.score > bestSafe.score)) {
+      bestSafe = candidate;
     }
   });
 
-  if (!best || best.count === 0) return fallback;
+  const selected = bestSafe ?? bestOverall;
+  if (!selected || selected.count === 0) return normalizeShadowColor(fallback, fallback);
 
-  return {
-    r: Math.round(best.rSum / best.count),
-    g: Math.round(best.gSum / best.count),
-    b: Math.round(best.bSum / best.count),
-  };
+  return normalizeShadowColor(
+    {
+      r: Math.round(selected.rSum / selected.count),
+      g: Math.round(selected.gSum / selected.count),
+      b: Math.round(selected.bSum / selected.count),
+    },
+    fallback
+  );
 }
 
 function averageColor(pixelData: Uint8Array): RGB {
