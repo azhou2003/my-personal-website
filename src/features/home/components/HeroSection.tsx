@@ -131,18 +131,8 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     orbitConfig.mars.rotation,
     orbitConfig.mars.inclination
   );
-  const renderOrbitControls = (planet: "earth" | "mars", label: string) => (
-    <div
-      className="rounded-[1.15rem] border p-3.5 sm:p-4 space-y-3"
-      style={{
-        background: "var(--color-orbit-control-bg)",
-        borderColor: "var(--color-orbit-control-border)",
-        boxShadow: "var(--color-orbit-control-shadow)",
-      }}
-    >
-      <h4 className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[var(--color-orbit-menu-muted)]">
-        {label}
-      </h4>
+  const renderOrbitControlFields = (planet: "earth" | "mars") => (
+    <>
       {ORBIT_CONTROL_FIELDS.map((field) => {
         const value = orbitConfig[planet][field.key];
         return (
@@ -172,6 +162,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           </label>
         );
       })}
+    </>
+  );
+
+  const renderOrbitControls = (planet: "earth" | "mars", label: string) => (
+    <div
+      className="rounded-[1.15rem] border p-3.5 sm:p-4 space-y-3"
+      style={{
+        background: "var(--color-orbit-control-bg)",
+        borderColor: "var(--color-orbit-control-border)",
+        boxShadow: "var(--color-orbit-control-shadow)",
+      }}
+    >
+      <h4 className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[var(--color-orbit-menu-muted)]">
+        {label}
+      </h4>
+      {renderOrbitControlFields(planet)}
     </div>
   );
 
@@ -193,64 +199,71 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           Close
         </button>
       </div>
-      <div
-        className="sm:hidden rounded-full border p-1 grid grid-cols-2 gap-1 mt-1"
-        style={{
-          borderColor: "var(--color-orbit-control-border)",
-          background: "var(--color-orbit-control-bg)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setActivePlanetTab("earth")}
-          aria-pressed={activePlanetTab === "earth"}
-          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
-            activePlanetTab === "earth"
-              ? "shadow-sm"
-              : "hover:-translate-y-[1px]"
-          }`}
-          style={activePlanetTab === "earth"
-            ? {
-                borderColor: "var(--color-orbit-chip-active-border)",
-                background: "var(--color-orbit-chip-active-bg)",
-                color: "var(--color-orbit-menu-title)",
-              }
-            : {
-                borderColor: "transparent",
-                background: "transparent",
-                color: "var(--color-orbit-menu-muted)",
-              }}
-        >
-          Earth
-        </button>
-        <button
-          type="button"
-          onClick={() => setActivePlanetTab("mars")}
-          aria-pressed={activePlanetTab === "mars"}
-          className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
-            activePlanetTab === "mars"
-              ? "shadow-sm"
-              : "hover:-translate-y-[1px]"
-          }`}
-          style={activePlanetTab === "mars"
-            ? {
-                borderColor: "var(--color-orbit-chip-active-border)",
-                background: "var(--color-orbit-chip-active-bg)",
-                color: "var(--color-orbit-menu-title)",
-              }
-            : {
-                borderColor: "transparent",
-                background: "transparent",
-                color: "var(--color-orbit-menu-muted)",
-              }}
-        >
-          Mars
-        </button>
-      </div>
       <div className="sm:hidden mt-2.5">
-        {activePlanetTab === "earth"
-          ? renderOrbitControls("earth", "Earth Orbit")
-          : renderOrbitControls("mars", "Mars Orbit")}
+        <div
+          className="rounded-t-[1.15rem] border border-b-0 p-1 grid grid-cols-2 gap-1"
+          style={{
+            borderColor: "var(--color-orbit-control-border)",
+            background: "var(--color-orbit-control-bg)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActivePlanetTab("earth")}
+            aria-pressed={activePlanetTab === "earth"}
+            className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+              activePlanetTab === "earth"
+                ? "shadow-sm"
+                : "hover:-translate-y-[1px]"
+            }`}
+            style={activePlanetTab === "earth"
+              ? {
+                  borderColor: "var(--color-orbit-chip-active-border)",
+                  background: "var(--color-orbit-chip-active-bg)",
+                  color: "var(--color-orbit-menu-title)",
+                }
+              : {
+                  borderColor: "transparent",
+                  background: "transparent",
+                  color: "var(--color-orbit-menu-muted)",
+                }}
+          >
+            Earth
+          </button>
+          <button
+            type="button"
+            onClick={() => setActivePlanetTab("mars")}
+            aria-pressed={activePlanetTab === "mars"}
+            className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+              activePlanetTab === "mars"
+                ? "shadow-sm"
+                : "hover:-translate-y-[1px]"
+            }`}
+            style={activePlanetTab === "mars"
+              ? {
+                  borderColor: "var(--color-orbit-chip-active-border)",
+                  background: "var(--color-orbit-chip-active-bg)",
+                  color: "var(--color-orbit-menu-title)",
+                }
+              : {
+                  borderColor: "transparent",
+                  background: "transparent",
+                  color: "var(--color-orbit-menu-muted)",
+                }}
+          >
+            Mars
+          </button>
+        </div>
+        <div
+          className="-mt-px rounded-b-[1.15rem] border p-3.5 space-y-3"
+          style={{
+            background: "var(--color-orbit-control-bg)",
+            borderColor: "var(--color-orbit-control-border)",
+            boxShadow: "var(--color-orbit-control-shadow)",
+          }}
+        >
+          {renderOrbitControlFields(activePlanetTab)}
+        </div>
       </div>
       <div className="hidden sm:block space-y-4 pt-3">
         {renderOrbitControls("earth", "Earth Orbit")}
