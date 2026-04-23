@@ -172,9 +172,9 @@
   --color-orbit-range-track-mid: color-mix(in srgb, var(--color-tag-2-border) 74%, #413a33 26%);
   --color-orbit-range-track-end: color-mix(in srgb, var(--color-tag-3-border) 76%, #413a33 24%);
   --color-orbit-range-thumb: #ddc8aa;
-  --color-orbit-range-thumb-border: color-mix(in srgb, #e39a63 64%, #8b7863 36%);
-  --color-orbit-range-thumb-border-active: color-mix(in srgb, #e39a63 76%, #8b7863 24%);
-  --color-orbit-range-thumb-glow: color-mix(in srgb, #e39a63 36%, transparent);
+  --color-orbit-range-thumb-border: color-mix(in srgb, #f1b27a 78%, #8b7863 22%);
+  --color-orbit-range-thumb-border-active: color-mix(in srgb, #ffc38f 86%, #8b7863 14%);
+  --color-orbit-range-thumb-glow: color-mix(in srgb, #f1b27a 44%, transparent);
   --color-compact-pill-bg: #23201c;
   --color-compact-pill-border: #5f574d;
   --color-compact-pill-kicker: #b9a68d;
@@ -337,29 +337,29 @@ h1, h2, h3, h4 {
 .orbit-range:hover::-webkit-slider-runnable-track,
 .orbit-range:focus-visible::-webkit-slider-runnable-track,
 .orbit-range:active::-webkit-slider-runnable-track {
-  filter: saturate(1.16) brightness(1.04);
+  filter: saturate(1.1) brightness(1.02);
 }
 
 .orbit-range:hover::-moz-range-track,
 .orbit-range:focus-visible::-moz-range-track,
 .orbit-range:active::-moz-range-track {
-  filter: saturate(1.16) brightness(1.04);
+  filter: saturate(1.1) brightness(1.02);
 }
 
 .orbit-range:hover::-webkit-slider-thumb,
 .orbit-range:focus-visible::-webkit-slider-thumb,
 .orbit-range:active::-webkit-slider-thumb {
-  transform: scale(1.09);
+  transform: scale(1.06);
   border-color: var(--color-orbit-range-thumb-border-active);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px var(--color-orbit-range-thumb-glow);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--color-orbit-range-thumb-glow);
 }
 
 .orbit-range:hover::-moz-range-thumb,
 .orbit-range:focus-visible::-moz-range-thumb,
 .orbit-range:active::-moz-range-thumb {
-  transform: scale(1.09);
+  transform: scale(1.06);
   border-color: var(--color-orbit-range-thumb-border-active);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px var(--color-orbit-range-thumb-glow);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--color-orbit-range-thumb-glow);
 }
 
 .markdown-content h2 {

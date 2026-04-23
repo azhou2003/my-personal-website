@@ -17,6 +17,7 @@ const ORBIT_CONTROL_FIELD_MAP = new Map(ORBIT_CONTROL_FIELDS.map((field) => [fie
 const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
   const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
+  const [activeSliderId, setActiveSliderId] = useState<string | null>(null);
   const [isSunHovered, setIsSunHovered] = useState(false);
   const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
   const orbitMenuMobileRef = React.useRef<HTMLDivElement>(null);
@@ -115,6 +116,37 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     }
   }, [isOrbitMenuOpen]);
 
+  useEffect(() => {
+    if (!isOrbitMenuOpen) {
+      setActiveSliderId(null);
+    }
+  }, [isOrbitMenuOpen]);
+
+  useEffect(() => {
+    if (!activeSliderId) return;
+
+    const clearSliderFocus = () => setActiveSliderId(null);
+    window.addEventListener("pointerup", clearSliderFocus);
+    window.addEventListener("pointercancel", clearSliderFocus);
+
+    return () => {
+      window.removeEventListener("pointerup", clearSliderFocus);
+      window.removeEventListener("pointercancel", clearSliderFocus);
+    };
+  }, [activeSliderId]);
+
+  const beginSliderInteraction = useCallback((sliderId: string) => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 639px)").matches) return;
+    setActiveSliderId(sliderId);
+  }, []);
+
+  const endSliderInteraction = useCallback(() => {
+    setActiveSliderId(null);
+  }, []);
+
+  const isMobileSliderFocusMode = activeSliderId !== null;
+
   const earthPos = getOrbit3DPosition(
     ORBIT_CENTER,
     earthRadiusX,
@@ -131,12 +163,27 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     orbitConfig.mars.rotation,
     orbitConfig.mars.inclination
   );
-  const renderOrbitControlFields = (planet: "earth" | "mars") => (
+  const renderOrbitControlFields = (planet: "earth" | "mars", dimNonActive = false) => (
     <>
       {ORBIT_CONTROL_FIELDS.map((field) => {
         const value = orbitConfig[planet][field.key];
+        const sliderId = `${planet}-${field.key}`;
+        const isActiveSlider = activeSliderId === sliderId;
+        const shouldDimSlider = dimNonActive && isMobileSliderFocusMode && !isActiveSlider;
+        if (shouldDimSlider) {
+          return null;
+        }
         return (
-          <label key={`${planet}-${field.key}`} className="block text-xs space-y-1.5">
+          <label
+            key={`${planet}-${field.key}`}
+            className="block text-xs space-y-1.5 transition-opacity duration-150"
+            style={{
+              borderRadius: "0.7rem",
+              boxShadow: isActiveSlider && !isMobileSliderFocusMode
+                ? "inset 0 0 0 1px color-mix(in srgb, var(--color-orbit-chip-active-border) 58%, transparent)"
+                : "none",
+            }}
+          >
             <div className="flex items-center justify-between gap-2">
               <span style={{ color: "color-mix(in srgb, var(--color-orbit-menu-title) 90%, transparent)" }}>{field.label}</span>
               <span
@@ -157,6 +204,10 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
               step={field.step}
               value={value}
               onChange={(event) => updateOrbitSpec(planet, field.key, Number(event.target.value))}
+              onPointerDown={() => beginSliderInteraction(sliderId)}
+              onPointerUp={endSliderInteraction}
+              onPointerCancel={endSliderInteraction}
+              onBlur={endSliderInteraction}
               className="orbit-range cursor-pointer"
             />
           </label>
@@ -183,7 +234,13 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
 
   const renderOrbitMenuContent = () => (
     <>
-      <div className="flex items-center justify-between gap-2 border-b pb-3" style={{ borderColor: "var(--color-orbit-menu-divider)" }}>
+      <div
+        className="flex items-center justify-between gap-2 border-b pb-3 transition-opacity duration-150"
+        style={{
+          borderColor: "var(--color-orbit-menu-divider)",
+          display: isMobileSliderFocusMode ? "none" : "flex",
+        }}
+      >
         <h3 className="text-sm font-semibold tracking-[0.08em] text-[var(--color-orbit-menu-title)]">Orbit Controls</h3>
         <button
           type="button"
@@ -205,13 +262,15 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           style={{
             borderColor: "var(--color-orbit-control-border)",
             background: "var(--color-orbit-control-bg)",
+            display: isMobileSliderFocusMode ? "none" : "grid",
+            transition: "opacity 150ms ease",
           }}
         >
           <button
             type="button"
             onClick={() => setActivePlanetTab("earth")}
             aria-pressed={activePlanetTab === "earth"}
-            className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+            className={`text-xs py-2 rounded-tl-[0.95rem] rounded-tr-[0.32rem] rounded-bl-[0.28rem] rounded-br-[0.28rem] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
               activePlanetTab === "earth"
                 ? "shadow-sm"
                 : "hover:-translate-y-[1px]"
@@ -234,7 +293,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
             type="button"
             onClick={() => setActivePlanetTab("mars")}
             aria-pressed={activePlanetTab === "mars"}
-            className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+            className={`text-xs py-2 rounded-tr-[0.95rem] rounded-tl-[0.32rem] rounded-bl-[0.28rem] rounded-br-[0.28rem] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
               activePlanetTab === "mars"
                 ? "shadow-sm"
                 : "hover:-translate-y-[1px]"
@@ -255,14 +314,17 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           </button>
         </div>
         <div
-          className="-mt-px rounded-b-[1.15rem] border p-3.5 space-y-3"
+          className={`${isMobileSliderFocusMode ? "rounded-[1.15rem]" : "-mt-px rounded-b-[1.15rem]"} border p-3.5 space-y-3`}
           style={{
-            background: "var(--color-orbit-control-bg)",
+            background: isMobileSliderFocusMode
+              ? "color-mix(in srgb, var(--color-orbit-control-bg) 34%, transparent)"
+              : "var(--color-orbit-control-bg)",
             borderColor: "var(--color-orbit-control-border)",
             boxShadow: "var(--color-orbit-control-shadow)",
+            transition: "background 150ms ease",
           }}
         >
-          {renderOrbitControlFields(activePlanetTab)}
+          {renderOrbitControlFields(activePlanetTab, true)}
         </div>
       </div>
       <div className="hidden sm:block space-y-4 pt-3">
@@ -273,12 +335,13 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         type="button"
         onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
         className="w-full text-xs py-2.5 rounded-xl border mt-3 sm:mt-4 hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
-        style={{
-          borderColor: "var(--color-orbit-chip-active-border)",
-          background: "var(--color-orbit-chip-active-bg)",
-          boxShadow: "var(--color-orbit-action-shadow)",
-          color: "var(--color-orbit-menu-title)",
-        }}
+          style={{
+            borderColor: "var(--color-orbit-chip-active-border)",
+            background: "var(--color-orbit-chip-active-bg)",
+            boxShadow: "var(--color-orbit-action-shadow)",
+            color: "var(--color-orbit-menu-title)",
+            display: isMobileSliderFocusMode ? "none" : "block",
+          }}
       >
         Reset to Defaults
       </button>
@@ -512,7 +575,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       </div>
       {isClient && isOrbitMenuOpen && createPortal(
         <div
-          className="fixed inset-0 z-[120] p-3 overflow-y-auto bg-black/45 dark:bg-black/60 backdrop-blur-[2px] sm:hidden"
+          className={`fixed inset-0 z-[120] p-3 overflow-y-auto sm:hidden transition-[background-color,backdrop-filter] duration-150 ${
+            isMobileSliderFocusMode
+              ? "bg-black/8 dark:bg-black/14 backdrop-blur-0"
+              : "bg-black/45 dark:bg-black/60 backdrop-blur-[2px]"
+          }`}
         >
           <div
             ref={orbitMenuMobileRef}
