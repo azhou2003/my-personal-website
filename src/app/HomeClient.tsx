@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { Footer, Navbar } from "@/components/layout";
 import { AboutSection, HeroSection, HomeHeroHeading } from "@/features/home/components";
 import { HOME_ANIMATION_TIMINGS } from "@/lib/motion";
@@ -264,7 +265,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
     <div
       ref={scrollContainerRef}
       className="h-[100dvh] min-h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
-      style={{ ["--home-nav-h" as const]: "72px" }}
+      style={{ "--home-nav-h": "72px" } as CSSProperties}
     >
       <div
         className={`transition-all duration-500 ease-out ${
