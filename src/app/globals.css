@@ -67,9 +67,13 @@
   --color-orbit-action-bg: color-mix(in srgb, var(--color-about-surface-bg) 82%, #fff4db 18%);
   --color-orbit-action-border: color-mix(in srgb, var(--color-about-surface-border) 80%, #8f6c40 20%);
   --color-orbit-action-shadow: 0 8px 16px -14px rgba(58, 41, 24, 0.42), 0 1px 2px rgba(58, 41, 24, 0.1);
-  --color-orbit-range-track: color-mix(in srgb, var(--color-about-surface-border) 66%, #f0e3c6 34%);
+  --color-orbit-range-track-start: color-mix(in srgb, var(--color-tag-1-border) 78%, #f6edcf 22%);
+  --color-orbit-range-track-mid: color-mix(in srgb, var(--color-tag-2-border) 72%, #f6edcf 28%);
+  --color-orbit-range-track-end: color-mix(in srgb, var(--color-tag-3-border) 74%, #f6edcf 26%);
   --color-orbit-range-thumb: #fef4de;
   --color-orbit-range-thumb-border: color-mix(in srgb, var(--color-hero-core-border) 62%, #8f6c40 38%);
+  --color-orbit-range-thumb-border-active: color-mix(in srgb, var(--color-hero-core-border) 76%, #b36f3d 24%);
+  --color-orbit-range-thumb-glow: color-mix(in srgb, var(--color-tag-3-border) 34%, transparent);
   --color-compact-pill-bg: rgba(247, 242, 223, 0.86);
   --color-compact-pill-border: rgba(122, 90, 54, 0.2);
   --color-compact-pill-kicker: #7a5a36;
@@ -164,9 +168,13 @@
   --color-orbit-action-bg: color-mix(in srgb, var(--color-about-surface-bg) 76%, #3a2d22 24%);
   --color-orbit-action-border: color-mix(in srgb, var(--color-about-surface-border) 90%, #8b7863 10%);
   --color-orbit-action-shadow: 0 9px 16px -12px rgba(0, 0, 0, 0.72), 0 1px 2px rgba(0, 0, 0, 0.5);
-  --color-orbit-range-track: color-mix(in srgb, var(--color-about-surface-border) 74%, #423a32 26%);
+  --color-orbit-range-track-start: color-mix(in srgb, var(--color-tag-1-border) 78%, #413a33 22%);
+  --color-orbit-range-track-mid: color-mix(in srgb, var(--color-tag-2-border) 74%, #413a33 26%);
+  --color-orbit-range-track-end: color-mix(in srgb, var(--color-tag-3-border) 76%, #413a33 24%);
   --color-orbit-range-thumb: #ddc8aa;
   --color-orbit-range-thumb-border: color-mix(in srgb, #e39a63 64%, #8b7863 36%);
+  --color-orbit-range-thumb-border-active: color-mix(in srgb, #e39a63 76%, #8b7863 24%);
+  --color-orbit-range-thumb-glow: color-mix(in srgb, #e39a63 36%, transparent);
   --color-compact-pill-bg: #23201c;
   --color-compact-pill-border: #5f574d;
   --color-compact-pill-kicker: #b9a68d;
@@ -277,7 +285,7 @@ h1, h2, h3, h4 {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 1.2rem;
+  height: 1.3rem;
   background: transparent;
 }
 
@@ -286,38 +294,72 @@ h1, h2, h3, h4 {
 }
 
 .orbit-range::-webkit-slider-runnable-track {
-  height: 0.44rem;
+  height: 0.5rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--color-orbit-range-track) 90%, #f6ebd1 10%) 0%, var(--color-orbit-range-track) 100%);
+  background: linear-gradient(90deg, var(--color-orbit-range-track-start) 0%, var(--color-orbit-range-track-mid) 50%, var(--color-orbit-range-track-end) 100%);
   border: 1px solid color-mix(in srgb, var(--color-orbit-chip-border) 74%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 24%, transparent);
+  transition: filter 160ms ease;
 }
 
 .orbit-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 1rem;
-  height: 1rem;
-  margin-top: -0.33rem;
+  width: 1.06rem;
+  height: 1.06rem;
+  margin-top: -0.34rem;
   border-radius: 999px;
   border: 2px solid var(--color-orbit-range-thumb-border);
   background: var(--color-orbit-range-thumb);
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22), 0 0 0 0 var(--color-orbit-range-thumb-glow);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .orbit-range::-moz-range-track {
-  height: 0.44rem;
+  height: 0.5rem;
   border-radius: 999px;
-  background: var(--color-orbit-range-track);
+  background: linear-gradient(90deg, var(--color-orbit-range-track-start) 0%, var(--color-orbit-range-track-mid) 50%, var(--color-orbit-range-track-end) 100%);
   border: 1px solid color-mix(in srgb, var(--color-orbit-chip-border) 74%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 20%, transparent);
+  transition: filter 160ms ease;
 }
 
 .orbit-range::-moz-range-thumb {
-  width: 1rem;
-  height: 1rem;
+  width: 1.06rem;
+  height: 1.06rem;
   border-radius: 999px;
   border: 2px solid var(--color-orbit-range-thumb-border);
   background: var(--color-orbit-range-thumb);
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22), 0 0 0 0 var(--color-orbit-range-thumb-glow);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.orbit-range:hover::-webkit-slider-runnable-track,
+.orbit-range:focus-visible::-webkit-slider-runnable-track,
+.orbit-range:active::-webkit-slider-runnable-track {
+  filter: saturate(1.16) brightness(1.04);
+}
+
+.orbit-range:hover::-moz-range-track,
+.orbit-range:focus-visible::-moz-range-track,
+.orbit-range:active::-moz-range-track {
+  filter: saturate(1.16) brightness(1.04);
+}
+
+.orbit-range:hover::-webkit-slider-thumb,
+.orbit-range:focus-visible::-webkit-slider-thumb,
+.orbit-range:active::-webkit-slider-thumb {
+  transform: scale(1.09);
+  border-color: var(--color-orbit-range-thumb-border-active);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px var(--color-orbit-range-thumb-glow);
+}
+
+.orbit-range:hover::-moz-range-thumb,
+.orbit-range:focus-visible::-moz-range-thumb,
+.orbit-range:active::-moz-range-thumb {
+  transform: scale(1.09);
+  border-color: var(--color-orbit-range-thumb-border-active);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px var(--color-orbit-range-thumb-glow);
 }
 
 .markdown-content h2 {
