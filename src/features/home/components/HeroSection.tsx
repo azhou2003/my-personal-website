@@ -314,13 +314,11 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           </button>
         </div>
         <div
-          className={`${isMobileSliderFocusMode ? "rounded-[1.15rem]" : "-mt-px rounded-b-[1.15rem]"} border p-3.5 space-y-3`}
+          className={`${isMobileSliderFocusMode ? "rounded-[1.15rem] px-2.5 py-1.5 space-y-0" : "-mt-px rounded-b-[1.15rem] border p-3.5 space-y-3"}`}
           style={{
-            background: isMobileSliderFocusMode
-              ? "color-mix(in srgb, var(--color-orbit-control-bg) 34%, transparent)"
-              : "var(--color-orbit-control-bg)",
+            background: isMobileSliderFocusMode ? "transparent" : "var(--color-orbit-control-bg)",
             borderColor: "var(--color-orbit-control-border)",
-            boxShadow: "var(--color-orbit-control-shadow)",
+            boxShadow: isMobileSliderFocusMode ? "none" : "var(--color-orbit-control-shadow)",
             transition: "background 150ms ease",
           }}
         >
