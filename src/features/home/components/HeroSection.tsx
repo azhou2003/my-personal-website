@@ -132,8 +132,15 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
     orbitConfig.mars.inclination
   );
   const renderOrbitControls = (planet: "earth" | "mars", label: string) => (
-    <div className="rounded-2xl border border-black/10 dark:border-white/20 bg-[var(--color-card-muted-bg)] p-3 sm:p-4 space-y-2.5">
-      <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground-light/75 dark:text-foreground-dark/75">
+    <div
+      className="rounded-[1.15rem] border p-3.5 sm:p-4 space-y-3"
+      style={{
+        background: "var(--color-orbit-control-bg)",
+        borderColor: "var(--color-orbit-control-border)",
+        boxShadow: "var(--color-orbit-control-shadow)",
+      }}
+    >
+      <h4 className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[var(--color-orbit-menu-muted)]">
         {label}
       </h4>
       {ORBIT_CONTROL_FIELDS.map((field) => {
@@ -141,8 +148,15 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         return (
           <label key={`${planet}-${field.key}`} className="block text-xs space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-foreground-light/85 dark:text-foreground-dark/85">{field.label}</span>
-              <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">
+              <span style={{ color: "color-mix(in srgb, var(--color-orbit-menu-title) 90%, transparent)" }}>{field.label}</span>
+              <span
+                className="font-mono text-[11px] px-1.5 py-0.5 rounded-md"
+                style={{
+                  background: "var(--color-orbit-chip-bg)",
+                  border: "1px solid var(--color-orbit-chip-border)",
+                  color: "var(--color-orbit-menu-muted)",
+                }}
+              >
                 {value.toFixed(field.step < 1 ? 2 : 0)}
               </span>
             </div>
@@ -153,7 +167,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
               step={field.step}
               value={value}
               onChange={(event) => updateOrbitSpec(planet, field.key, Number(event.target.value))}
-              className="w-full accent-accent-orange cursor-pointer"
+              className="orbit-range cursor-pointer"
             />
           </label>
         );
@@ -163,26 +177,49 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
 
   const renderOrbitMenuContent = () => (
     <>
-      <div className="flex items-center justify-between gap-2 border-b border-black/10 dark:border-white/15 pb-2">
-        <h3 className="text-sm font-semibold tracking-wide">Orbit Controls</h3>
+      <div className="flex items-center justify-between gap-2 border-b pb-3" style={{ borderColor: "var(--color-orbit-menu-divider)" }}>
+        <h3 className="text-sm font-semibold tracking-[0.08em] text-[var(--color-orbit-menu-title)]">Orbit Controls</h3>
         <button
           type="button"
           onClick={() => setIsOrbitMenuOpen(false)}
-          className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-tab-border)] dark:border-[var(--color-tab-border-dark)] bg-white/80 dark:bg-white/10 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px] dark:hover:bg-white/20 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+          className="text-xs px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer hover:-translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+          style={{
+            borderColor: "var(--color-orbit-action-border)",
+            background: "var(--color-orbit-action-bg)",
+            boxShadow: "var(--color-orbit-action-shadow)",
+            color: "var(--color-orbit-menu-title)",
+          }}
         >
           Close
         </button>
       </div>
-      <div className="sm:hidden rounded-full border border-black/10 dark:border-white/20 p-1 grid grid-cols-2 gap-1 bg-[var(--color-card-muted-bg)]">
+      <div
+        className="sm:hidden rounded-full border p-1 grid grid-cols-2 gap-1 mt-1"
+        style={{
+          borderColor: "var(--color-orbit-control-border)",
+          background: "var(--color-orbit-control-bg)",
+        }}
+      >
         <button
           type="button"
           onClick={() => setActivePlanetTab("earth")}
           aria-pressed={activePlanetTab === "earth"}
           className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
             activePlanetTab === "earth"
-              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
-              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
+              ? "shadow-sm"
+              : "hover:-translate-y-[1px]"
           }`}
+          style={activePlanetTab === "earth"
+            ? {
+                borderColor: "var(--color-orbit-chip-active-border)",
+                background: "var(--color-orbit-chip-active-bg)",
+                color: "var(--color-orbit-menu-title)",
+              }
+            : {
+                borderColor: "transparent",
+                background: "transparent",
+                color: "var(--color-orbit-menu-muted)",
+              }}
         >
           Earth
         </button>
@@ -192,26 +229,43 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           aria-pressed={activePlanetTab === "mars"}
           className={`text-xs py-2 rounded-full border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
             activePlanetTab === "mars"
-              ? "border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 shadow-sm"
-              : "border-transparent hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20 hover:-translate-y-[1px]"
+              ? "shadow-sm"
+              : "hover:-translate-y-[1px]"
           }`}
+          style={activePlanetTab === "mars"
+            ? {
+                borderColor: "var(--color-orbit-chip-active-border)",
+                background: "var(--color-orbit-chip-active-bg)",
+                color: "var(--color-orbit-menu-title)",
+              }
+            : {
+                borderColor: "transparent",
+                background: "transparent",
+                color: "var(--color-orbit-menu-muted)",
+              }}
         >
           Mars
         </button>
       </div>
-      <div className="sm:hidden">
+      <div className="sm:hidden mt-2.5">
         {activePlanetTab === "earth"
           ? renderOrbitControls("earth", "Earth Orbit")
           : renderOrbitControls("mars", "Mars Orbit")}
       </div>
-      <div className="hidden sm:block space-y-3">
+      <div className="hidden sm:block space-y-4 pt-3">
         {renderOrbitControls("earth", "Earth Orbit")}
         {renderOrbitControls("mars", "Mars Orbit")}
       </div>
       <button
         type="button"
         onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
-        className="w-full text-xs py-2.5 rounded-xl border border-[var(--color-hero-core-border)] bg-accent-orange/30 dark:bg-accent-orange/25 text-foreground-light dark:text-foreground-dark shadow-sm hover:bg-accent-orange/45 dark:hover:bg-accent-orange/35 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+        className="w-full text-xs py-2.5 rounded-xl border mt-3 sm:mt-4 hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+        style={{
+          borderColor: "var(--color-orbit-chip-active-border)",
+          background: "var(--color-orbit-chip-active-bg)",
+          boxShadow: "var(--color-orbit-action-shadow)",
+          color: "var(--color-orbit-menu-title)",
+        }}
       >
         Reset to Defaults
       </button>
@@ -449,14 +503,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         >
           <div
             ref={orbitMenuMobileRef}
-            className="mx-auto w-full max-w-md rounded-2xl border text-foreground-light dark:text-foreground-dark p-3 space-y-3"
+            className="relative overflow-hidden mx-auto w-full max-w-md rounded-[1.6rem] border text-foreground-light dark:text-foreground-dark p-3.5 space-y-3"
             style={{
               background: "var(--color-orbit-menu-bg)",
               borderColor: "var(--color-orbit-menu-border)",
               boxShadow: "var(--color-orbit-menu-shadow)",
             }}
           >
-            {renderOrbitMenuContent()}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "var(--color-orbit-menu-overlay)",
+                opacity: 0.78,
+              }}
+            />
+            <div className="relative z-10">{renderOrbitMenuContent()}</div>
           </div>
         </div>,
         document.body
@@ -464,14 +526,22 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       {isOrbitMenuOpen && (
         <div
           ref={orbitMenuDesktopRef}
-          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-2xl border text-foreground-light dark:text-foreground-dark p-4 space-y-3"
+          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-[1.55rem] border text-foreground-light dark:text-foreground-dark p-4 space-y-3 overflow-hidden"
           style={{
             background: "var(--color-orbit-menu-bg)",
             borderColor: "var(--color-orbit-menu-border)",
             boxShadow: "var(--color-orbit-menu-shadow-soft)",
           }}
         >
-          {renderOrbitMenuContent()}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "var(--color-orbit-menu-overlay)",
+              opacity: 0.66,
+            }}
+          />
+          <div className="relative z-10">{renderOrbitMenuContent()}</div>
         </div>
       )}
       {isClient && earthOrbitData && (
