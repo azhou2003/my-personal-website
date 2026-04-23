@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { Footer, Navbar } from "@/components/layout";
 import { AboutSection, HeroSection, HomeHeroHeading } from "@/features/home/components";
 import { HOME_ANIMATION_TIMINGS } from "@/lib/motion";
@@ -26,6 +27,8 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const activeSectionRef = useRef<"hero" | "about">("hero");
   const touchStartYRef = useRef<number | null>(null);
   const touchStartXRef = useRef<number | null>(null);
+  const snapReleaseTimeoutRef = useRef<number | null>(null);
+  const heroSettleTimeoutRef = useRef<number | null>(null);
 
   const getTargetTop = useCallback((element: HTMLElement) => {
     const scrollRoot = scrollContainerRef.current;
@@ -42,16 +45,45 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
       if (!scrollRoot || !aboutEl) return;
 
       const targetTop = section === "hero" ? 0 : getTargetTop(aboutEl);
+      if (snapReleaseTimeoutRef.current !== null) {
+        window.clearTimeout(snapReleaseTimeoutRef.current);
+      }
+      if (heroSettleTimeoutRef.current !== null) {
+        window.clearTimeout(heroSettleTimeoutRef.current);
+      }
+
       isSnappingRef.current = true;
       setActiveSection(section);
       scrollRoot.scrollTo({ top: targetTop, behavior: "smooth" });
 
-      window.setTimeout(() => {
+      if (section === "hero" && window.matchMedia("(max-width: 767px)").matches) {
+        heroSettleTimeoutRef.current = window.setTimeout(() => {
+          scrollRoot.scrollTo({ top: 0, behavior: "auto" });
+          window.requestAnimationFrame(() => {
+            scrollRoot.scrollTop = 0;
+          });
+          heroSettleTimeoutRef.current = null;
+        }, 460);
+      }
+
+      snapReleaseTimeoutRef.current = window.setTimeout(() => {
         isSnappingRef.current = false;
-      }, 420);
+        snapReleaseTimeoutRef.current = null;
+      }, 500);
     },
     [getTargetTop]
   );
+
+  useEffect(() => {
+    return () => {
+      if (snapReleaseTimeoutRef.current !== null) {
+        window.clearTimeout(snapReleaseTimeoutRef.current);
+      }
+      if (heroSettleTimeoutRef.current !== null) {
+        window.clearTimeout(heroSettleTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     activeSectionRef.current = activeSection;
@@ -232,7 +264,8 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
+      className="h-[100dvh] min-h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
+      style={{ "--home-nav-h": "72px" } as CSSProperties}
     >
       <div
         className={`transition-all duration-500 ease-out ${
@@ -247,9 +280,9 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
         {/* Hero section with integrated heading - takes full viewport minus navbar */}
           <section
             id="hero"
-          className={`w-full relative transition-all duration-800 ease-out h-[calc(100svh-72px)] min-h-[30rem] ${
+          className={`w-full relative transition-all duration-800 ease-out h-[calc(100dvh-var(--home-nav-h,72px))] min-h-[30rem] ${
             activeSection === "about"
-              ? "opacity-0 -translate-y-10 pointer-events-none"
+              ? "opacity-0 sm:-translate-y-10 pointer-events-none"
               : "opacity-100 translate-y-0"
           }`}
         >
@@ -279,8 +312,8 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
         {/* About Me Expanded Section - Shows on scroll */}
         <section
           ref={aboutSectionRef}
-          className={`w-full flex items-center justify-center transition-all duration-900 max-[640px]:duration-700 ease-out min-h-[calc(100svh-72px)] ${
-            activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-7 sm:translate-y-10"
+          className={`w-full flex items-center justify-center transition-all duration-900 max-[640px]:duration-700 ease-out min-h-[calc(100dvh-var(--home-nav-h,72px))] ${
+            activeSection === "about" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-0 sm:translate-y-10"
           }`}
         >
           <AboutSection

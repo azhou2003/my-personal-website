@@ -328,7 +328,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }
 
   return (
-    <section className="w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-8 lg:py-12 min-h-[calc(100svh-72px)] sm:min-h-0 flex items-center">
+    <section className="w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-8 lg:py-12 min-h-[calc(100dvh-var(--home-nav-h,72px))] sm:min-h-0 flex items-center">
       <style jsx>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -426,7 +426,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 <div
                   key={slide.id}
                   data-about-slide
-                  className={`snap-center snap-always px-1.5 sm:px-2.5 py-4 sm:py-5 lg:py-0 min-h-[calc(100svh-72px)] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                  className={`snap-center snap-always px-1.5 sm:px-2.5 py-4 sm:py-5 lg:py-0 min-h-[calc(100dvh-var(--home-nav-h,72px))] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
                 >
                   <div className="relative isolate w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
