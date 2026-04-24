@@ -299,6 +299,26 @@ h1, h2, h3, h4 {
   border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
 }
 
+.blog-related-card {
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--color-tag-2-border) 82%, var(--color-border));
+  background: color-mix(in srgb, var(--color-tag-2-bg) 56%, var(--color-bg));
+  box-shadow: 0 10px 22px -20px color-mix(in srgb, var(--color-tag-3-border) 68%, transparent);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.blog-related-card:hover,
+.blog-related-card:focus-visible {
+  border-color: color-mix(in srgb, var(--color-tag-2-border) 92%, var(--color-tag-3-border));
+  background: color-mix(in srgb, var(--color-tag-2-bg) 66%, var(--color-bg));
+  box-shadow: 0 12px 24px -20px color-mix(in srgb, var(--color-tag-2-border) 80%, transparent);
+  transform: translateY(-1px);
+}
+
+.blog-post-pagination-divider {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+}
+
 .blog-post-content-divider {
   border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
   margin-top: 0.2rem;
@@ -377,13 +397,12 @@ h1, h2, h3, h4 {
 }
 
 .blog-toc-panel {
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 95%, #ffffff 5%) 0%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%);
-  box-shadow: 0 16px 34px rgba(28, 22, 15, 0.16);
-  backdrop-filter: blur(7px);
-  padding: 0.78rem 0.82rem;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0;
 }
 
 .blog-toc-kicker {
@@ -395,9 +414,9 @@ h1, h2, h3, h4 {
 }
 
 .blog-toc-nav {
-  border-left: 1px solid color-mix(in srgb, var(--color-border) 86%, transparent);
-  margin-left: 0.22rem;
-  padding-left: 0.38rem;
+  border-left: none;
+  margin-left: 0;
+  padding-left: 0;
   display: grid;
   gap: 0.24rem;
 }
@@ -608,13 +627,17 @@ h1, h2, h3, h4 {
 }
 
 .markdown-content figure[data-size="wide"] {
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .markdown-content figure[data-size="full"] {
-  margin-left: clamp(-2rem, -6vw, -4rem);
-  margin-right: clamp(-2rem, -6vw, -4rem);
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .markdown-content figcaption {

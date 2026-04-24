@@ -141,8 +141,10 @@ Caption and size options (`wide` or `full`) using alt metadata:
 
 ```md
 ![Alt text | Caption text | wide](/houston.jpeg)
-![Alt text | Full bleed image | full](/journal.jpeg)
+![Alt text | Full width image | full](/journal.jpeg)
 ```
+
+Both `wide` and `full` remain constrained to the post content width (no bleed outside the markdown column).
 
 Images and GIFs are zoomable when not wrapped in links.
 
@@ -182,7 +184,6 @@ Regular inline links remain normal links.
 These work automatically on post pages:
 
 - Reading progress bar at the top
-- Share button
 - Back-to-top button
 - Reading time estimate
 - Heading anchor links copy the section URL

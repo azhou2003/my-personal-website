@@ -9,7 +9,6 @@ import {
   MarkdownContent,
   ReaderPreferences,
   ReadingProgress,
-  ShareButton,
 } from "@/features/blog/components";
 import { formatDate } from "@/lib/formatDate";
 import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/markdown";
@@ -83,7 +82,6 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
           <div className="blog-post-meta-row">
             <div className="blog-post-meta-tools">
               <p className="blog-post-meta text-muted text-sm">{metadataParts.join(" · ")}</p>
-              <ShareButton title={data.title || resolvedParams.slug} />
             </div>
           </div>
           {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="blog-post-tags" />}
@@ -101,7 +99,7 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
                 <Link
                   key={related.slug}
                   href={`/blog/${related.slug}`}
-                  className="rounded-lg border border-border-light bg-background-light/70 px-4 py-3 text-sm transition-colors hover:border-accent-yellow/70 hover:bg-accent-yellow/10 dark:border-border-dark dark:bg-background-dark/60"
+                  className="blog-related-card rounded-lg px-4 py-3 text-sm"
                 >
                   <p className="font-medium text-foreground-light dark:text-foreground-dark">{related.title}</p>
                   <p className="mt-1 text-xs text-muted">{formatDate(related.date)}</p>
@@ -110,7 +108,9 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
             </div>
           </section>
         )}
-        <div className="flex justify-between items-center mt-16">
+        <div
+          className={`flex justify-between items-center mt-16 ${relatedPosts.length === 0 ? "blog-post-pagination-divider pt-8" : ""}`}
+        >
           {prevPost ? (
             <Link
               href={`/blog/${prevPost.slug}`}
