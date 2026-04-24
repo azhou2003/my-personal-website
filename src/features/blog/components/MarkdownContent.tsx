@@ -11,6 +11,8 @@ type LightboxState = {
   alt: string;
 };
 
+type CalloutVariant = "note" | "tip" | "warning";
+
 const IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
 const VIDEO_EXTENSION_PATTERN = /\.(mp4|ogg|ogv|webm)$/i;
 
@@ -52,6 +54,25 @@ function parseHttpUrl(rawHref: string) {
 
 function stripWww(hostname: string) {
   return hostname.replace(/^www\./, "").toLowerCase();
+}
+
+function getGistUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return null;
+  }
+
+  const host = stripWww(parsed.hostname);
+  if (host !== "gist.github.com") {
+    return null;
+  }
+
+  const segments = parsed.pathname.split("/").filter(Boolean);
+  if (segments.length < 2) {
+    return null;
+  }
+
+  return parsed.toString();
 }
 
 function getYouTubeEmbedUrl(rawHref: string) {
@@ -107,6 +128,111 @@ function createEmbedContainer() {
   const wrapper = document.createElement("div");
   wrapper.className = "md-embed";
   return wrapper;
+}
+
+function createEmbedCard(title: string, href: string) {
+  const card = document.createElement("a");
+  card.href = href;
+  card.target = "_blank";
+  card.rel = "noopener noreferrer";
+  card.className = "md-embed-card";
+
+  const titleNode = document.createElement("span");
+  titleNode.className = "md-embed-card-title";
+  titleNode.textContent = title;
+
+  const urlNode = document.createElement("span");
+  urlNode.className = "md-embed-card-url";
+  urlNode.textContent = href;
+
+  card.appendChild(titleNode);
+  card.appendChild(urlNode);
+  return card;
+}
+
+function parseImageAltMetadata(rawAlt: string) {
+  const parts = rawAlt
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return { alt: rawAlt, caption: "", size: "normal" as const };
+  }
+
+  let size: "normal" | "wide" | "full" = "normal";
+  const last = parts[parts.length - 1].toLowerCase();
+  if (last === "wide" || last === "full") {
+    size = last;
+    parts.pop();
+  }
+
+  const alt = parts[0] || rawAlt;
+  const caption = parts.slice(1).join(" | ");
+  return { alt, caption, size };
+}
+
+function applyImageFigureEnhancements(article: HTMLElement) {
+  article.querySelectorAll("img").forEach((node) => {
+    const image = node as HTMLImageElement;
+    image.classList.add("md-zoomable-image");
+    image.setAttribute("loading", "lazy");
+
+    if (image.closest("figure")) {
+      return;
+    }
+
+    const { alt, caption, size } = parseImageAltMetadata(image.getAttribute("alt") || "");
+    image.alt = alt;
+
+    const parent = image.parentElement;
+    if (!parent) {
+      return;
+    }
+
+    const figure = document.createElement("figure");
+    if (size !== "normal") {
+      figure.setAttribute("data-size", size);
+    }
+
+    parent.replaceChild(figure, image);
+    figure.appendChild(image);
+
+    if (caption) {
+      const figcaption = document.createElement("figcaption");
+      figcaption.textContent = caption;
+      figure.appendChild(figcaption);
+    }
+  });
+}
+
+function applyCallouts(article: HTMLElement) {
+  const markers: Record<string, CalloutVariant> = {
+    "[!NOTE]": "note",
+    "[!TIP]": "tip",
+    "[!WARNING]": "warning",
+    "[!WARN]": "warning",
+  };
+
+  article.querySelectorAll("blockquote").forEach((node) => {
+    const blockquote = node as HTMLElement;
+    const firstParagraph = blockquote.querySelector("p");
+    if (!firstParagraph) {
+      return;
+    }
+
+    const text = firstParagraph.textContent?.trim() || "";
+    const matchedMarker = Object.keys(markers).find((marker) => text.startsWith(marker));
+    if (!matchedMarker) {
+      return;
+    }
+
+    const variant = markers[matchedMarker];
+    blockquote.classList.add("md-callout", `md-callout-${variant}`);
+
+    const withoutMarker = text.slice(matchedMarker.length).trim();
+    firstParagraph.textContent = withoutMarker;
+  });
 }
 
 function replaceParagraphWithEmbed(anchor: HTMLAnchorElement) {
@@ -166,6 +292,14 @@ function replaceParagraphWithEmbed(anchor: HTMLAnchorElement) {
     image.className = "md-embed-image md-zoomable-image";
     wrapper.appendChild(image);
     paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  const gistUrl = getGistUrl(href);
+  if (gistUrl) {
+    const wrapper = createEmbedContainer();
+    wrapper.appendChild(createEmbedCard("GitHub Gist", gistUrl));
+    paragraph.replaceWith(wrapper);
   }
 }
 
@@ -218,14 +352,12 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
       pre.appendChild(button);
     });
 
-    article.querySelectorAll("img").forEach((image) => {
-      image.classList.add("md-zoomable-image");
-      image.setAttribute("loading", "lazy");
-    });
-
     article.querySelectorAll("p > a:only-child").forEach((anchorNode) => {
       replaceParagraphWithEmbed(anchorNode as HTMLAnchorElement);
     });
+
+    applyImageFigureEnhancements(article);
+    applyCallouts(article);
 
     const clearFootnoteHighlight = (element: HTMLElement) => {
       window.setTimeout(() => {
@@ -280,6 +412,25 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
             history.replaceState(null, "", `#${targetId}`);
           }
 
+          return;
+        }
+
+        if (anchor.classList.contains("md-heading-anchor")) {
+          event.preventDefault();
+          const heading = anchor.parentElement as HTMLElement | null;
+          const headingId = heading?.id;
+
+          if (!headingId) {
+            return;
+          }
+
+          const nextUrl = `${window.location.origin}${window.location.pathname}#${headingId}`;
+
+          try {
+            await navigator.clipboard.writeText(nextUrl);
+          } catch {}
+
+          history.replaceState(null, "", `#${headingId}`);
           return;
         }
       }

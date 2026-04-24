@@ -251,8 +251,12 @@ h1, h2, h3, h4 {
 
 .markdown-content {
   font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--reader-font-scale, 1));
   line-height: 1.8;
+}
+
+.blog-post-shell {
+  max-width: var(--blog-prose-max-width, 48rem);
 }
 
 .markdown-content h1,
@@ -402,15 +406,89 @@ h1, h2, h3, h4 {
   text-underline-offset: 0.15em;
 }
 
+.markdown-content figure {
+  margin: 1.15em 0;
+}
+
+.markdown-content figure img {
+  width: 100%;
+  border-radius: 0.7rem;
+}
+
+.markdown-content figure[data-size="wide"] {
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+}
+
+.markdown-content figure[data-size="full"] {
+  margin-left: clamp(-2rem, -6vw, -4rem);
+  margin-right: clamp(-2rem, -6vw, -4rem);
+}
+
+.markdown-content figcaption {
+  margin-top: 0.45rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--color-hero-subtitle);
+}
+
 .markdown-content blockquote {
   border-left: 4px solid var(--color-border);
   padding-left: 1em;
+}
+
+.markdown-content .md-callout {
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-radius: 0.6rem;
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+}
+
+.markdown-content .md-callout p {
+  margin: 0;
+}
+
+.markdown-content .md-callout-note {
+  border-left-color: #4f7c9f;
+  background: color-mix(in srgb, #4f7c9f 12%, transparent);
+}
+
+.markdown-content .md-callout-tip {
+  border-left-color: #5d8c4b;
+  background: color-mix(in srgb, #5d8c4b 13%, transparent);
+}
+
+.markdown-content .md-callout-warning {
+  border-left-color: #d48b30;
+  background: color-mix(in srgb, #d48b30 16%, transparent);
 }
 
 .markdown-content pre {
   overflow-x: auto;
   border-radius: 0.5rem;
   padding: 0.9em 1em;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-fg) 8%, var(--color-bg));
+}
+
+.markdown-content pre code.hljs {
+  display: block;
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.markdown-content :not(pre) > code {
+  border: 1px solid var(--color-border);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--color-bg) 86%, var(--color-fg) 14%);
+  padding: 0.12em 0.35em;
 }
 
 .markdown-content table {
@@ -468,6 +546,30 @@ h1, h2, h3, h4 {
   border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+}
+
+.markdown-content .md-embed-card {
+  display: block;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  background: color-mix(in srgb, var(--color-bg) 96%, transparent);
+}
+
+.markdown-content .md-embed-card-title {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-hero-subtitle);
+  margin-bottom: 0.3rem;
+}
+
+.markdown-content .md-embed-card-url {
+  display: block;
+  word-break: break-all;
+  font-size: 0.88rem;
 }
 
 .markdown-content .md-copy-button {

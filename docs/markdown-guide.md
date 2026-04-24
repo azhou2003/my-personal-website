@@ -1,80 +1,69 @@
 # Blog Markdown Guide
 
-This blog uses one shared markdown pipeline:
+This project uses a shared markdown pipeline for blog posts:
 
-- `remark-gfm` for GitHub-style markdown features (tables, task lists, footnotes, strikethrough)
-- `remark-breaks` so a single newline is rendered as a line break
-- `remark-math` + `rehype-katex` for LaTeX math rendering
-- `rehype-sanitize` for predictable, safe markdown output
+- `remark-gfm` for tables, task lists, footnotes, and strikethrough
+- `remark-breaks` so single newlines render as line breaks
+- `remark-math` + `rehype-katex` for LaTeX
+- `rehype-highlight` for syntax-highlighted code blocks
+- `rehype-sanitize` for safe output
 
-## 1) Post frontmatter
+## Post frontmatter
 
-Every post in `src/content/posts/*.md` should start with frontmatter:
+Posts live in `src/content/posts/*.md` and start with YAML frontmatter.
 
 ```yaml
 ---
 title: "Post Title"
-date: "2026-04-23"
-updated: "2026-04-24"
-tags: ["Writing", "Dev"]
-summary: "One short summary sentence for the blog card."
+date: "2026-04-24"
+updated: "2026-04-25"
+tags: ["Tag1", "Tag2"]
+summary: "Short summary used on blog cards."
 image: "/journal.jpeg"
 ---
 ```
 
-Field behavior:
+Frontmatter fields and behavior:
 
-- `title` is shown on blog cards and the post page title
-- `date` is shown as `Published ...`
-- `updated` is optional; when present it is shown as `Updated ...`
-- `tags` power post tags and filtering on `/blog`
-- `summary` is shown on blog cards and in metadata description
-- `image` is used for the blog card preview image
+- `title` (optional) - defaults to slug when missing
+- `date` (optional in code, recommended in practice) - shown as `Published ...`
+- `updated` (optional) - shown as `Updated ...` and triggers an `Updated` badge
+- `tags` (optional) - defaults to `[]`; used for filters and related posts
+- `summary` (optional) - defaults to `""`; used in cards and metadata
+- `image` (optional) - used in blog card preview
 
-## 2) Core markdown features
+## Core markdown syntax
 
-### Headings and paragraphs
-
-```md
-# H1
-## H2
-### H3
-
-First line
-Second line
-
-New paragraph
-```
-
-Notes:
-
-- H2/H3/H4 headings automatically get clickable anchor links on the post page
-- Single newlines create visible line breaks
-
-### Lists, links, and quotes
+### Headings and line breaks
 
 ```md
-- Item one
-- Item two
-
-1. First
-2. Second
-
-[External link](https://example.com)
-
-> This is a blockquote.
+## Heading
+This line breaks
+without a blank line.
 ```
 
-### Code blocks
+### Lists, links, quotes, strikethrough
+
+```md
+- Bullet
+1. Ordered
+
+[Link](https://example.com)
+
+> Quote
+
+~~strikethrough~~
+```
+
+### Syntax-highlighted code blocks
 
 ````md
 ```ts
-const greeting = "hello";
-console.log(greeting);
+function add(a: number, b: number) {
+  return a + b;
+}
 ```
 ````
-
-Note: code blocks get a copy button automatically on the post page.
 
 ### Tables and task lists
 
@@ -82,7 +71,6 @@ Note: code blocks get a copy button automatically on the post page.
 | Feature | Status |
 | --- | --- |
 | Tables | Works |
-| Task lists | Works |
 
 - [x] Done
 - [ ] Todo
@@ -91,57 +79,59 @@ Note: code blocks get a copy button automatically on the post page.
 ### Footnotes
 
 ```md
-Here is a sentence with a footnote.[^origin]
+Text with footnote.[^origin]
 
-[^origin]: This is the footnote text.
+[^origin]: Footnote content.
 ```
 
-Notes:
-
-- Footnotes are supported via GFM syntax
-- Footnote jumps are smooth-scrolled and highlighted on arrival
+Footnote links support both directions (reference -> footer and footer -> reference).
 
 ### LaTeX math
 
-Inline math:
-
 ```md
-Einstein wrote $E = mc^2$.
-```
+Inline: $E = mc^2$
 
-Block math:
-
-```md
 $$
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
 $$
 ```
 
-Notes:
+Use `\$` for a literal dollar sign.
 
-- Use single `$...$` for inline math
-- Use double `$$...$$` for block math
-- Escape a literal dollar sign as `\$`
+## Content enhancements
 
-## 3) Media support
+### Callouts
 
-### Standard markdown images (recommended)
+Use blockquotes with markers:
+
+```md
+> [!NOTE] This is a note.
+> [!TIP] This is a tip.
+> [!WARNING] This is a warning.
+```
+
+### Images, captions, and size variants
+
+Standard image:
 
 ```md
 ![Alt text](/houston.jpeg)
-![Animated gif](https://media.example.com/loop.gif)
 ```
 
-Notes:
+Caption and size options (`wide` or `full`) using alt metadata:
 
-- Images and GIFs render inline
-- Clicking an unlinked image opens the lightbox preview
+```md
+![Alt text | Caption text | wide](/houston.jpeg)
+![Alt text | Full bleed image | full](/journal.jpeg)
+```
 
-### Auto-embed standalone links
+Images and GIFs are zoomable when not wrapped in links.
 
-If a paragraph contains only a bare URL, it is auto-embedded when supported.
+## Auto-embed standalone links
 
-YouTube URLs:
+If a paragraph contains only a bare URL, the post auto-embeds it when supported.
+
+YouTube:
 
 ```md
 https://www.youtube.com/watch?v=dQw4w9WgXcQ
@@ -149,105 +139,41 @@ https://youtu.be/dQw4w9WgXcQ
 https://www.youtube.com/shorts/dQw4w9WgXcQ
 ```
 
-Direct video file URLs:
+Direct media files:
 
 ```md
 https://cdn.example.com/demo.mp4
 https://cdn.example.com/demo.webm
-```
-
-Direct image file URLs:
-
-```md
 https://images.example.com/photo.jpg
-https://images.example.com/animation.gif
+https://images.example.com/anim.gif
 ```
 
-Notes:
-
-- Only standalone bare links are auto-embedded
-- Normal inline markdown links stay normal links
-- Raw HTML embeds like `<iframe>` or `<video>` are not supported in markdown
-
-## 4) Automatic post-page features
-
-These are automatic and do not require special markdown syntax:
-
-- Top reading progress bar
-- Share button (native share when available, clipboard fallback)
-- Back-to-top button after scrolling
-- Reading-time estimate (`X min read`) based on post content
-
-## 5) Full example post
+GitHub Gist card preview:
 
 ```md
----
-title: "A Complete Example"
-date: "2026-04-23"
-updated: "2026-04-24"
-tags: ["Example", "Markdown"]
-summary: "A post showing all supported markdown features."
-image: "/journal.jpeg"
----
-
-## Intro
-
-This line breaks
-without a blank line because `remark-breaks` is enabled.
-
-### Lists and quote
-
-- One
-- Two
-
-> A thoughtful quote.
-
-### Link and footnote
-
-[Portfolio](https://example.com)
-
-This sentence has a footnote.[^1]
-
-[^1]: Footnote content goes here.
-
-### Table
-
-| Name | Value |
-| --- | --- |
-| Mood | Calm |
-
-### LaTeX
-
-Euler's identity is $e^{i\pi} + 1 = 0$.
-
-$$
-\nabla \cdot \vec{E} = \frac{\rho}{\varepsilon_0}
-$$
-
-### Code
-
-```ts
-function add(a: number, b: number) {
-  return a + b;
-}
+https://gist.github.com/octocat/9257657
 ```
 
-### Image
+Gists render as a linked preview card (title + URL), not a full inline script embed.
 
-![City skyline](/houston.jpeg)
+Regular inline links remain normal links.
 
-### YouTube auto-embed
+## Automatic post page features
 
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
+These work automatically on post pages:
 
-### MP4 auto-embed
-
-https://cdn.example.com/demo.mp4
-```
+- Reading progress bar at the top
+- Share button
+- Back-to-top button
+- Reading time estimate
+- Heading anchor links copy the section URL
+- Sticky table of contents on large screens
+- Related posts based on shared tags
+- Reader preferences (`Aa` size cycle and prose width toggle)
 
 ## Avoid
 
-- Raw HTML for layout or embeds (`<iframe>`, `<video>`, `<div>`, etc.)
+- Raw HTML for layout/embeds (`<iframe>`, `<video>`, etc.)
 - Mixing markdown and HTML when markdown syntax already exists
 
-For style changes, update `src/app/globals.css` under `.markdown-content` selectors.
+For style updates, edit `.markdown-content` rules in `src/app/globals.css`.

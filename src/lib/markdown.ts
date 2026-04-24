@@ -5,6 +5,7 @@ import gfm from "remark-gfm";
 import math from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeKatex from "rehype-katex";
+import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import path from "path";
@@ -35,9 +36,10 @@ async function renderMarkdown(content: string) {
     .use(gfm)
     .use(breaks)
     .use(math)
-    .use(remarkRehype)
-    .use(rehypeSanitize)
+    .use(remarkRehype, { clobberPrefix: "" })
+    .use(rehypeSanitize, { clobberPrefix: "" })
     .use(rehypeKatex)
+    .use(rehypeHighlight)
     .use(rehypeStringify)
     .process(content);
 
