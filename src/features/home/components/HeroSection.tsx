@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { buildOrbitRenderData, clamp, getOrbit3DPosition, getOrbitRadii } from "./hero-orbit/math";
@@ -19,6 +19,9 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
   const [activeSliderId, setActiveSliderId] = useState<string | null>(null);
   const [isSunHovered, setIsSunHovered] = useState(false);
+  const [isDesktopCompact, setIsDesktopCompact] = useState(false);
+  const [isDesktopMenuModeReady, setIsDesktopMenuModeReady] = useState(false);
+  const [desktopCompactMeasureTick, setDesktopCompactMeasureTick] = useState(0);
   const [orbitConfig, setOrbitConfig] = useState(getDefaultOrbitConfig);
   const orbitMenuMobileRef = React.useRef<HTMLDivElement>(null);
   const orbitMenuDesktopRef = React.useRef<HTMLDivElement>(null);
@@ -134,6 +137,58 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       window.removeEventListener("pointercancel", clearSliderFocus);
     };
   }, [activeSliderId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const scheduleDesktopCompactRecheck = () => {
+      setDesktopCompactMeasureTick((prev) => prev + 1);
+    };
+
+    window.addEventListener("resize", scheduleDesktopCompactRecheck);
+
+    return () => {
+      window.removeEventListener("resize", scheduleDesktopCompactRecheck);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isOrbitMenuOpen || typeof window === "undefined") {
+      setIsDesktopCompact(false);
+      setIsDesktopMenuModeReady(false);
+      return;
+    }
+
+    const isDesktopViewport = window.matchMedia("(min-width: 640px)").matches;
+    if (!isDesktopViewport) {
+      setIsDesktopCompact(false);
+      setIsDesktopMenuModeReady(true);
+      return;
+    }
+
+    setIsDesktopMenuModeReady(false);
+    setIsDesktopCompact(false);
+    let rafId1 = 0;
+    let rafId2 = 0;
+
+    rafId1 = window.requestAnimationFrame(() => {
+      rafId2 = window.requestAnimationFrame(() => {
+        const desktopMenu = orbitMenuDesktopRef.current;
+        if (!desktopMenu) {
+          setIsDesktopMenuModeReady(true);
+          return;
+        }
+        const hasVerticalOverflow = desktopMenu.scrollHeight > desktopMenu.clientHeight + 1;
+        setIsDesktopCompact(hasVerticalOverflow);
+        setIsDesktopMenuModeReady(true);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId1);
+      window.cancelAnimationFrame(rafId2);
+    };
+  }, [isOrbitMenuOpen, desktopCompactMeasureTick]);
 
   const beginSliderInteraction = useCallback((sliderId: string) => {
     if (typeof window === "undefined") return;
@@ -325,14 +380,83 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
           {renderOrbitControlFields(activePlanetTab, true)}
         </div>
       </div>
-      <div className="hidden sm:block space-y-4 pt-3">
-        {renderOrbitControls("earth", "Earth Orbit")}
-        {renderOrbitControls("mars", "Mars Orbit")}
-      </div>
+      {isDesktopCompact ? (
+        <div className="hidden sm:block pt-2.5">
+          <div
+            className="rounded-t-[1.15rem] border border-b-0 p-1 grid grid-cols-2 gap-1"
+            style={{
+              borderColor: "var(--color-orbit-control-border)",
+              background: "var(--color-orbit-control-bg)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setActivePlanetTab("earth")}
+              aria-pressed={activePlanetTab === "earth"}
+              className={`text-xs py-2 rounded-tl-[0.95rem] rounded-tr-[0.32rem] rounded-bl-[0.28rem] rounded-br-[0.28rem] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+                activePlanetTab === "earth"
+                  ? "shadow-sm"
+                  : "hover:-translate-y-[1px]"
+              }`}
+              style={activePlanetTab === "earth"
+                ? {
+                    borderColor: "var(--color-orbit-chip-active-border)",
+                    background: "var(--color-orbit-chip-active-bg)",
+                    color: "var(--color-orbit-menu-title)",
+                  }
+                : {
+                    borderColor: "transparent",
+                    background: "transparent",
+                    color: "var(--color-orbit-menu-muted)",
+                  }}
+            >
+              Earth
+            </button>
+            <button
+              type="button"
+              onClick={() => setActivePlanetTab("mars")}
+              aria-pressed={activePlanetTab === "mars"}
+              className={`text-xs py-2 rounded-tr-[0.95rem] rounded-tl-[0.32rem] rounded-bl-[0.28rem] rounded-br-[0.28rem] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)] ${
+                activePlanetTab === "mars"
+                  ? "shadow-sm"
+                  : "hover:-translate-y-[1px]"
+              }`}
+              style={activePlanetTab === "mars"
+                ? {
+                    borderColor: "var(--color-orbit-chip-active-border)",
+                    background: "var(--color-orbit-chip-active-bg)",
+                    color: "var(--color-orbit-menu-title)",
+                  }
+                : {
+                    borderColor: "transparent",
+                    background: "transparent",
+                    color: "var(--color-orbit-menu-muted)",
+                  }}
+            >
+              Mars
+            </button>
+          </div>
+          <div
+            className="-mt-px rounded-b-[1.15rem] border p-3.5 space-y-3"
+            style={{
+              background: "var(--color-orbit-control-bg)",
+              borderColor: "var(--color-orbit-control-border)",
+              boxShadow: "var(--color-orbit-control-shadow)",
+            }}
+          >
+            {renderOrbitControlFields(activePlanetTab)}
+          </div>
+        </div>
+      ) : (
+        <div className="hidden sm:block space-y-4 pt-3">
+          {renderOrbitControls("earth", "Earth Orbit")}
+          {renderOrbitControls("mars", "Mars Orbit")}
+        </div>
+      )}
       <button
         type="button"
         onClick={() => setOrbitConfig(getDefaultOrbitConfig())}
-        className="w-full text-xs py-2.5 rounded-xl border mt-3 sm:mt-4 hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]"
+        className={`w-full text-xs py-2.5 rounded-xl border ${isDesktopCompact ? "mt-3" : "mt-3 sm:mt-4"} hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-link)]`}
           style={{
             borderColor: "var(--color-orbit-chip-active-border)",
             background: "var(--color-orbit-chip-active-bg)",
@@ -604,11 +728,13 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       {isOrbitMenuOpen && (
         <div
           ref={orbitMenuDesktopRef}
-          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-[1.55rem] border text-foreground-light dark:text-foreground-dark p-4 space-y-3 overflow-hidden"
+          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-[1.55rem] border text-foreground-light dark:text-foreground-dark p-4 space-y-3 overflow-x-hidden overflow-y-auto"
           style={{
             background: "var(--color-orbit-menu-bg)",
             borderColor: "var(--color-orbit-menu-border)",
             boxShadow: "var(--color-orbit-menu-shadow-soft)",
+            maxHeight: "calc(100dvh - var(--home-nav-h, 72px) - 2.5rem)",
+            visibility: isDesktopMenuModeReady ? "visible" : "hidden",
           }}
         >
           <div
