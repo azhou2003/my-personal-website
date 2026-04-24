@@ -30,6 +30,7 @@ image: "/path/to/image.png"
 - **Dark mode**: Class-based (`darkMode: 'class'` in tailwind.config.js) and managed by `next-themes`
 - **Styling**: Tailwind Typography plugin (`@tailwindcss/typography`) available via `prose` class
 - **Blog markdown**: Uses `remark-gfm`, `remark-breaks`, `remark-math`, `rehype-katex`, `rehype-highlight`, and `rehype-sanitize`; standalone bare links can auto-embed YouTube and direct media, and show linked Gist preview cards on the client; image size metadata (`wide`, `full`) stays constrained to the markdown column
+- **Reader controls**: Blog posts provide font size, measure width, and line spacing toggles (measure toggle hidden on mobile)
 - **Custom palette**: Earthy tones - sage `#b7c7a3`, yellow `#ffe066`, orange `#ffb385`; backgrounds light `#fefae0` / dark `#2e2a27`
 - **Path alias**: `@/*` maps to `./src/*`
 

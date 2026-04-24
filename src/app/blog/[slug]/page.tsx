@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
           </section>
         )}
         <div
-          className={`flex justify-between items-center mt-16 ${relatedPosts.length === 0 ? "blog-post-pagination-divider pt-8" : ""}`}
+          className={`blog-post-pagination-row flex justify-between items-center mt-16 ${relatedPosts.length === 0 ? "blog-post-pagination-divider pt-8" : ""}`}
         >
           {prevPost ? (
             <Link

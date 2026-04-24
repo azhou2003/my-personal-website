@@ -189,7 +189,7 @@ These work automatically on post pages:
 - Heading anchor links copy the section URL
 - Sticky table of contents on large screens (indexes `##`, `###`, and `####` headings)
 - Related posts based on shared tags (up to 2 posts; ties break by newer `date` first)
-- Reader preferences (`A-`, `A+`, and measure toggle) in a dedicated row below tags
+- Reader preferences (`A-`, `A+`, measure, and line spacing) in a dedicated row below tags (`measure` is hidden on mobile)
 
 ## Avoid
 

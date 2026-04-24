@@ -288,7 +288,7 @@ _n/a (automatic, no special markdown required)_
 
 - Reading progress bar appears at top while scrolling.
 - Back-to-top button appears after scrolling down.
-- Reader preferences buttons (`A-`, `A+`, and measure toggle) are shown in their own row below tags.
+- Reader preferences buttons (`A-`, `A+`, measure, and line spacing) are shown in their own row below tags (`measure` is hidden on mobile).
 - Sticky table of contents appears on large screens and tracks `##`, `###`, and `####` headings.
 - Related posts show up to 2 items; ties are resolved by newer `date` first.
 - Heading anchors (`#`) copy the section URL.

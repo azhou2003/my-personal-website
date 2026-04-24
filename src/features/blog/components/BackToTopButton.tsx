@@ -36,7 +36,7 @@ export default function BackToTopButton() {
       className="fixed z-40 pointer-events-none"
       style={{
         right:
-          "max(calc(env(safe-area-inset-right, 0px) + clamp(1rem, 4vw, 1.75rem)), calc(50vw - (var(--blog-prose-max-width, 48rem) / 2) + 1rem))",
+          "max(calc(env(safe-area-inset-right, 0px) + clamp(1rem, 4vw, 1.75rem)), calc(50vw - (var(--blog-prose-max-width, 48rem) / 2) + 1rem + var(--blog-back-to-top-desktop-nudge, 0px)))",
         bottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
       }}
     >
