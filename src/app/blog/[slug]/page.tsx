@@ -75,12 +75,14 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
           ← Back to Blog
         </Link>
         <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="blog-post-meta-row mb-6">
+          <div className="blog-post-meta-tools">
             <p className="text-muted text-sm">{metadataParts.join(" · ")}</p>
             <ShareButton title={data.title || resolvedParams.slug} />
-            <ReaderPreferences />
           </div>
+        </div>
+        <div className="blog-post-reader-row mb-8">
+          <ReaderPreferences />
         </div>
         {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
         <MarkdownContent html={content} />

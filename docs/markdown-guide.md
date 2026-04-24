@@ -167,9 +167,9 @@ These work automatically on post pages:
 - Back-to-top button
 - Reading time estimate
 - Heading anchor links copy the section URL
-- Sticky table of contents on large screens
+- Sticky table of contents on large screens (indexes `##`, `###`, and `####` headings)
 - Related posts based on shared tags
-- Reader preferences (`Aa` size cycle and prose width toggle)
+- Reader preferences (`Aa` size cycle and prose width toggle) in a dedicated row below metadata
 
 ## Avoid
 

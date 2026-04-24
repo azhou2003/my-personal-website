@@ -30,7 +30,11 @@ This post alternates markdown source and rendered output for each feature.
 ###### source
 
 ````md
-#### Sample heading
+## Sample H2 heading
+
+### Sample H3 heading
+
+#### Sample H4 heading
 
 This line breaks
 without a blank line.
@@ -38,7 +42,11 @@ without a blank line.
 
 ###### render
 
-#### Sample heading
+## Sample H2 heading
+
+### Sample H3 heading
+
+#### Sample H4 heading
 
 This line breaks
 without a blank line.
@@ -278,8 +286,8 @@ _n/a (automatic, no special markdown required)_
 - Reading progress bar appears at top while scrolling.
 - Back-to-top button appears after scrolling down.
 - Share button is shown in the metadata row.
-- Reader preferences buttons (`Aa` and width toggle) are shown in the metadata row.
-- Sticky table of contents appears on large screens.
+- Reader preferences buttons (`Aa` and width toggle) are shown in their own row below metadata.
+- Sticky table of contents appears on large screens and tracks `##`, `###`, and `####` headings.
 - Related posts appear near the end when shared tags exist.
 - Heading anchors (`#`) copy the section URL.
 

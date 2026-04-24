@@ -27,9 +27,19 @@ export default function ReaderPreferences() {
     applyPreferences(FONT_OPTIONS[safeIndex], savedWide);
   }, []);
 
-  const cycleFontSize = () => {
+  const decreaseFontSize = () => {
     setFontIndex((previous) => {
-      const next = (previous + 1) % FONT_OPTIONS.length;
+      const next = Math.max(0, previous - 1);
+      const nextScale = FONT_OPTIONS[next];
+      localStorage.setItem(FONT_KEY, String(nextScale));
+      applyPreferences(nextScale, wideMode);
+      return next;
+    });
+  };
+
+  const increaseFontSize = () => {
+    setFontIndex((previous) => {
+      const next = Math.min(FONT_OPTIONS.length - 1, previous + 1);
       const nextScale = FONT_OPTIONS[next];
       localStorage.setItem(FONT_KEY, String(nextScale));
       applyPreferences(nextScale, wideMode);
@@ -47,22 +57,33 @@ export default function ReaderPreferences() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="reader-tools" role="group" aria-label="Reader preferences">
+      <span className="reader-tools-label">Reader</span>
       <button
         type="button"
-        onClick={cycleFontSize}
-        className="rounded-md border border-border-light px-2 py-1 text-[0.72rem] text-muted transition-colors hover:text-foreground-light dark:border-border-dark dark:hover:text-foreground-dark"
-        aria-label="Cycle reader font size"
+        onClick={decreaseFontSize}
+        className="reader-tool-button"
+        aria-label="Decrease reader font size"
+        disabled={fontIndex === 0}
       >
-        Aa
+        A-
+      </button>
+      <button
+        type="button"
+        onClick={increaseFontSize}
+        className="reader-tool-button"
+        aria-label="Increase reader font size"
+        disabled={fontIndex === FONT_OPTIONS.length - 1}
+      >
+        A+
       </button>
       <button
         type="button"
         onClick={toggleWidth}
         aria-pressed={wideMode}
-        className="rounded-md border border-border-light px-2 py-1 text-[0.72rem] text-muted transition-colors hover:text-foreground-light dark:border-border-dark dark:hover:text-foreground-dark"
+        className={`reader-tool-button reader-tool-measure ${wideMode ? "is-active" : ""}`}
       >
-        {wideMode ? "Width: Wide" : "Width: Normal"}
+        {wideMode ? "Measure: Wide" : "Measure: Classic"}
       </button>
     </div>
   );

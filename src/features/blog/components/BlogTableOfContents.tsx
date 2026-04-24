@@ -9,7 +9,7 @@ type TocItem = {
 };
 
 function getHeadings() {
-  return Array.from(document.querySelectorAll(".markdown-content h2, .markdown-content h3"))
+  return Array.from(document.querySelectorAll(".markdown-content h2, .markdown-content h3, .markdown-content h4"))
     .map((node) => {
       const heading = node as HTMLElement;
       if (!heading.id) {
@@ -28,7 +28,7 @@ function getHeadings() {
       return {
         id: heading.id,
         text,
-        level: heading.tagName === "H3" ? 3 : 2,
+        level: heading.tagName === "H4" ? 4 : heading.tagName === "H3" ? 3 : 2,
       } satisfies TocItem;
     })
     .filter((item): item is TocItem => Boolean(item));
@@ -89,21 +89,20 @@ export default function BlogTableOfContents() {
   }
 
   return (
-    <aside className="pointer-events-none fixed right-8 top-28 z-30 hidden w-64 xl:block">
-      <div className="pointer-events-auto rounded-xl border border-border-light bg-background-light/90 p-3 shadow-md backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/90">
-        <p className="mb-2 text-[0.67rem] uppercase tracking-[0.18em] text-muted">On this page</p>
-        <nav aria-label="Table of contents" className="space-y-1">
+    <aside className="blog-toc pointer-events-none">
+      <div className="blog-toc-panel pointer-events-auto">
+        <p className="blog-toc-kicker">On this page</p>
+        <nav aria-label="Table of contents" className="blog-toc-nav">
           {items.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className={`block rounded px-2 py-1 text-xs transition-colors ${
-                activeId === item.id
-                  ? "bg-accent-yellow/25 text-foreground-light dark:text-foreground-dark"
-                  : "text-muted hover:text-foreground-light dark:hover:text-foreground-dark"
-              } ${item.level === 3 ? "ml-3" : "ml-0"}`}
+              title={item.text}
+              className={`blog-toc-link ${activeId === item.id ? "is-active" : ""} ${
+                item.level === 4 ? "is-grandchild" : item.level === 3 ? "is-child" : ""
+              }`}
             >
-              {item.text}
+              <span className="blog-toc-link-text">{item.text}</span>
             </a>
           ))}
         </nav>
