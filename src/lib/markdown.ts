@@ -2,7 +2,12 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import breaks from "remark-breaks";
 import gfm from "remark-gfm";
-import html from "remark-html";
+import math from "remark-math";
+import remarkRehype from "remark-rehype";
+import rehypeKatex from "rehype-katex";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeStringify from "rehype-stringify";
 import path from "path";
 import fs from "fs";
 import type { BlogFrontmatter, BlogMeta } from "./types";
@@ -12,6 +17,8 @@ function estimateReadingTimeMinutes(markdown: string) {
   const plainText = markdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]*`/g, " ")
+    .replace(/\$\$[\s\S]*?\$\$/g, " ")
+    .replace(/\$[^$\n]+\$/g, " ")
     .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, " $1 ")
     .replace(/<[^>]+>/g, " ")
@@ -28,7 +35,16 @@ async function renderMarkdown(content: string) {
   const processedContent = await remark()
     .use(gfm)
     .use(breaks)
-    .use(html, { sanitize: true })
+    .use(math)
+    .use(remarkRehype, {
+      clobberPrefix: "",
+      footnoteBackContent: "Back",
+      footnoteBackLabel: "Back to reference",
+    })
+    .use(rehypeSanitize, { clobberPrefix: "" })
+    .use(rehypeKatex)
+    .use(rehypeHighlight)
+    .use(rehypeStringify)
     .process(content);
 
   return processedContent.toString();

@@ -1,55 +1,67 @@
 # Blog Markdown Guide
 
-This project uses a single, shared markdown pipeline for all posts:
+This project uses a shared markdown pipeline for blog posts:
 
-- `remark-gfm` for tables, task lists, and strikethrough
+- `remark-gfm` for tables, task lists, footnotes, and strikethrough
 - `remark-breaks` so single newlines render as line breaks
-- `remark-html` with sanitization enabled for predictable output
+- `remark-math` + `rehype-katex` for LaTeX
+- `rehype-highlight` for syntax-highlighted code blocks
+- `rehype-sanitize` for safe output
 
-## Use Markdown Syntax (Preferred)
+## Post frontmatter
 
-Write posts with normal markdown syntax instead of raw HTML tags.
+Posts live in `src/content/posts/*.md` and start with YAML frontmatter.
 
-### Headings
-
-```md
-# H1
-## H2
-### H3
+```yaml
+---
+title: "Post Title"
+date: "2026-04-24"
+updated: "2026-04-25"
+tags: ["Tag1", "Tag2"]
+summary: "Short summary used on blog cards."
+image: "/journal.jpeg"
+---
 ```
 
-### Paragraphs and line breaks
+Frontmatter fields and behavior:
+
+- `title` (optional) - defaults to slug when missing
+- `date` (optional in code, recommended in practice) - shown as `Published ...`
+- `updated` (optional) - shown as `Updated ...`
+- `tags` (optional) - defaults to `[]`; used for filters and related posts
+- `summary` (optional) - defaults to `""`; used in cards and metadata
+- `image` (optional) - used in blog card preview
+
+## Core markdown syntax
+
+### Headings and line breaks
 
 ```md
-First line
-Second line
-
-New paragraph
+## Heading
+This line breaks
+without a blank line.
 ```
 
-### Lists
+### Lists, links, quotes, strikethrough
 
 ```md
-- Item one
-- Item two
-- Item three
+- Bullet
+1. Ordered
 
-1. First
-2. Second
+[Link](https://example.com)
+
+> Quote
+
+~~strikethrough~~
 ```
 
-### Links and images
-
-```md
-[My link](https://example.com)
-![Alt text](/houston.jpeg)
-```
-
-### Code blocks
+### Syntax-highlighted code blocks
 
 ````md
 ```ts
-console.log("hello")
+function add(a: number, b: number) {
+  return a + b;
+}
 ```
 ````
 
@@ -64,9 +76,124 @@ console.log("hello")
 - [ ] Todo
 ```
 
+### Footnotes
+
+```md
+Text with footnote.[^origin]
+
+[^origin]: Footnote content.
+```
+
+Footnote links support both directions (reference -> footer and footer -> reference).
+
+Reference-style example:
+
+```md
+Recent LLM progress has been fast.[^openai]
+Transformer architecture remains foundational.[^attention]
+
+[^openai]: OpenAI, "GPT-4 Technical Report," 2023. https://arxiv.org/abs/2303.08774
+[^attention]: Vaswani et al., "Attention Is All You Need," NeurIPS 2017. https://arxiv.org/abs/1706.03762
+```
+
+Reusing a citation in multiple places:
+
+```md
+First mention of this source.[^book]
+Later mention of the same source.[^book]
+
+[^book]: Cal Newport, *Deep Work*, Grand Central Publishing, 2016.
+```
+
+### LaTeX math
+
+```md
+Inline: $E = mc^2$
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+```
+
+Use `\$` for a literal dollar sign.
+
+## Content enhancements
+
+### Callouts
+
+Use blockquotes with markers:
+
+```md
+> [!NOTE] This is a note.
+> [!TIP] This is a tip.
+> [!WARNING] This is a warning.
+```
+
+### Images, captions, and size variants
+
+Standard image:
+
+```md
+![Alt text](/houston.jpeg)
+```
+
+Caption and size options (`wide` or `full`) using alt metadata:
+
+```md
+![Alt text | Caption text | wide](/houston.jpeg)
+![Alt text | Full width image | full](/journal.jpeg)
+```
+
+Both `wide` and `full` remain constrained to the post content width (no bleed outside the markdown column).
+
+Images and GIFs are zoomable when not wrapped in links.
+
+## Auto-embed standalone links
+
+If a paragraph contains only a bare URL, the post auto-embeds it when supported.
+
+YouTube:
+
+```md
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
+https://youtu.be/dQw4w9WgXcQ
+https://www.youtube.com/shorts/dQw4w9WgXcQ
+```
+
+Direct media files:
+
+```md
+https://cdn.example.com/demo.mp4
+https://cdn.example.com/demo.webm
+https://images.example.com/photo.jpg
+https://images.example.com/anim.gif
+```
+
+GitHub Gist card preview:
+
+```md
+https://gist.github.com/octocat/9257657
+```
+
+Gists render as a linked preview card (title + URL), not a full inline script embed.
+
+Regular inline links remain normal links.
+
+## Automatic post page features
+
+These work automatically on post pages:
+
+- Reading progress bar at the top
+- Back-to-top button
+- Reading time estimate
+- Heading anchor links copy the section URL
+- Sticky table of contents on large screens (indexes `##`, `###`, and `####` headings)
+- Related posts based on shared tags (up to 2 posts; ties break by newer `date` first)
+- Reader preferences (`A-`, `A+`, measure, and line spacing) in a dedicated row below tags (`measure` is hidden on mobile)
+
 ## Avoid
 
-- Raw HTML (`<ul>`, `<li>`, `<br>`, etc.)
-- Mixed markdown + HTML for basic formatting
+- Raw HTML for layout/embeds (`<iframe>`, `<video>`, etc.)
+- Mixing markdown and HTML when markdown syntax already exists
 
-The blog now has centralized markdown styling, so formatting updates should happen in one place: `src/app/globals.css` under `.markdown-content` selectors.
+For style updates, edit `.markdown-content` rules in `src/app/globals.css`.

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 
 type MarkdownContentProps = {
   html: string;
@@ -12,6 +11,11 @@ type LightboxState = {
   alt: string;
 };
 
+type CalloutVariant = "note" | "tip" | "warning";
+
+const IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+const VIDEO_EXTENSION_PATTERN = /\.(mp4|ogg|ogv|webm)$/i;
+
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -20,6 +24,284 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+
+function normalizeComparableUrl(value: string) {
+  return value.trim().replace(/\/$/, "");
+}
+
+function isBareUrlAnchor(anchor: HTMLAnchorElement) {
+  const href = anchor.getAttribute("href") || "";
+  const text = anchor.textContent?.trim() || "";
+
+  if (!href || !text) {
+    return false;
+  }
+
+  return normalizeComparableUrl(href) === normalizeComparableUrl(text);
+}
+
+function parseHttpUrl(rawHref: string) {
+  try {
+    const parsed = new URL(rawHref);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function stripWww(hostname: string) {
+  return hostname.replace(/^www\./, "").toLowerCase();
+}
+
+function getGistUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return null;
+  }
+
+  const host = stripWww(parsed.hostname);
+  if (host !== "gist.github.com") {
+    return null;
+  }
+
+  const segments = parsed.pathname.split("/").filter(Boolean);
+  if (segments.length < 2) {
+    return null;
+  }
+
+  return parsed.toString();
+}
+
+function getYouTubeEmbedUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return null;
+  }
+
+  const host = stripWww(parsed.hostname);
+  let videoId: string | null = null;
+
+  if (host === "youtu.be") {
+    videoId = parsed.pathname.split("/").filter(Boolean)[0] || null;
+  } else if (host === "youtube.com" || host === "m.youtube.com") {
+    if (parsed.pathname === "/watch") {
+      videoId = parsed.searchParams.get("v");
+    } else if (parsed.pathname.startsWith("/shorts/") || parsed.pathname.startsWith("/embed/") || parsed.pathname.startsWith("/live/")) {
+      videoId = parsed.pathname.split("/").filter(Boolean)[1] || null;
+    }
+  }
+
+  if (!videoId) {
+    return null;
+  }
+
+  const cleanId = videoId.replace(/[^a-zA-Z0-9_-]/g, "");
+  if (!cleanId) {
+    return null;
+  }
+
+  return `https://www.youtube.com/embed/${cleanId}`;
+}
+
+function isDirectImageUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return false;
+  }
+
+  return IMAGE_EXTENSION_PATTERN.test(parsed.pathname);
+}
+
+function isDirectVideoUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return false;
+  }
+
+  return VIDEO_EXTENSION_PATTERN.test(parsed.pathname);
+}
+
+function createEmbedContainer() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "md-embed";
+  return wrapper;
+}
+
+function createEmbedCard(title: string, href: string) {
+  const card = document.createElement("a");
+  card.href = href;
+  card.target = "_blank";
+  card.rel = "noopener noreferrer";
+  card.className = "md-embed-card";
+
+  const titleNode = document.createElement("span");
+  titleNode.className = "md-embed-card-title";
+  titleNode.textContent = title;
+
+  const urlNode = document.createElement("span");
+  urlNode.className = "md-embed-card-url";
+  urlNode.textContent = href;
+
+  card.appendChild(titleNode);
+  card.appendChild(urlNode);
+  return card;
+}
+
+function parseImageAltMetadata(rawAlt: string) {
+  const parts = rawAlt
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return { alt: rawAlt, caption: "", size: "normal" as const };
+  }
+
+  let size: "normal" | "wide" | "full" = "normal";
+  const last = parts[parts.length - 1].toLowerCase();
+  if (last === "wide" || last === "full") {
+    size = last;
+    parts.pop();
+  }
+
+  const alt = parts[0] || rawAlt;
+  const caption = parts.slice(1).join(" | ");
+  return { alt, caption, size };
+}
+
+function applyImageFigureEnhancements(article: HTMLElement) {
+  article.querySelectorAll("img").forEach((node) => {
+    const image = node as HTMLImageElement;
+    image.classList.add("md-zoomable-image");
+    image.setAttribute("loading", "lazy");
+
+    if (image.closest("figure")) {
+      return;
+    }
+
+    const { alt, caption, size } = parseImageAltMetadata(image.getAttribute("alt") || "");
+    image.alt = alt;
+
+    const parent = image.parentElement;
+    if (!parent) {
+      return;
+    }
+
+    const figure = document.createElement("figure");
+    if (size !== "normal") {
+      figure.setAttribute("data-size", size);
+    }
+
+    parent.replaceChild(figure, image);
+    figure.appendChild(image);
+
+    if (caption) {
+      const figcaption = document.createElement("figcaption");
+      figcaption.textContent = caption;
+      figure.appendChild(figcaption);
+    }
+  });
+}
+
+function applyCallouts(article: HTMLElement) {
+  const markers: Record<string, CalloutVariant> = {
+    "[!NOTE]": "note",
+    "[!TIP]": "tip",
+    "[!WARNING]": "warning",
+    "[!WARN]": "warning",
+  };
+
+  article.querySelectorAll("blockquote").forEach((node) => {
+    const blockquote = node as HTMLElement;
+    const firstParagraph = blockquote.querySelector("p");
+    if (!firstParagraph) {
+      return;
+    }
+
+    const text = firstParagraph.textContent?.trim() || "";
+    const matchedMarker = Object.keys(markers).find((marker) => text.startsWith(marker));
+    if (!matchedMarker) {
+      return;
+    }
+
+    const variant = markers[matchedMarker];
+    blockquote.classList.add("md-callout", `md-callout-${variant}`);
+
+    const withoutMarker = text.slice(matchedMarker.length).trim();
+    firstParagraph.textContent = withoutMarker;
+  });
+}
+
+function replaceParagraphWithEmbed(anchor: HTMLAnchorElement) {
+  const paragraph = anchor.parentElement;
+  if (!paragraph || paragraph.tagName.toLowerCase() !== "p") {
+    return;
+  }
+
+  const links = paragraph.querySelectorAll("a");
+  if (links.length !== 1 || links[0] !== anchor) {
+    return;
+  }
+
+  if (paragraph.textContent?.trim() !== anchor.textContent?.trim()) {
+    return;
+  }
+
+  if (!isBareUrlAnchor(anchor)) {
+    return;
+  }
+
+  const href = anchor.getAttribute("href") || "";
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(href);
+
+  if (youtubeEmbedUrl) {
+    const wrapper = createEmbedContainer();
+    const iframe = document.createElement("iframe");
+    iframe.src = youtubeEmbedUrl;
+    iframe.title = "YouTube video embed";
+    iframe.className = "md-embed-frame";
+    iframe.loading = "lazy";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    wrapper.appendChild(iframe);
+    paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  if (isDirectVideoUrl(href)) {
+    const wrapper = createEmbedContainer();
+    const video = document.createElement("video");
+    video.src = href;
+    video.controls = true;
+    video.preload = "metadata";
+    video.className = "md-embed-video";
+    wrapper.appendChild(video);
+    paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  if (isDirectImageUrl(href)) {
+    const wrapper = createEmbedContainer();
+    const image = document.createElement("img");
+    image.src = href;
+    image.alt = "Embedded image";
+    image.loading = "lazy";
+    image.className = "md-embed-image md-zoomable-image";
+    wrapper.appendChild(image);
+    paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  const gistUrl = getGistUrl(href);
+  if (gistUrl) {
+    const wrapper = createEmbedContainer();
+    wrapper.appendChild(createEmbedCard("GitHub Gist", gistUrl));
+    paragraph.replaceWith(wrapper);
+  }
+}
 
 export default function MarkdownContent({ html }: MarkdownContentProps) {
   const articleRef = useRef<HTMLElement | null>(null);
@@ -70,10 +352,12 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
       pre.appendChild(button);
     });
 
-    article.querySelectorAll("img").forEach((image) => {
-      image.classList.add("md-zoomable-image");
-      image.setAttribute("loading", "lazy");
+    article.querySelectorAll("p > a:only-child").forEach((anchorNode) => {
+      replaceParagraphWithEmbed(anchorNode as HTMLAnchorElement);
     });
+
+    applyImageFigureEnhancements(article);
+    applyCallouts(article);
 
     const clearFootnoteHighlight = (element: HTMLElement) => {
       window.setTimeout(() => {
@@ -128,6 +412,25 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
             history.replaceState(null, "", `#${targetId}`);
           }
 
+          return;
+        }
+
+        if (anchor.classList.contains("md-heading-anchor")) {
+          event.preventDefault();
+          const heading = anchor.parentElement as HTMLElement | null;
+          const headingId = heading?.id;
+
+          if (!headingId) {
+            return;
+          }
+
+          const nextUrl = `${window.location.origin}${window.location.pathname}#${headingId}`;
+
+          try {
+            await navigator.clipboard.writeText(nextUrl);
+          } catch {}
+
+          history.replaceState(null, "", `#${headingId}`);
           return;
         }
       }
@@ -198,11 +501,12 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
           >
             Close
           </button>
-          <Image
+          {/* Keep native img for remote markdown media compatibility in lightbox. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={lightbox.src}
             alt={lightbox.alt}
-            width={1600}
-            height={1200}
+            loading="eager"
             className="max-h-[86vh] max-w-[92vw] rounded-md object-contain"
             onClick={(event) => event.stopPropagation()}
           />
