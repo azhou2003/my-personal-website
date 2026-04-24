@@ -302,18 +302,31 @@ h1, h2, h3, h4 {
 
 .blog-related-card {
   display: block;
-  border: 1px solid color-mix(in srgb, var(--color-tag-2-border) 82%, var(--color-border));
-  background: color-mix(in srgb, var(--color-tag-2-bg) 56%, var(--color-bg));
-  box-shadow: 0 10px 22px -20px color-mix(in srgb, var(--color-tag-3-border) 68%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-tag-1-border) 84%, var(--color-border));
+  background: color-mix(in srgb, var(--color-tag-1-bg) 58%, var(--color-bg));
+  box-shadow: 0 10px 22px -20px color-mix(in srgb, var(--color-tag-1-border) 68%, transparent);
   transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.blog-related-section .blog-related-card:nth-child(even) {
+  border-color: color-mix(in srgb, var(--color-tag-2-border) 84%, var(--color-border));
+  background: color-mix(in srgb, var(--color-tag-2-bg) 58%, var(--color-bg));
+  box-shadow: 0 10px 22px -20px color-mix(in srgb, var(--color-tag-2-border) 68%, transparent);
 }
 
 .blog-related-card:hover,
 .blog-related-card:focus-visible {
-  border-color: color-mix(in srgb, var(--color-tag-2-border) 92%, var(--color-tag-3-border));
-  background: color-mix(in srgb, var(--color-tag-2-bg) 66%, var(--color-bg));
-  box-shadow: 0 12px 24px -20px color-mix(in srgb, var(--color-tag-2-border) 80%, transparent);
+  border-color: color-mix(in srgb, var(--color-tag-1-border) 94%, var(--color-border));
+  background: color-mix(in srgb, var(--color-tag-1-bg) 68%, var(--color-bg));
+  box-shadow: 0 12px 24px -20px color-mix(in srgb, var(--color-tag-1-border) 80%, transparent);
   transform: translateY(-1px);
+}
+
+.blog-related-section .blog-related-card:nth-child(even):hover,
+.blog-related-section .blog-related-card:nth-child(even):focus-visible {
+  border-color: color-mix(in srgb, var(--color-tag-2-border) 94%, var(--color-border));
+  background: color-mix(in srgb, var(--color-tag-2-bg) 68%, var(--color-bg));
+  box-shadow: 0 12px 24px -20px color-mix(in srgb, var(--color-tag-2-border) 80%, transparent);
 }
 
 .blog-post-pagination-divider {
