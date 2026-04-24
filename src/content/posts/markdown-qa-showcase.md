@@ -1,15 +1,15 @@
 ---
 title: "Markdown QA Showcase"
-date: "2026-04-23"
-updated: "2026-04-23"
-tags: ["QA", "Markdown", "Docs", "Musings"]
+date: "2003-01-12"
+updated: "2004-01-12"
+tags: ["Docs", "Misc."]
 summary: "A single post that exercises every documented markdown and blog rendering feature."
-image: "/journal.jpeg"
+image: ""
 ---
 
-### Markdown QA Showcase
+### Markdown Usage Guide
 
-This post alternates markdown source and rendered output for each feature.
+This is not really a post, just a showcase of different markdown features I am using (for testing and reference).
 
 ###### source = raw markdown, render = actual output
 
