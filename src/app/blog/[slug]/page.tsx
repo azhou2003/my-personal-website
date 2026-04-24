@@ -5,7 +5,6 @@ import { StaticTagList } from "@/components/ui/tags";
 import {
   BackToTopButton,
   MarkdownContent,
-  ReaderComfortToggle,
   ReadingProgress,
   ShareButton,
 } from "@/features/blog/components";
@@ -59,7 +58,6 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
           <div className="flex flex-wrap items-center gap-4">
             <p className="text-muted text-sm">{metadataParts.join(" · ")}</p>
             <ShareButton title={data.title || resolvedParams.slug} />
-            <ReaderComfortToggle />
           </div>
         </div>
         {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}

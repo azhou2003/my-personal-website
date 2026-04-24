@@ -449,6 +449,26 @@ h1, h2, h3, h4 {
   position: relative;
 }
 
+.markdown-content .md-embed {
+  margin: 1.15em 0;
+}
+
+.markdown-content .md-embed-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+}
+
+.markdown-content .md-embed-video,
+.markdown-content .md-embed-image {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+}
+
 .markdown-content .md-copy-button {
   position: absolute;
   top: 0.5rem;
@@ -477,18 +497,6 @@ h1, h2, h3, h4 {
   }
   100% {
     background: transparent;
-  }
-}
-
-.reader-comfort .markdown-content {
-  font-size: 1.18rem;
-  line-height: 1.95;
-}
-
-@media (max-width: 768px) {
-  .reader-comfort .markdown-content {
-    font-size: 1.12rem;
-    line-height: 1.88;
   }
 }
 

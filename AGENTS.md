@@ -18,6 +18,7 @@ Blog post frontmatter:
 ---
 title: "Post Title"
 date: "YYYY-MM-DD"
+updated: "YYYY-MM-DD" # optional
 tags: ["Tag1", "Tag2"]
 summary: "Brief summary."
 image: "/path/to/image.png"

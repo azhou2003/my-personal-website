@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 
 type MarkdownContentProps = {
   html: string;
@@ -12,6 +11,9 @@ type LightboxState = {
   alt: string;
 };
 
+const IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+const VIDEO_EXTENSION_PATTERN = /\.(mp4|ogg|ogv|webm)$/i;
+
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -20,6 +22,152 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+
+function normalizeComparableUrl(value: string) {
+  return value.trim().replace(/\/$/, "");
+}
+
+function isBareUrlAnchor(anchor: HTMLAnchorElement) {
+  const href = anchor.getAttribute("href") || "";
+  const text = anchor.textContent?.trim() || "";
+
+  if (!href || !text) {
+    return false;
+  }
+
+  return normalizeComparableUrl(href) === normalizeComparableUrl(text);
+}
+
+function parseHttpUrl(rawHref: string) {
+  try {
+    const parsed = new URL(rawHref);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function stripWww(hostname: string) {
+  return hostname.replace(/^www\./, "").toLowerCase();
+}
+
+function getYouTubeEmbedUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return null;
+  }
+
+  const host = stripWww(parsed.hostname);
+  let videoId: string | null = null;
+
+  if (host === "youtu.be") {
+    videoId = parsed.pathname.split("/").filter(Boolean)[0] || null;
+  } else if (host === "youtube.com" || host === "m.youtube.com") {
+    if (parsed.pathname === "/watch") {
+      videoId = parsed.searchParams.get("v");
+    } else if (parsed.pathname.startsWith("/shorts/") || parsed.pathname.startsWith("/embed/") || parsed.pathname.startsWith("/live/")) {
+      videoId = parsed.pathname.split("/").filter(Boolean)[1] || null;
+    }
+  }
+
+  if (!videoId) {
+    return null;
+  }
+
+  const cleanId = videoId.replace(/[^a-zA-Z0-9_-]/g, "");
+  if (!cleanId) {
+    return null;
+  }
+
+  return `https://www.youtube.com/embed/${cleanId}`;
+}
+
+function isDirectImageUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return false;
+  }
+
+  return IMAGE_EXTENSION_PATTERN.test(parsed.pathname);
+}
+
+function isDirectVideoUrl(rawHref: string) {
+  const parsed = parseHttpUrl(rawHref);
+  if (!parsed) {
+    return false;
+  }
+
+  return VIDEO_EXTENSION_PATTERN.test(parsed.pathname);
+}
+
+function createEmbedContainer() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "md-embed";
+  return wrapper;
+}
+
+function replaceParagraphWithEmbed(anchor: HTMLAnchorElement) {
+  const paragraph = anchor.parentElement;
+  if (!paragraph || paragraph.tagName.toLowerCase() !== "p") {
+    return;
+  }
+
+  const links = paragraph.querySelectorAll("a");
+  if (links.length !== 1 || links[0] !== anchor) {
+    return;
+  }
+
+  if (paragraph.textContent?.trim() !== anchor.textContent?.trim()) {
+    return;
+  }
+
+  if (!isBareUrlAnchor(anchor)) {
+    return;
+  }
+
+  const href = anchor.getAttribute("href") || "";
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(href);
+
+  if (youtubeEmbedUrl) {
+    const wrapper = createEmbedContainer();
+    const iframe = document.createElement("iframe");
+    iframe.src = youtubeEmbedUrl;
+    iframe.title = "YouTube video embed";
+    iframe.className = "md-embed-frame";
+    iframe.loading = "lazy";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    wrapper.appendChild(iframe);
+    paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  if (isDirectVideoUrl(href)) {
+    const wrapper = createEmbedContainer();
+    const video = document.createElement("video");
+    video.src = href;
+    video.controls = true;
+    video.preload = "metadata";
+    video.className = "md-embed-video";
+    wrapper.appendChild(video);
+    paragraph.replaceWith(wrapper);
+    return;
+  }
+
+  if (isDirectImageUrl(href)) {
+    const wrapper = createEmbedContainer();
+    const image = document.createElement("img");
+    image.src = href;
+    image.alt = "Embedded image";
+    image.loading = "lazy";
+    image.className = "md-embed-image md-zoomable-image";
+    wrapper.appendChild(image);
+    paragraph.replaceWith(wrapper);
+  }
+}
 
 export default function MarkdownContent({ html }: MarkdownContentProps) {
   const articleRef = useRef<HTMLElement | null>(null);
@@ -73,6 +221,10 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
     article.querySelectorAll("img").forEach((image) => {
       image.classList.add("md-zoomable-image");
       image.setAttribute("loading", "lazy");
+    });
+
+    article.querySelectorAll("p > a:only-child").forEach((anchorNode) => {
+      replaceParagraphWithEmbed(anchorNode as HTMLAnchorElement);
     });
 
     const clearFootnoteHighlight = (element: HTMLElement) => {
@@ -198,11 +350,10 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
           >
             Close
           </button>
-          <Image
+          <img
             src={lightbox.src}
             alt={lightbox.alt}
-            width={1600}
-            height={1200}
+            loading="eager"
             className="max-h-[86vh] max-w-[92vw] rounded-md object-contain"
             onClick={(event) => event.stopPropagation()}
           />
