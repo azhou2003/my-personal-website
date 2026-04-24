@@ -4,7 +4,8 @@ This blog uses one shared markdown pipeline:
 
 - `remark-gfm` for GitHub-style markdown features (tables, task lists, footnotes, strikethrough)
 - `remark-breaks` so a single newline is rendered as a line break
-- `remark-html` with sanitization enabled for predictable, safe HTML output
+- `remark-math` + `rehype-katex` for LaTeX math rendering
+- `rehype-sanitize` for predictable, safe markdown output
 
 ## 1) Post frontmatter
 
@@ -100,6 +101,28 @@ Notes:
 - Footnotes are supported via GFM syntax
 - Footnote jumps are smooth-scrolled and highlighted on arrival
 
+### LaTeX math
+
+Inline math:
+
+```md
+Einstein wrote $E = mc^2$.
+```
+
+Block math:
+
+```md
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+```
+
+Notes:
+
+- Use single `$...$` for inline math
+- Use double `$$...$$` for block math
+- Escape a literal dollar sign as `\$`
+
 ## 3) Media support
 
 ### Standard markdown images (recommended)
@@ -192,6 +215,14 @@ This sentence has a footnote.[^1]
 | Name | Value |
 | --- | --- |
 | Mood | Calm |
+
+### LaTeX
+
+Euler's identity is $e^{i\pi} + 1 = 0$.
+
+$$
+\nabla \cdot \vec{E} = \frac{\rho}{\varepsilon_0}
+$$
 
 ### Code
 
