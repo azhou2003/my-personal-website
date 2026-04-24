@@ -123,6 +123,19 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   }, []);
 
   useEffect(() => {
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
     if (!scrollRoot) return;
 
@@ -144,6 +157,13 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
 
     const handleScroll = () => {
       const currentTop = scrollRoot.scrollTop;
+
+      if (!isSnappingRef.current && activeSectionRef.current === "hero" && currentTop > 0) {
+        scrollRoot.scrollTop = 0;
+        setIsScrolled(false);
+        return;
+      }
+
       setIsScrolled(currentTop > 50);
 
       const aboutEl = aboutSectionRef.current;
