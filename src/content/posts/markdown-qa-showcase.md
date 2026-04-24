@@ -141,13 +141,16 @@ function add(a: number, b: number) {
 
 ````md
 This sentence has a footnote.[^qa-note-render]
+This sentence cites a reference source.[^qa-ref]
 
 [^qa-note-render]: Footnote content for QA validation.
+[^qa-ref]: Vaswani et al., "Attention Is All You Need," NeurIPS 2017. https://arxiv.org/abs/1706.03762
 ````
 
 ###### render
 
 This sentence has a footnote.[^qa-note-render]
+This sentence cites a reference source.[^qa-ref]
 
 ---
 
@@ -286,9 +289,10 @@ _n/a (automatic, no special markdown required)_
 - Reading progress bar appears at top while scrolling.
 - Back-to-top button appears after scrolling down.
 - Share button is shown in the metadata row.
-- Reader preferences buttons (`Aa` and width toggle) are shown in their own row below metadata.
+- Reader preferences buttons (`A-`, `A+`, and measure toggle) are shown in their own row below tags.
 - Sticky table of contents appears on large screens and tracks `##`, `###`, and `####` headings.
-- Related posts appear near the end when shared tags exist.
+- Related posts show up to 2 items; ties are resolved by newer `date` first.
 - Heading anchors (`#`) copy the section URL.
 
 [^qa-note-render]: Footnote content for QA validation.
+[^qa-ref]: Vaswani et al., "Attention Is All You Need," NeurIPS 2017. https://arxiv.org/abs/1706.03762

@@ -27,7 +27,7 @@ Frontmatter fields and behavior:
 
 - `title` (optional) - defaults to slug when missing
 - `date` (optional in code, recommended in practice) - shown as `Published ...`
-- `updated` (optional) - shown as `Updated ...` and triggers an `Updated` badge
+- `updated` (optional) - shown as `Updated ...`
 - `tags` (optional) - defaults to `[]`; used for filters and related posts
 - `summary` (optional) - defaults to `""`; used in cards and metadata
 - `image` (optional) - used in blog card preview
@@ -85,6 +85,25 @@ Text with footnote.[^origin]
 ```
 
 Footnote links support both directions (reference -> footer and footer -> reference).
+
+Reference-style example:
+
+```md
+Recent LLM progress has been fast.[^openai]
+Transformer architecture remains foundational.[^attention]
+
+[^openai]: OpenAI, "GPT-4 Technical Report," 2023. https://arxiv.org/abs/2303.08774
+[^attention]: Vaswani et al., "Attention Is All You Need," NeurIPS 2017. https://arxiv.org/abs/1706.03762
+```
+
+Reusing a citation in multiple places:
+
+```md
+First mention of this source.[^book]
+Later mention of the same source.[^book]
+
+[^book]: Cal Newport, *Deep Work*, Grand Central Publishing, 2016.
+```
 
 ### LaTeX math
 
@@ -168,8 +187,8 @@ These work automatically on post pages:
 - Reading time estimate
 - Heading anchor links copy the section URL
 - Sticky table of contents on large screens (indexes `##`, `###`, and `####` headings)
-- Related posts based on shared tags
-- Reader preferences (`Aa` size cycle and prose width toggle) in a dedicated row below metadata
+- Related posts based on shared tags (up to 2 posts; ties break by newer `date` first)
+- Reader preferences (`A-`, `A+`, and measure toggle) in a dedicated row below tags
 
 ## Avoid
 

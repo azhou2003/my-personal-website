@@ -36,7 +36,11 @@ async function renderMarkdown(content: string) {
     .use(gfm)
     .use(breaks)
     .use(math)
-    .use(remarkRehype, { clobberPrefix: "" })
+    .use(remarkRehype, {
+      clobberPrefix: "",
+      footnoteBackContent: "Back",
+      footnoteBackLabel: "Back to reference",
+    })
     .use(rehypeSanitize, { clobberPrefix: "" })
     .use(rehypeKatex)
     .use(rehypeHighlight)

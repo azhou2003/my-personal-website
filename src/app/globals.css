@@ -250,7 +250,7 @@ h1, h2, h3, h4 {
 }
 
 .markdown-content {
-  font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
+  font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
   font-size: calc(1.1rem * var(--reader-font-scale, 1));
   line-height: 1.8;
 }
@@ -275,6 +275,14 @@ h1, h2, h3, h4 {
 .blog-post-reader-row {
   display: flex;
   justify-content: flex-start;
+}
+
+.blog-related-section {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+}
+
+.blog-post-content-divider {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
 }
 
 .reader-tools {
@@ -332,7 +340,7 @@ h1, h2, h3, h4 {
 .blog-toc {
   position: fixed;
   --blog-toc-gap: 1rem;
-  top: 6.8rem;
+  top: 8.4rem;
   z-index: 30;
   display: none;
   width: 16.25rem;
@@ -429,7 +437,7 @@ h1, h2, h3, h4 {
 .markdown-content h4,
 .markdown-content h5,
 .markdown-content h6 {
-  font-family: var(--font-serif, Georgia, 'Times New Roman', Times, serif);
+  font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
 }
 
 .markdown-content p {
@@ -756,6 +764,46 @@ h1, h2, h3, h4 {
 
 .md-footnote-highlight {
   animation: footnote-highlight-fade 1.8s ease-out;
+}
+
+.markdown-content section[data-footnotes] {
+  margin-top: 2rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  font-size: 0.94em;
+}
+
+.markdown-content section[data-footnotes] h2 {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-hero-subtitle);
+}
+
+.markdown-content section[data-footnotes] ol {
+  margin: 0.5rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.markdown-content section[data-footnotes] li {
+  margin: 0.25rem 0;
+}
+
+.markdown-content section[data-footnotes] li p {
+  margin: 0.2rem 0;
+  line-height: 1.55;
+}
+
+.markdown-content a[data-footnote-backref] {
+  margin-left: 0.35rem;
+  font-size: 0.78em;
+  text-decoration: none;
+  color: color-mix(in srgb, var(--color-fg) 74%, transparent);
+}
+
+.markdown-content a[data-footnote-backref]:hover {
+  text-decoration: underline;
 }
 
 @keyframes footnote-highlight-fade {

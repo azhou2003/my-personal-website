@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { StaticTagList } from "@/components/ui/tags";
 import {
   BackToTopButton,
@@ -62,7 +63,7 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
 
       return new Date(b.post.date).getTime() - new Date(a.post.date).getTime();
     })
-    .slice(0, 3)
+    .slice(0, 2)
     .map((entry) => entry.post);
 
   return (
@@ -72,7 +73,10 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
       <BlogTableOfContents />
       <main className="blog-post-shell mx-auto w-full py-16 px-4">
         <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
-          ← Back to Blog
+          <span className="inline-flex items-center gap-1">
+            <ArrowLeft size={14} aria-hidden="true" />
+            Back to Blog
+          </span>
         </Link>
         <h1 className="text-3xl font-bold mb-2">{data.title || resolvedParams.slug}</h1>
         <div className="blog-post-meta-row mb-6">
@@ -81,13 +85,14 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
             <ShareButton title={data.title || resolvedParams.slug} />
           </div>
         </div>
+        {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
         <div className="blog-post-reader-row mb-8">
           <ReaderPreferences />
         </div>
-        {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="mb-8" />}
+        <div className="blog-post-content-divider mb-8" aria-hidden="true" />
         <MarkdownContent html={content} />
         {relatedPosts.length > 0 && (
-          <section className="mt-14 border-t border-border-light pt-8 dark:border-border-dark">
+          <section className="blog-related-section mt-14 pt-8">
             <h2 className="mb-4 text-lg font-semibold">Related posts</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {relatedPosts.map((related) => (
@@ -109,7 +114,10 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
               href={`/blog/${prevPost.slug}`}
               className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors"
             >
-              ← Previous: {prevPost.title}
+              <span className="inline-flex items-center gap-1">
+                <ArrowLeft size={14} aria-hidden="true" />
+                Previous: {prevPost.title}
+              </span>
             </Link>
           ) : (
             <div />
@@ -119,7 +127,10 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
               href={`/blog/${nextPost.slug}`}
               className="text-accent underline text-base px-2 py-1 rounded hover:bg-accent-yellow/20 transition-colors ml-auto"
             >
-              Next: {nextPost.title} →
+              <span className="inline-flex items-center gap-1">
+                Next: {nextPost.title}
+                <ArrowRight size={14} aria-hidden="true" />
+              </span>
             </Link>
           ) : (
             <div />

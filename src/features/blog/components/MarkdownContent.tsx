@@ -501,6 +501,8 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
           >
             Close
           </button>
+          {/* Keep native img for remote markdown media compatibility in lightbox. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightbox.src}
             alt={lightbox.alt}
