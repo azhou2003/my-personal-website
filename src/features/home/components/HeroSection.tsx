@@ -728,7 +728,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       {isOrbitMenuOpen && (
         <div
           ref={orbitMenuDesktopRef}
-          className="hidden sm:block absolute z-40 right-4 top-1/2 -translate-y-1/2 w-full max-w-md rounded-[1.55rem] border text-foreground-light dark:text-foreground-dark p-4 space-y-3 overflow-x-hidden overflow-y-auto"
+          className="hidden sm:block fixed z-[140] right-2 md:right-3 lg:right-4 top-1/2 -translate-y-1/2 w-[clamp(14.75rem,26vw,22.5rem)] rounded-[1.55rem] border text-foreground-light dark:text-foreground-dark p-4 space-y-3 overflow-x-hidden overflow-y-auto"
           style={{
             background: "var(--color-orbit-menu-bg)",
             borderColor: "var(--color-orbit-menu-border)",

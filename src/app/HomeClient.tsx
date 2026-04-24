@@ -158,12 +158,6 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
     const handleScroll = () => {
       const currentTop = scrollRoot.scrollTop;
 
-      if (!isSnappingRef.current && activeSectionRef.current === "hero" && currentTop > 0) {
-        scrollRoot.scrollTop = 0;
-        setIsScrolled(false);
-        return;
-      }
-
       setIsScrolled(currentTop > 50);
 
       const aboutEl = aboutSectionRef.current;
