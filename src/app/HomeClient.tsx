@@ -174,12 +174,16 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
     };
 
     const handleWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) < 6) return;
-
       if (isSnappingRef.current) {
         event.preventDefault();
         return;
       }
+
+      if (activeSectionRef.current === "hero") {
+        event.preventDefault();
+      }
+
+      if (Math.abs(event.deltaY) < 2) return;
 
       const aboutEl = aboutSectionRef.current;
       if (!aboutEl) return;
@@ -187,7 +191,6 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
       const currentTop = scrollRoot.scrollTop;
 
       if (event.deltaY > 0 && activeSectionRef.current === "hero") {
-        event.preventDefault();
         snapToSection("about");
       } else if (event.deltaY < 0 && activeSectionRef.current === "about" && currentTop <= aboutTop + 96) {
         event.preventDefault();
@@ -284,7 +287,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-[100dvh] min-h-[100svh] overflow-y-auto flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
+      className="h-[100dvh] min-h-[100svh] overflow-y-auto overscroll-y-none flex flex-col bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors"
       style={{ "--home-nav-h": "72px" } as CSSProperties}
     >
       <div
