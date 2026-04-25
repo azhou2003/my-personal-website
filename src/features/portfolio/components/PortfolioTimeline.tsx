@@ -366,7 +366,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
           const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
           const isFocused = isActiveOnMobile || isActiveOnDesktop;
           const rowScale = timelineScaleByIndex[idx] ?? 1;
-          const focusedRowScale = isFocused ? rowScale * 1.04 : rowScale;
+          const focusedRowScale = isFocused ? rowScale * (isMobile ? 1.04 : 1.02) : rowScale;
           const imageSrc = project.images[0] || "/file.svg";
           const isTransparentAsset = /\.(svg|png)(?:\?.*)?$/i.test(imageSrc);
           const imageFitClass = isTransparentAsset ? "object-contain p-3" : "object-cover";
@@ -377,9 +377,9 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
             : "opacity-0 scale-75 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:scale-100 sm:group-focus-within:pointer-events-auto";
 
           const popupPositionClass = isLeft
-            ? "left-full ml-10 origin-left"
-            : "right-full mr-10 origin-right";
-          const desktopInfoPanelClass = `absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[250px] max-w-[80vw] sm:min-w-[300px] sm:max-w-sm rounded-[1.75rem] border p-5 sm:p-6 transition-all duration-300 z-30 flex flex-col items-center text-center ${popupVisibilityClass}`;
+            ? "left-full ml-6 2xl:ml-10 origin-left"
+            : "right-full mr-6 2xl:mr-10 origin-right";
+          const desktopInfoPanelClass = `absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[220px] max-w-[72vw] sm:min-w-[260px] sm:max-w-[20rem] 2xl:min-w-[300px] 2xl:max-w-sm rounded-[1.75rem] border p-4 sm:p-5 2xl:p-6 transition-all duration-300 z-30 flex flex-col items-center text-center ${popupVisibilityClass}`;
           const mobileInfoPanelClass = "relative z-30 rounded-[1.75rem] border p-4 sm:p-5 flex flex-col items-center text-center";
           const infoPanelStyle = {
             background: "var(--color-about-surface-bg)",
@@ -420,7 +420,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
                           aria-label={`Open ${project.title} project`}
                         >
-                          <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 sm:group-hover:scale-105 sm:group-focus-within:scale-105 2xl:group-hover:scale-110 2xl:group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110 sm:scale-105 2xl:scale-110" : ""}`}>
                             {isTransparentAsset && (
                               <>
                                 <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
@@ -437,14 +437,14 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           </div>
                         </a>
                         <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
-                          <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
+                          <h2 className="text-base sm:text-lg 2xl:text-xl font-semibold font-sans mb-2 2xl:mb-3 text-[var(--color-about-surface-title)] leading-tight">
                             {project.title}
                           </h2>
-                          <div className="w-14 border-t-2 border-dotted mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
-                          <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                          <div className="w-12 2xl:w-14 border-t-2 border-dotted mb-2 2xl:mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
+                          <div className="flex flex-wrap gap-2 mb-2 2xl:mb-3 justify-center">
                             <StaticTagList tags={project.tags} className="mb-0 justify-center" />
                           </div>
-                          <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
+                          <p className="text-[0.88rem] 2xl:text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
                             {project.description}
                           </p>
                         </div>
@@ -463,7 +463,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
                           aria-label={`Open ${project.title} project`}
                         >
-                          <div className={`relative w-28 h-20 sm:w-48 sm:h-28 md:w-56 md:h-32 lg:w-64 lg:h-36 xl:w-72 xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110" : ""}`}>
+                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 sm:group-hover:scale-105 sm:group-focus-within:scale-105 2xl:group-hover:scale-110 2xl:group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110 sm:scale-105 2xl:scale-110" : ""}`}>
                             {isTransparentAsset && (
                               <>
                                 <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
@@ -480,14 +480,14 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           </div>
                         </a>
                         <div className={desktopInfoPanelClass} style={infoPanelStyle} tabIndex={-1}>
-                          <h2 className="text-lg sm:text-xl font-semibold font-sans mb-3 text-[var(--color-about-surface-title)] leading-tight">
+                          <h2 className="text-base sm:text-lg 2xl:text-xl font-semibold font-sans mb-2 2xl:mb-3 text-[var(--color-about-surface-title)] leading-tight">
                             {project.title}
                           </h2>
-                          <div className="w-14 border-t-2 border-dotted mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
-                          <div className="flex flex-wrap gap-2 mb-3 justify-center">
+                          <div className="w-12 2xl:w-14 border-t-2 border-dotted mb-2 2xl:mb-3" style={{ borderColor: "var(--color-about-surface-divider)" }} />
+                          <div className="flex flex-wrap gap-2 mb-2 2xl:mb-3 justify-center">
                             <StaticTagList tags={project.tags} className="mb-0 justify-center" />
                           </div>
-                          <p className="text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
+                          <p className="text-[0.88rem] 2xl:text-sm text-foreground-light/95 dark:text-foreground-dark/95 leading-relaxed">
                             {project.description}
                           </p>
                         </div>
