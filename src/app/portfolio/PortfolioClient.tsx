@@ -22,11 +22,14 @@ interface PortfolioClientProps {
   projects: PortfolioProject[];
 }
 
+const MAX_VISIBLE_TAGS = 10;
+
 export default function PortfolioClient({ projects }: PortfolioClientProps) {
   const [search, setSearch] = useState("");
   const [triggerKey, setTriggerKey] = useState(0);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showAllTags, setShowAllTags] = useState(false);
   const normalizedSearch = search.trim().toLowerCase();
 
   const tagFrequency = useMemo(() => getTagFrequency(projects), [projects]);
@@ -38,6 +41,11 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
         return a.localeCompare(b);
       }),
     [projects, tagFrequency]
+  );
+
+  const visibleTags = useMemo(
+    () => (showAllTags ? allTags : allTags.slice(0, MAX_VISIBLE_TAGS)),
+    [allTags, showAllTags]
   );
 
   const filteredProjects = useMemo(
@@ -73,6 +81,13 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((entry) => entry !== tag) : [...prev, tag]
     );
+  };
+
+  const hasActiveFilters = search.length > 0 || selectedTags.length > 0;
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setSelectedTags([]);
   };
 
   return (
@@ -132,16 +147,41 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
       </h1>
 
       <div className="flex justify-center mb-8 w-full">
-        <SearchBar
-          value={search}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
-          placeholder="Search by title or description..."
-        />
+        <div className="relative w-full max-w-md">
+          <SearchBar
+            value={search}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+            placeholder="Search by title or description..."
+            className="pr-10"
+          />
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              aria-label="Clear search and selected tags"
+              className="absolute inset-y-0 right-2 my-auto h-8 w-8 inline-flex items-center justify-center rounded-full text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="w-full max-w-2xl mb-8 flex flex-col items-center">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {allTags.map((tag, index) => (
+      <div className="w-full max-w-3xl mb-8 flex flex-col items-center gap-3">
+        <div className="w-full flex flex-wrap gap-2 justify-center">
+          {visibleTags.map((tag, index) => (
             <Tag
               key={tag}
               label={tag}
@@ -154,6 +194,16 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
             </Tag>
           ))}
         </div>
+
+        {allTags.length > MAX_VISIBLE_TAGS && (
+          <button
+            type="button"
+            onClick={() => setShowAllTags((prev) => !prev)}
+            className="text-xs font-semibold px-3 py-1.5 rounded-full border border-text-secondary/40 text-text-secondary hover:text-text-primary hover:border-text-primary/50 transition-colors"
+          >
+            {showAllTags ? "Show fewer tags" : `Show ${allTags.length - MAX_VISIBLE_TAGS} more tags`}
+          </button>
+        )}
       </div>
 
       <div className="flex justify-center mb-8 w-full">
