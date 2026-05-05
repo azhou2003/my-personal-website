@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Anjie Zhou",
     default: "Home | Anjie Zhou",
   },
-  description: "Software developer passionate about full-stack development, cybersecurity, and AI. Recent Computer Science graduate from Texas A&M.",
+  description: "Software developer passionate about pushing to main. Blog & Portfolio",
 };
 
 export default function RootLayout({
