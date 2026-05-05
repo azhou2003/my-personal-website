@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { List } from "lucide-react";
 
 type TocItem = {
   id: string;
   text: string;
   level: number;
+};
+
+type BlogTableOfContentsProps = {
+  topLabel?: string;
 };
 
 function getHeadings() {
@@ -34,9 +39,16 @@ function getHeadings() {
     .filter((item): item is TocItem => Boolean(item));
 }
 
-export default function BlogTableOfContents() {
+export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfContentsProps) {
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeToc = () => {
+    window.requestAnimationFrame(() => {
+      setIsOpen(false);
+    });
+  };
 
   useEffect(() => {
     const refresh = () => {
@@ -69,8 +81,8 @@ export default function BlogTableOfContents() {
 
       if (candidate) {
         setActiveId(candidate.id);
-      } else if (visible[0]) {
-        setActiveId(visible[0].id);
+      } else {
+        setActiveId("top");
       }
     };
 
@@ -84,20 +96,58 @@ export default function BlogTableOfContents() {
     };
   }, [items]);
 
-  if (items.length < 2) {
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeToc();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
+  if (items.length < 1) {
     return null;
   }
 
+  const tocItems: TocItem[] = [{ id: "top", text: topLabel, level: 2 }, ...items];
+
   return (
-    <aside className="blog-toc pointer-events-none">
-      <div className="blog-toc-panel pointer-events-auto">
+    <>
+      <button
+        type="button"
+        aria-label="Toggle table of contents"
+        aria-expanded={isOpen}
+        aria-controls="blog-toc-nav"
+        className={`blog-toc-mobile-toggle xl:hidden ${isOpen ? "is-open" : ""}`}
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <List size={14} aria-hidden="true" />
+      </button>
+
+      {isOpen && (
+        <div
+          aria-hidden="true"
+          className="blog-toc-overlay xl:hidden"
+          onClick={closeToc}
+        />
+      )}
+
+      <aside className={`blog-toc pointer-events-none ${isOpen ? "is-open" : ""}`}>
+        <div className="blog-toc-panel pointer-events-auto">
         <p className="blog-toc-kicker">On this page</p>
-        <nav aria-label="Table of contents" className="blog-toc-nav">
-          {items.map((item) => (
+          <nav id="blog-toc-nav" aria-label="Table of contents" className="blog-toc-nav">
+            {tocItems.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
               title={item.text}
+              onClick={closeToc}
               className={`blog-toc-link ${activeId === item.id ? "is-active" : ""} ${
                 item.level === 4 ? "is-grandchild" : item.level === 3 ? "is-child" : ""
               }`}
@@ -107,6 +157,7 @@ export default function BlogTableOfContents() {
           ))}
         </nav>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

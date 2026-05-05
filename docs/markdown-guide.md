@@ -184,12 +184,14 @@ Regular inline links remain normal links.
 These work automatically on post pages:
 
 - Reading progress bar at the top
-- Back-to-top button
 - Reading time estimate
 - Heading anchor links copy the section URL
-- Sticky table of contents on large screens (indexes `##`, `###`, and `####` headings)
+- Table of contents with the post title as the first item (links to top), indexing `##`, `###`, and `####` headings
+- Collapsible table of contents toggle on smaller screens (including mobile), opening as an overlay panel
 - Related posts based on shared tags (up to 2 posts; ties break by newer `date` first)
 - Reader preferences (`A-`, `A+`, measure, and line spacing) in a dedicated row below tags (`measure` is hidden on mobile)
+
+`markdown-qa-showcase.md` is available in development and hidden in production (excluded from listings and direct route access).
 
 ## Avoid
 

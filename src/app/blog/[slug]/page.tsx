@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { StaticTagList } from "@/components/ui/tags";
 import {
-  BackToTopButton,
   BlogTableOfContents,
   MarkdownContent,
   ReaderPreferences,
@@ -68,9 +67,9 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
   return (
     <>
       <ReadingProgress />
-      <BackToTopButton />
-      <BlogTableOfContents />
+      <BlogTableOfContents topLabel={data.title || resolvedParams.slug} />
       <main className="blog-post-shell mx-auto w-full py-16 px-4">
+        <div id="top" aria-hidden="true" />
         <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
           <span className="inline-flex items-center gap-1">
             <ArrowLeft size={14} aria-hidden="true" />
