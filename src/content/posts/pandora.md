@@ -2,13 +2,13 @@
 title: "Pandora's Box"
 date: "2026-05-04"
 tags: ["Musings"]
-summary: "Did you know? Pandora's Box was actually Pandora's Ja... Shut the fuck up."
+summary: "Did you know? Pandora's Box was actually Pandora's Ja... Shut up."
 image: "/journal.jpeg"
 ---
 
-As a man in his early 20's finding the person he wants to be, I often reflect on the sequence of experiences that created the person I am today. 
+As a man in his 20's searching for the person he wants to be, I often reflect on the experiences that created the person I am today. 
 
-Today, I am a software engineer who works in the GenAI[^GenAI] space. I enjoy what I do at work, yet, in my personal life, I find myself becoming progressively more disillusioned with the state of Tech. For the vast history of the human race, innovations in technology helped make the average person's life better. Now, it feels like the most prevalent technologies either distract us from what truly matters and/or are created solely as a vehicle for profit. Suffice to say, this was not always my viewpoint. In fact, in my youth, a great sum of my happiness came from digital technology.
+Today, I am a software engineer who works closely with GenAI[^GenAI]. I enjoy what I do; yet, in my personal life, I find myself becoming progressively more disillusioned with the state of Tech. For most of human history, innovations helped make the average person's life better. Now, it feels like the most prevalent technologies either distract us from what truly matters or are created solely as a vehicle for profit. Suffice to say, this was not always my viewpoint. In fact, in my youth, much of my happiness came from digital technology.
 
 ### The Box Opens
 
