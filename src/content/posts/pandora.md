@@ -20,10 +20,6 @@ Around that time, newer iPhones came with this voice assistant, "Siri", that rep
 
 **It bricked my phone.**
 
-...
-
-I felt slighted. 
-
 Whoever published that package probably had a good chuckle at the expense of a child who had *barely* seen his thirteenth summer. After several fruitless attempts at salvaging my phone, I reluctantly accepted the futility. In the end, I factory reset my phone... and promptly went back to tinkering. The experience, albeit discouraging, was one of my first true tastes of technological curiosity. 
 
 And I loved it.
