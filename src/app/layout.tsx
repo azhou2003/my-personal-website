@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { GlobalStars } from "@/components/layout";
 import { ThemeProvider } from "@/components/theme";
@@ -39,6 +40,7 @@ export default function RootLayout({
           <GlobalStars />
           <div className="relative z-10">{children}</div>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
