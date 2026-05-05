@@ -50,7 +50,7 @@ Who will speak for me when *I'm* the one left behind?
 
 Ultimately, my souring relationship with technology may also just be a microcosm of my growing distrust in institutions. Seeing genocides, invasions, and unrelentless greed over and over again in the short 20-or-so years I have been on this Earth has slowly eroded my belief in human good. 
 
-Even so, I hope that my cynical view of modern technology is unfounded. For, as a powerless nobody who unfortunately still has attachments to this world, what else can I do, but hope?
+Even so, I hope that my cynical view of modern technology is unfounded. For, as a nobody who still has attachments to this world, what else can I do, but hope?
 
 [^jailbreak]: Jailbreak - the process of removing software restrictions on apple devices to gain root access. https://en.wikipedia.org/wiki/IOS_jailbreaking
 [^cydia]: Cydia - an app for jailbroken devices that allows you to download software unavailable through the appstore. https://en.wikipedia.org/wiki/Cydia
