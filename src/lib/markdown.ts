@@ -13,6 +13,12 @@ import fs from "fs";
 import type { BlogFrontmatter, BlogMeta } from "./types";
 import { BLOG_POSTS_DIR } from "./contentPaths";
 
+const QA_SHOWCASE_SLUG = "markdown-qa-showcase";
+
+function isQAShowcaseHiddenInCurrentEnv() {
+  return process.env.NODE_ENV === "production";
+}
+
 function estimateReadingTimeMinutes(markdown: string) {
   const plainText = markdown
     .replace(/```[\s\S]*?```/g, " ")
@@ -51,6 +57,10 @@ async function renderMarkdown(content: string) {
 }
 
 export async function getBlogPostBySlug(slug: string) {
+  if (isQAShowcaseHiddenInCurrentEnv() && slug === QA_SHOWCASE_SLUG) {
+    return null;
+  }
+
   const postPath = path.join(BLOG_POSTS_DIR, `${slug}.md`);
   if (!fs.existsSync(postPath)) return null;
 
@@ -79,6 +89,7 @@ export function getAllBlogPosts(): BlogMeta[] {
   const files = fs.readdirSync(BLOG_POSTS_DIR);
   const posts = files
     .filter((file) => file.endsWith(".md"))
+    .filter((file) => !(isQAShowcaseHiddenInCurrentEnv() && file.replace(/\.md$/, "") === QA_SHOWCASE_SLUG))
     .map((file) => {
       const slug = file.replace(/\.md$/, "");
       const fullPath = path.join(BLOG_POSTS_DIR, file);

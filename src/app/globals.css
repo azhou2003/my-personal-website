@@ -405,9 +405,93 @@ h1, h2, h3, h4 {
   );
 }
 
+.blog-toc-mobile-toggle {
+  position: fixed;
+  left: calc(env(safe-area-inset-left, 0px) + 0.8rem);
+  right: auto;
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.9rem);
+  transform: none;
+  z-index: 45;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 92%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 96%, transparent);
+  color: var(--color-fg);
+  border-radius: 999px;
+  padding: 0;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.blog-toc-mobile-toggle.is-open {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+.blog-toc-mobile-toggle:hover,
+.blog-toc-mobile-toggle:focus-visible {
+  color: var(--color-fg);
+  border-color: color-mix(in srgb, var(--color-nav-active) 75%, var(--color-border));
+  background: color-mix(in srgb, var(--color-bg) 100%, transparent);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+.blog-toc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  border: none;
+  background: color-mix(in srgb, #000 36%, transparent);
+}
+
+@media (max-width: 1279px) {
+  .blog-toc {
+    display: block;
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.9rem);
+    left: calc(env(safe-area-inset-left, 0px) + 0.8rem);
+    right: auto;
+    width: min(18rem, calc(100vw - 1.6rem));
+    z-index: 40;
+    opacity: 0;
+    transform: translateY(0.35rem) scale(0.22);
+    transform-origin: 1rem calc(100% - 1rem);
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 200ms cubic-bezier(0.22, 0.9, 0.3, 1);
+  }
+
+  .blog-toc.is-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .blog-toc .blog-toc-panel {
+    border-radius: 0.95rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    background: color-mix(in srgb, var(--color-bg) 95%, transparent);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(10px);
+    padding: 0.75rem 0.72rem;
+    max-height: min(70vh, 31rem);
+    overflow: auto;
+  }
+}
+
 @media (min-width: 1280px) {
   .blog-toc {
     display: block;
+  }
+
+  .blog-toc-mobile-toggle,
+  .blog-toc-overlay {
+    display: none;
   }
 }
 
