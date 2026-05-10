@@ -778,6 +778,12 @@ h1, h2, h3, h4 {
   background: color-mix(in srgb, #d48b30 16%, transparent);
 }
 
+.markdown-content .md-callout-quote {
+  border-left: 0;
+  padding-left: 0;
+  text-align: center;
+}
+
 .markdown-content pre {
   overflow-x: auto;
   border-radius: 0.5rem;

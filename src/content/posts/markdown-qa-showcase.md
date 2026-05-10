@@ -222,6 +222,8 @@ Escaped dollar sign: \$5.
 > [!TIP] This is a tip callout.
 
 > [!WARNING] This is a warning callout.
+
+> [!QUOTE] This is a centered quote.
 ````
 
 ###### render
@@ -231,6 +233,8 @@ Escaped dollar sign: \$5.
 > [!TIP] This is a tip callout.
 
 > [!WARNING] This is a warning callout.
+
+> [!QUOTE] This is a centered quote.
 
 ---
 
