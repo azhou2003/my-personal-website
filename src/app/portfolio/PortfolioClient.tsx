@@ -84,7 +84,6 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
   };
 
   const hasActiveFilters = search.length > 0 || selectedTags.length > 0;
-
   const handleClearFilters = () => {
     setSearch("");
     setSelectedTags([]);
@@ -94,54 +93,75 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
     <main className="flex flex-1 flex-col items-center px-4 py-16 w-full">
       <p className="section-kicker text-center mb-2">My Portfolio</p>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-8 font-sans">
-        <span>From </span>
-        <span className="relative inline-block">
+        <span className="sm:hidden block w-full text-center leading-tight">
+          <span>From </span>
           <span
-            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
-              sortOrder === "desc" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+            className={`transition-colors duration-300 ${
+              sortOrder === "desc" ? "text-[var(--color-portfolio-present)]" : "text-[var(--color-portfolio-past)]"
             }`}
-            style={{
-              position: sortOrder === "desc" ? "static" : "absolute",
-              left: sortOrder === "desc" ? "auto" : "0",
-            }}
           >
-            Present
+            {sortOrder === "desc" ? "Present" : "Past"}
           </span>
+          <span> to </span>
           <span
-            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
-              sortOrder === "asc" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            className={`transition-colors duration-300 ${
+              sortOrder === "desc" ? "text-[var(--color-portfolio-past)]" : "text-[var(--color-portfolio-present)]"
             }`}
-            style={{
-              position: sortOrder === "asc" ? "static" : "absolute",
-              left: sortOrder === "asc" ? "auto" : "0",
-            }}
           >
-            Past
+            {sortOrder === "desc" ? "Past" : "Present"}
           </span>
         </span>
-        <span> to </span>
-        <span className="relative inline-block">
-          <span
-            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
-              sortOrder === "desc" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-            }`}
-            style={{
-              position: sortOrder === "desc" ? "static" : "absolute",
-              left: sortOrder === "desc" ? "auto" : "0",
-            }}
-          >
-            Past
+
+        <span className="hidden sm:inline">
+          <span>From </span>
+          <span className="relative inline-block">
+            <span
+              className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
+                sortOrder === "desc" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+              }`}
+              style={{
+                position: sortOrder === "desc" ? "static" : "absolute",
+                left: sortOrder === "desc" ? "auto" : "0",
+              }}
+            >
+              Present
+            </span>
+            <span
+              className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
+                sortOrder === "asc" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              }`}
+              style={{
+                position: sortOrder === "asc" ? "static" : "absolute",
+                left: sortOrder === "asc" ? "auto" : "0",
+              }}
+            >
+              Past
+            </span>
           </span>
-          <span
-            className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
-              sortOrder === "asc" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
-            }`}
-            style={{
-              position: sortOrder === "asc" ? "static" : "absolute",
-              left: sortOrder === "asc" ? "auto" : "0",
-            }}
-          >
-            Present
+          <span> to </span>
+          <span className="relative inline-block">
+            <span
+              className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-past)] ${
+                sortOrder === "desc" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              }`}
+              style={{
+                position: sortOrder === "desc" ? "static" : "absolute",
+                left: sortOrder === "desc" ? "auto" : "0",
+              }}
+            >
+              Past
+            </span>
+            <span
+              className={`transition-all duration-500 ease-in-out text-[var(--color-portfolio-present)] ${
+                sortOrder === "asc" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+              }`}
+              style={{
+                position: sortOrder === "asc" ? "static" : "absolute",
+                left: sortOrder === "asc" ? "auto" : "0",
+              }}
+            >
+              Present
+            </span>
           </span>
         </span>
       </h1>

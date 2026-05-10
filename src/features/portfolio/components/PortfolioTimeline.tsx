@@ -27,12 +27,20 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const mediaQuery = window.matchMedia("(max-width: 639px)");
-    const updateMobileState = () => setIsMobile(mediaQuery.matches);
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const noHoverQuery = window.matchMedia("(hover: none)");
+    const updateMobileState = () => {
+      setIsMobile(coarsePointerQuery.matches || noHoverQuery.matches);
+    };
 
     updateMobileState();
-    mediaQuery.addEventListener("change", updateMobileState);
-    return () => mediaQuery.removeEventListener("change", updateMobileState);
+    coarsePointerQuery.addEventListener("change", updateMobileState);
+    noHoverQuery.addEventListener("change", updateMobileState);
+
+    return () => {
+      coarsePointerQuery.removeEventListener("change", updateMobileState);
+      noHoverQuery.removeEventListener("change", updateMobileState);
+    };
   }, []);
 
   useEffect(() => {
@@ -349,7 +357,10 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
   }, [projects]);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto py-16 flex justify-center overflow-x-visible">
+    <div
+      className="relative w-full max-w-4xl mx-auto py-16 flex justify-center"
+      style={{ overflowX: isMobile ? "hidden" : "visible" }}
+    >
       <div
         className="absolute left-1/2 top-0 bottom-0 w-1 bg-[var(--color-timeline-line)] -translate-x-1/2 z-0"
         style={{ minHeight: "100%" }}
@@ -365,8 +376,8 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
           const isActiveOnMobile = isMobile && activeMobileIndex === idx;
           const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
           const isFocused = isActiveOnMobile || isActiveOnDesktop;
-          const rowScale = timelineScaleByIndex[idx] ?? 1;
-          const focusedRowScale = isFocused ? rowScale * (isMobile ? 1.04 : 1.02) : rowScale;
+          const rowScale = isMobile ? 1 : (timelineScaleByIndex[idx] ?? 1);
+          const focusedRowScale = isFocused ? rowScale * (isMobile ? 1 : 1.02) : rowScale;
           const imageSrc = project.images[0] || "/file.svg";
           const isTransparentAsset = /\.(svg|png)(?:\?.*)?$/i.test(imageSrc);
           const imageFitClass = isTransparentAsset ? "object-contain p-3" : "object-cover";
@@ -379,8 +390,12 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
           const popupPositionClass = isLeft
             ? "left-full ml-6 2xl:ml-10 origin-left"
             : "right-full mr-6 2xl:mr-10 origin-right";
-          const desktopInfoPanelClass = `absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[220px] max-w-[72vw] sm:min-w-[260px] sm:max-w-[20rem] 2xl:min-w-[300px] 2xl:max-w-sm rounded-[1.75rem] border p-4 sm:p-5 2xl:p-6 transition-all duration-300 z-30 flex flex-col items-center text-center ${popupVisibilityClass}`;
+          const desktopInfoPanelClass = `${isMobile ? "hidden" : "flex"} absolute top-1/2 ${popupPositionClass} -translate-y-1/2 min-w-[220px] max-w-[72vw] sm:min-w-[260px] sm:max-w-[20rem] 2xl:min-w-[300px] 2xl:max-w-sm rounded-[1.75rem] border p-4 sm:p-5 2xl:p-6 transition-all duration-300 z-30 flex-col items-center text-center ${popupVisibilityClass}`;
           const mobileInfoPanelClass = "relative z-30 rounded-[1.75rem] border p-4 sm:p-5 flex flex-col items-center text-center";
+          const focusedImageScaleClass = isFocused && !isMobile ? "scale-110 sm:scale-105 2xl:scale-110" : "";
+          const interactiveImageScaleClass = isMobile
+            ? "sm:group-hover:scale-105 2xl:group-hover:scale-110"
+            : "group-hover:scale-110 group-focus-within:scale-110 sm:group-hover:scale-105 sm:group-focus-within:scale-105 2xl:group-hover:scale-110 2xl:group-focus-within:scale-110";
           const infoPanelStyle = {
             background: "var(--color-about-surface-bg)",
             borderColor: "var(--color-about-surface-border)",
@@ -420,7 +435,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
                           aria-label={`Open ${project.title} project`}
                         >
-                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 sm:group-hover:scale-105 sm:group-focus-within:scale-105 2xl:group-hover:scale-110 2xl:group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110 sm:scale-105 2xl:scale-110" : ""}`}>
+                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 ${interactiveImageScaleClass} cursor-pointer z-10 ${focusedImageScaleClass}`}>
                             {isTransparentAsset && (
                               <>
                                 <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
@@ -463,7 +478,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                           className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow rounded-md"
                           aria-label={`Open ${project.title} project`}
                         >
-                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-focus-within:scale-110 sm:group-hover:scale-105 sm:group-focus-within:scale-105 2xl:group-hover:scale-110 2xl:group-focus-within:scale-110 cursor-pointer z-10 ${isFocused ? "scale-110 sm:scale-105 2xl:scale-110" : ""}`}>
+                          <div className={`relative w-28 h-20 sm:w-44 sm:h-26 md:w-52 md:h-30 lg:w-[14.5rem] lg:h-[8.5rem] xl:w-64 xl:h-36 2xl:w-72 2xl:h-40 max-w-full mx-3 sm:mx-0 ${imageContainerRadiusClass} shadow-lg overflow-hidden transition-transform duration-300 ${interactiveImageScaleClass} cursor-pointer z-10 ${focusedImageScaleClass}`}>
                             {isTransparentAsset && (
                               <>
                                 <div className="absolute inset-0 bg-[var(--color-card-muted-bg)]" aria-hidden="true" />
@@ -501,7 +516,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 </div>
               </div>
               <div
-                className={`sm:hidden transition-all duration-300 ease-out overflow-hidden ${
+                className={`${isMobile ? "" : "hidden"} transition-all duration-300 ease-out overflow-hidden ${
                   isActiveOnMobile
                     ? "max-h-64 opacity-100 translate-y-0 mt-3"
                     : "max-h-0 opacity-0 -translate-y-2 mt-0 pointer-events-none"
