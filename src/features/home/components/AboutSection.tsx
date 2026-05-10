@@ -7,11 +7,12 @@ import type { AboutSlide, AboutSlideLink } from "@/lib/types";
 
 interface AboutSectionProps {
   isExpanded: boolean;
-  animateIn?: boolean; // new prop for initial load animation
+  animateIn?: boolean;
   slides?: AboutSlide[];
   activeSlideIndex?: number;
   onActiveSlideIndexChange?: (index: number) => void;
   isActive?: boolean;
+  prefersReducedMotion?: boolean;
 }
 
 const AboutSection: React.FC<AboutSectionProps> = ({
@@ -21,6 +22,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   activeSlideIndex,
   onActiveSlideIndexChange,
   isActive = true,
+  prefersReducedMotion = false,
 }) => {
   const [showCompactText, setShowCompactText] = React.useState(!isExpanded);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -30,6 +32,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const slideNavUnlockTimerRef = React.useRef<number | null>(null);
   const isActiveRef = React.useRef(isActive);
   const readFullTriggerRefs = React.useRef<Record<string, HTMLButtonElement | null>>({});
+  const slideRefs = React.useRef<Array<HTMLElement | null>>([]);
 
   const defaultSlideLinks: AboutSlideLink[] = [
     {
@@ -83,11 +86,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [aboutSlides.length, resolvedActiveSlideIndex, setResolvedActiveSlideIndex]);
 
   const getSlideElements = React.useCallback(() => {
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) return [];
-    const trackEl = scrollEl.firstElementChild as HTMLElement | null;
-    if (!trackEl) return [];
-    return Array.from(trackEl.querySelectorAll<HTMLElement>("[data-about-slide]"));
+    return slideRefs.current.filter((slide): slide is HTMLElement => slide !== null);
   }, []);
 
   const getClosestSlideIndex = React.useCallback(() => {
@@ -180,7 +179,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
   React.useEffect(() => {
     if (!isExpanded && animateIn) {
-      // Only delay on initial load
       const timer = setTimeout(() => setShowCompactText(true), 2000);
       return () => clearTimeout(timer);
     } else {
@@ -202,15 +200,41 @@ const AboutSection: React.FC<AboutSectionProps> = ({
       typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches;
     if (isControlled && !allowControlledScrollSync) return;
 
+    const slideEls = getSlideElements();
+    if (slideEls.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bestIndex: number | null = null;
+        let bestRatio = 0;
+
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const index = slideEls.indexOf(entry.target as HTMLElement);
+          if (index < 0) return;
+          if (entry.intersectionRatio >= bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestIndex = index;
+          }
+        });
+
+        if (bestIndex !== null && bestRatio >= 0.55) {
+          setResolvedActiveSlideIndex(bestIndex);
+        }
+      },
+      {
+        root: scrollEl,
+        threshold: [0.55, 0.7, 0.9],
+      }
+    );
+
+    slideEls.forEach((slideEl) => observer.observe(slideEl));
     updateActiveSlideIndex();
-    scrollEl.addEventListener("scroll", updateActiveSlideIndex, { passive: true });
-    window.addEventListener("resize", updateActiveSlideIndex);
 
     return () => {
-      scrollEl.removeEventListener("scroll", updateActiveSlideIndex);
-      window.removeEventListener("resize", updateActiveSlideIndex);
+      observer.disconnect();
     };
-  }, [isExpanded, isActive, activeSlideIndex, updateActiveSlideIndex]);
+  }, [isExpanded, isActive, activeSlideIndex, getSlideElements, setResolvedActiveSlideIndex, updateActiveSlideIndex]);
 
   React.useEffect(() => {
     if (!isExpanded) return;
@@ -347,6 +371,17 @@ const AboutSection: React.FC<AboutSectionProps> = ({
           line-height: 1.15;
           animation: gradient 6s ease infinite;
         }
+        .gradient-text-name-static {
+          display: inline;
+          color: var(--color-gradient-text-fallback);
+          background: var(--color-about-gradient);
+          background-size: 300% 100%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          padding-bottom: 0.08em;
+          line-height: 1.15;
+        }
         .about-mobile-description-preview {
           display: -webkit-box;
           -webkit-box-orient: vertical;
@@ -402,7 +437,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
           className="overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-proximity pb-2 sm:pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="grid grid-flow-col auto-cols-[100%] gap-3 sm:gap-5 lg:gap-6">
-            {aboutSlides.map((slide, index) => {
+                {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
               const isCurrentSlide = index === resolvedActiveSlideIndex;
               const currentSlideLabel = String(index + 1).padStart(2, "0");
@@ -421,12 +456,19 @@ const AboutSection: React.FC<AboutSectionProps> = ({
               const midShadowPercent = Math.round(baseShadowOpacity * 82);
               const softShadowPercent = Math.round(baseShadowOpacity * 66);
               const textureShadowPercent = Math.round(baseShadowOpacity * 28);
+              const shouldRenderHeavyDecor = Math.abs(index - resolvedActiveSlideIndex) <= 1;
+              const shouldAnimateGradient =
+                !prefersReducedMotion && isCurrentSlide && isActive && isExpanded;
 
               return (
                 <div
                   key={slide.id}
                   data-about-slide
+                  ref={(node) => {
+                    slideRefs.current[index] = node;
+                  }}
                   className={`snap-center snap-always px-1.5 sm:px-2.5 py-4 sm:py-5 lg:py-0 min-h-[calc(100dvh-var(--home-nav-h,72px))] lg:min-h-0 flex items-center justify-center transition-opacity duration-300 ease-out ${isCurrentSlide ? "sm:opacity-100" : "sm:opacity-90"}`}
+                  style={{ contentVisibility: "auto", containIntrinsicSize: "680px" } as React.CSSProperties}
                 >
                   <div className="relative isolate w-full max-w-[24rem] sm:max-w-[31rem] lg:max-w-none mx-auto lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-center lg:gap-0 xl:gap-1">
                     <div className="hidden lg:flex lg:justify-center lg:translate-x-8 xl:translate-x-10 lg:relative lg:z-20">
@@ -522,7 +564,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                           borderColor: "var(--color-about-surface-border)",
                         }}
                       >
-                        {slide.imageSrc && (
+                        {slide.imageSrc && shouldRenderHeavyDecor && (
                           <>
                             <div
                               aria-hidden="true"
@@ -567,7 +609,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             <h2 className="text-[1.52rem] sm:text-4xl lg:text-[2.6rem] font-bold mb-1.5 sm:mb-4 pb-[0.04em] text-[var(--color-about-surface-title)] leading-[1.1]">
                               {index === 0 ? (
                                 <>
-                                  Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
+                                  Hey, I&apos;m <span className={shouldAnimateGradient ? "gradient-text-name" : "gradient-text-name-static"}>Anjie</span>.
                                 </>
                               ) : (
                                 slide.title
@@ -583,7 +625,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             <h2 className="text-[1.7rem] sm:text-4xl lg:text-[2.7rem] font-bold mb-3 sm:mb-4 pb-[0.06em] text-[var(--color-about-surface-title)] leading-[1.1]">
                               {index === 0 ? (
                                 <>
-                                  Hey, I&apos;m <span className="gradient-text-name">Anjie</span>.
+                                  Hey, I&apos;m <span className={shouldAnimateGradient ? "gradient-text-name" : "gradient-text-name-static"}>Anjie</span>.
                                 </>
                               ) : (
                                 slide.title

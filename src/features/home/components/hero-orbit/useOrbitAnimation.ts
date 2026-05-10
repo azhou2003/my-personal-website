@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ORBIT_ANIMATION } from "@/lib/motion";
-import { type OrbitConfig, type OrbitDimensions } from "./types";
+import { useCallback, useEffect, useState } from "react";
+import { type OrbitDimensions } from "./types";
 
 const getDefaultOrbitDimensions = (): OrbitDimensions => ({
   radiusX: 260,
@@ -41,18 +40,10 @@ const getResponsiveOrbitDimensions = (): OrbitDimensions => {
   };
 };
 
-interface UseOrbitAnimationArgs {
-  animateOrbit: boolean;
-  orbitConfig: OrbitConfig;
-}
-
-export function useOrbitAnimation({ animateOrbit, orbitConfig }: UseOrbitAnimationArgs) {
-  const [earthAnimatedAngle, setEarthAnimatedAngle] = useState(0);
-  const [marsAnimatedAngle, setMarsAnimatedAngle] = useState(0);
+export function useOrbitAnimation() {
   const [isClient, setIsClient] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [dimensions, setDimensions] = useState<OrbitDimensions>(getDefaultOrbitDimensions);
-  const lastTimestampRef = useRef<number | null>(null);
 
   const updateDimensions = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -81,50 +72,9 @@ export function useOrbitAnimation({ animateOrbit, orbitConfig }: UseOrbitAnimati
     };
   }, [updateDimensions]);
 
-  useEffect(() => {
-    if (!animateOrbit) {
-      lastTimestampRef.current = null;
-      return;
-    }
-
-    let rafId = 0;
-    const tick = (timestamp: number) => {
-      const prevTimestamp = lastTimestampRef.current;
-      lastTimestampRef.current = timestamp;
-
-      if (prevTimestamp !== null) {
-        const deltaSeconds = (timestamp - prevTimestamp) / 1000;
-        const baseDeltaDegrees = ORBIT_ANIMATION.baseDegreesPerSecond * deltaSeconds;
-
-        setEarthAnimatedAngle((prev) => (prev + baseDeltaDegrees * orbitConfig.earth.speedMultiplier) % 360);
-        setMarsAnimatedAngle((prev) => (prev + baseDeltaDegrees * orbitConfig.mars.speedMultiplier) % 360);
-      }
-
-      rafId = window.requestAnimationFrame(tick);
-    };
-
-    rafId = window.requestAnimationFrame(tick);
-    return () => {
-      window.cancelAnimationFrame(rafId);
-      lastTimestampRef.current = null;
-    };
-  }, [animateOrbit, orbitConfig.earth.speedMultiplier, orbitConfig.mars.speedMultiplier]);
-
-  const earthAngle = useMemo(
-    () => (animateOrbit ? (earthAnimatedAngle + orbitConfig.earth.baseAngle) % 360 : orbitConfig.earth.baseAngle),
-    [animateOrbit, earthAnimatedAngle, orbitConfig.earth.baseAngle]
-  );
-
-  const marsAngle = useMemo(
-    () => (animateOrbit ? (marsAnimatedAngle + orbitConfig.mars.baseAngle) % 360 : orbitConfig.mars.baseAngle),
-    [animateOrbit, marsAnimatedAngle, orbitConfig.mars.baseAngle]
-  );
-
   return {
     dimensions,
     isClient,
     isSceneReady,
-    earthAngle,
-    marsAngle,
   };
 }
