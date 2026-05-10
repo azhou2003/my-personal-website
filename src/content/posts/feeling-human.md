@@ -1,7 +1,7 @@
 ---
 title: "The Search for Humanity"
 date: "2026-04-13"
-tags: ["Musings"]
+tags: ["Musing", "Individuality", "Writing"]
 summary: "It ends here."
 image: "/journal.jpeg"
 ---
@@ -14,10 +14,10 @@ However, if I were to describe something as feeling "human", it wouldn't be... t
 - that song that everyone hates, but you secretly like.
 - a mother who loves her child, despite all their shortcomings.
 
-Perfect may be the goal, but all the charm is in imperfection. 
+Perfect may be the goal, but all the charm is found in imperfection. 
 
-All this to say, when I scroll past LinkedIn&trade; post after LinkedIn&trade; post, all perfectly written, where if I were to cover the author, I couldn't, for the life of me, be able to tell who wrote it, a part of me is disappointed.
+So, when I scroll past LinkedIn&trade; post after LinkedIn&trade; post, all perfectly written, where if I were to cover the author, I couldn't for the life of me tell who wrote it... part of me is disappointed.
 
-I have always been envious of people who are great orators or great writers. Whenever I have an interesting thought, I seldom have the finesse to articulate it well. At least with writing, I can take my time. When I started journaling years ago, I would rewrite over and over again — crossing out words, rephrasing entire paragraphs — frustrated at my inability to organize my thoughts coherently. When all was said and done, in spite of all the effort, something always felt a little off.
+I have always been envious of people who are great orators or great writers. Whenever I have an interesting thought, I rarely have the finesse to articulate it well. At least with writing, I can take my time. When I started journaling years ago, I would rewrite over and over again — crossing out words, rephrasing entire paragraphs — frustrated at my inability to organize my thoughts coherently. When all was said and done, in spite of all the effort, something always felt a little off.
 
 But now, I appreciate those imperfections a little more. This doesn't mean I no longer want to become a better writer. I hope that one day I'll become a great writer. But when that happens, I hope there will always be something lost translating an idea into actuality. At the end of the day, that gap between my writing and perfection is *me*.
