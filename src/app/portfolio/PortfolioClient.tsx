@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { FaChevronDown } from "react-icons/fa";
 import { SearchBar, SortSwitch } from "@/components/ui";
 import { accentClasses } from "@/components/ui/styles";
 import { Tag } from "@/components/ui/tags";
@@ -219,9 +220,14 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
           <button
             type="button"
             onClick={() => setShowAllTags((prev) => !prev)}
-            className="text-xs font-semibold px-3 py-1.5 rounded-full border border-text-secondary/40 text-text-secondary hover:text-text-primary hover:border-text-primary/50 transition-colors"
+            className="inline-flex items-center justify-center p-1 text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow/60 rounded-sm"
+            aria-expanded={showAllTags}
+            aria-label={showAllTags ? "Show fewer tags" : "Show more tags"}
           >
-            {showAllTags ? "Show fewer tags" : `Show ${allTags.length - MAX_VISIBLE_TAGS} more tags`}
+            <FaChevronDown
+              className={`h-3.5 w-3.5 transition-transform duration-200 ${showAllTags ? "rotate-180" : "rotate-0"}`}
+              aria-hidden="true"
+            />
           </button>
         )}
       </div>

@@ -207,11 +207,12 @@ function applyImageFigureEnhancements(article: HTMLElement) {
 }
 
 function applyCallouts(article: HTMLElement) {
-  const markers: Record<string, CalloutVariant> = {
+  const markers: Record<string, CalloutVariant | "quote"> = {
     "[!NOTE]": "note",
     "[!TIP]": "tip",
     "[!WARNING]": "warning",
     "[!WARN]": "warning",
+    "[!QUOTE]": "quote",
   };
 
   article.querySelectorAll("blockquote").forEach((node) => {
@@ -228,10 +229,15 @@ function applyCallouts(article: HTMLElement) {
     }
 
     const variant = markers[matchedMarker];
-    blockquote.classList.add("md-callout", `md-callout-${variant}`);
+    if (variant === "quote") {
+      blockquote.classList.add("md-callout-quote");
+    } else {
+      blockquote.classList.add("md-callout", `md-callout-${variant}`);
+    }
 
-    const withoutMarker = text.slice(matchedMarker.length).trim();
-    firstParagraph.textContent = withoutMarker;
+    const escapedMarker = matchedMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const markerPattern = new RegExp(`^\\s*${escapedMarker}\\s*`);
+    firstParagraph.innerHTML = firstParagraph.innerHTML.replace(markerPattern, "");
   });
 }
 
