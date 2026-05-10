@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { buildOrbitRenderData, clamp, getOrbit3DPosition, getOrbitRadii } from "./hero-orbit/math";
+import { buildOrbitRenderData, clamp, getOrbitRadii } from "./hero-orbit/math";
 import {
-  ORBIT_CENTER,
   ORBIT_CONTROL_FIELDS,
   PORTRAIT_CUTOFF,
   getDefaultOrbitConfig,
   type OrbitSpec,
-  type Position3D,
 } from "./hero-orbit/types";
+import OrbitPlanets from "./hero-orbit/OrbitPlanets";
 import { useOrbitAnimation } from "./hero-orbit/useOrbitAnimation";
 
 const ORBIT_CONTROL_FIELD_MAP = new Map(ORBIT_CONTROL_FIELDS.map((field) => [field.key, field] as const));
 
-const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = false }) => {
+const HeroSection: React.FC<{ animateOrbit?: boolean; isActive?: boolean; prefersReducedMotion?: boolean }> = ({
+  animateOrbit = false,
+  isActive = true,
+  prefersReducedMotion = false,
+}) => {
   const [isOrbitMenuOpen, setIsOrbitMenuOpen] = useState(false);
   const [activePlanetTab, setActivePlanetTab] = useState<"earth" | "mars">("earth");
   const [activeSliderId, setActiveSliderId] = useState<string | null>(null);
@@ -27,10 +30,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
   const orbitMenuDesktopRef = React.useRef<HTMLDivElement>(null);
   const portraitButtonRef = React.useRef<HTMLButtonElement>(null);
 
-  const { dimensions, isClient, isSceneReady, earthAngle, marsAngle } = useOrbitAnimation({
-    animateOrbit,
-    orbitConfig,
-  });
+  const { dimensions, isClient, isSceneReady } = useOrbitAnimation();
 
   const { earthRadiusX, earthRadiusY, marsRadiusX, marsRadiusY } = useMemo(
     () => getOrbitRadii(dimensions, orbitConfig),
@@ -202,22 +202,6 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
 
   const isMobileSliderFocusMode = activeSliderId !== null;
 
-  const earthPos = getOrbit3DPosition(
-    ORBIT_CENTER,
-    earthRadiusX,
-    earthRadiusY,
-    earthAngle,
-    orbitConfig.earth.rotation,
-    orbitConfig.earth.inclination
-  );
-  const marsPos = getOrbit3DPosition(
-    ORBIT_CENTER,
-    marsRadiusX,
-    marsRadiusY,
-    marsAngle,
-    orbitConfig.mars.rotation,
-    orbitConfig.mars.inclination
-  );
   const renderOrbitControlFields = (planet: "earth" | "mars", dimNonActive = false) => (
     <>
       {ORBIT_CONTROL_FIELDS.map((field) => {
@@ -469,30 +453,6 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
       </button>
     </>
   );
-  const renderPlanet = (pos: Position3D, planetTexture: string, rotationSpeed: number) => (
-    <div
-      className="absolute"
-      style={{
-        left: `calc(50% + ${pos.x}px)`,
-        top: `calc(${sceneCenterY} + ${pos.y}px)`,
-        transform: "translate(-50%, -50%)",
-        zIndex: pos.z >= 0 ? 25 : 5, // Dynamic z-index based on position
-      }}
-    >
-      <div 
-        className="rounded-full shadow-xl bg-cover bg-center"
-        style={{
-          width: `${dimensions.planetSize}px`,
-          height: `${dimensions.planetSize}px`,
-          backgroundImage: `url('${planetTexture}')`,
-          backgroundSize: "300% 100%",
-          backgroundPosition: "0% center",
-          backgroundRepeat: "repeat-x",
-          animation: rotationSpeed > 0 ? `earthSpin ${8 / rotationSpeed}s linear infinite` : "none"
-        }}
-      />
-    </div>
-  );
   const maxOrbitRadius = Math.max(earthRadiusX, earthRadiusY, marsRadiusX, marsRadiusY);
   const svgSize = Math.max(Math.floor(maxOrbitRadius * 2.9), 460);
   const halfSvgSize = svgSize / 2;
@@ -517,7 +477,7 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
 
   return (
     <section
-      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden will-change-transform transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`relative flex items-center justify-center w-full h-full min-h-0 p-2 sm:p-4 m-0 overflow-hidden will-change-transform [contain:layout_paint_style] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isSceneReady ? "opacity-100 scale-100" : "opacity-0 scale-[0.965]"
       }`}
     >
@@ -571,13 +531,17 @@ const HeroSection: React.FC<{ animateOrbit?: boolean }> = ({ animateOrbit = fals
         </svg>
       )}
 
-      <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(earthPos, '/earthy-earth.jpg', orbitConfig.earth.rotationSpeed)}
-      </div>
-
-      <div className="absolute w-full h-full top-0 left-0 pointer-events-none">
-        {renderPlanet(marsPos, '/earthy-mars.jpg', orbitConfig.mars.rotationSpeed)}
-      </div>
+      <OrbitPlanets
+        animateOrbit={animateOrbit}
+        isActive={isActive}
+        prefersReducedMotion={prefersReducedMotion}
+        dimensions={dimensions}
+        orbitConfig={orbitConfig}
+        earthRadiusX={earthRadiusX}
+        earthRadiusY={earthRadiusY}
+        marsRadiusX={marsRadiusX}
+        marsRadiusY={marsRadiusY}
+      />
       <div
         className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-[6]"
         style={{

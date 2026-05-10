@@ -19,6 +19,8 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   const [showToMyWorld, setShowToMyWorld] = useState(false);
   const [startOrbit, setStartOrbit] = useState(false);
   const [activeAboutSlideIndex, setActiveAboutSlideIndex] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
   const aboutSectionRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
@@ -90,7 +92,27 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
   }, [activeSection]);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener("change", updatePreference);
+    return () => {
+      mediaQuery.removeEventListener("change", updatePreference);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleVisibility = () => setIsPageVisible(!document.hidden);
+    handleVisibility();
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
     if (activeSection !== "hero" || aboutSlides.length === 0) return;
+    if (!isPageVisible || prefersReducedMotion) return;
 
     const intervalId = window.setInterval(() => {
       setActiveAboutSlideIndex((prev) => (prev + 1) % aboutSlides.length);
@@ -99,7 +121,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [activeSection, aboutSlides.length]);
+  }, [activeSection, aboutSlides.length, isPageVisible, prefersReducedMotion]);
 
   useEffect(() => {
     const scrollRoot = scrollContainerRef.current;
@@ -268,15 +290,22 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
 
   // Staggered text animation on mount
   useEffect(() => {
-    const timer1 = setTimeout(() => setShowWelcome(true), HOME_ANIMATION_TIMINGS.welcomeDelayMs);
-    const timer2 = setTimeout(() => setShowToMyWorld(true), HOME_ANIMATION_TIMINGS.toMyWorldDelayMs);
-    const timer3 = setTimeout(() => setStartOrbit(true), HOME_ANIMATION_TIMINGS.orbitStartDelayMs);
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, []);
+      if (prefersReducedMotion) {
+        setShowWelcome(true);
+        setShowToMyWorld(true);
+        setStartOrbit(false);
+        return;
+      }
+
+      const timer1 = setTimeout(() => setShowWelcome(true), HOME_ANIMATION_TIMINGS.welcomeDelayMs);
+      const timer2 = setTimeout(() => setShowToMyWorld(true), HOME_ANIMATION_TIMINGS.toMyWorldDelayMs);
+      const timer3 = setTimeout(() => setStartOrbit(true), HOME_ANIMATION_TIMINGS.orbitStartDelayMs);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+  }, [prefersReducedMotion]);
 
   return (
     <div
@@ -303,7 +332,11 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
               : "opacity-100 translate-y-0"
           }`}
         >
-          <HeroSection animateOrbit={startOrbit} />
+          <HeroSection
+            animateOrbit={startOrbit}
+            isActive={activeSection === "hero" && isPageVisible}
+            prefersReducedMotion={prefersReducedMotion}
+          />
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-background-light/45 dark:to-background-dark/55 z-30" />
           <HomeHeroHeading showWelcome={showWelcome} showToMyWorld={showToMyWorld} />
         </section>
@@ -323,6 +356,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
             slides={aboutSlides}
             activeSlideIndex={activeAboutSlideIndex}
             isActive={activeSection === "hero"}
+            prefersReducedMotion={prefersReducedMotion}
           />
         </div>
 
@@ -339,6 +373,7 @@ export default function HomeClient({ aboutSlides }: HomeClientProps) {
             activeSlideIndex={activeAboutSlideIndex}
             onActiveSlideIndexChange={setActiveAboutSlideIndex}
             isActive={activeSection === "about"}
+            prefersReducedMotion={prefersReducedMotion}
           />
         </section>
 
