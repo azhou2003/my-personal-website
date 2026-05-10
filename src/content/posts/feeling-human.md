@@ -1,7 +1,7 @@
 ---
 title: "The Search for Humanity"
 date: "2026-04-13"
-tags: ["Musing", "Individuality", "Writing"]
+tags: ["Musings", "Individuality", "Writing", "poop", "pee", "poopee"]
 summary: "It ends here."
 image: "/journal.jpeg"
 ---
