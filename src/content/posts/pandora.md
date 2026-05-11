@@ -1,26 +1,26 @@
 ---
 title: "Pandora's Box"
 date: "2026-05-04"
-tags: ["Musings", "Ramblings", "Tech", "Retrospective", "Introspective"]
+tags: ["Musings", "Tech", "Introspective", "Writing"]
 summary: "Did you know? Pandora's Box was actually Pandora's Ja... Shut up."
 image: "/journal.jpeg"
 ---
 
 As a man in his 20's searching for the person he wants to be, I often reflect on the experiences that created who I am today. 
 
-Today, I am a software engineer. I enjoy what I do, yet in my personal life, I find myself becoming progressively more disillusioned with the state of Tech. For much of human history, innovations offered a pathway for people to improve their lives. Now, it feels like the most prevalent technologies either distract us from what truly matters or are just a vehicle for profit. Suffice it to say, this was not always my viewpoint. In fact, in my youth, a lot of my happiness stemmed from digital technology.
+Today, I am a software engineer. I enjoy what I do, yet in my personal life, I find myself becoming progressively more disillusioned with the state of Tech. For much of human history, innovations offered a pathway for people to improve their lives. Now, it feels like the most prevalent technologies either distract us from what truly matters or are a vehicle for profit. Suffice it to say, this was not always my viewpoint. In fact, in my youth, a lot of my happiness stemmed from digital technology.
 
 ### The Box Opens
 
-When I was twelve, I discovered how to jailbreak[^jailbreak] my iPhone 4. That very night, instead of sleeping, I spent hours under my blanket tinkering with the design of the home screen. My child self was overwhelmed by the seemingly infinite possibilities at my fingertips. The following day, my poor decision caught up to me as I struggled to peel my eyes open in class. Unsurprisingly, this feeble consequence did not deter me from pursuing my new obsession. Whether it be on the car ride home, at church, or wherever I found myself to be, I would spend all my time browsing Cydia[^cydia], looking for cool packages to try. Unbeknownst to little Anjie, the honeymoon period was soon to end. 
+When I was twelve, I discovered how to jailbreak[^jailbreak] my iPhone 4. That very night, instead of sleeping, I spent hours under my blanket tinkering with the design of the home screen. My child self was overwhelmed by the seemingly infinite possibilities at my fingertips. The following morning, my poor decision caught up to me as I struggled to peel my eyes open in class. Unsurprisingly, this feeble consequence did not deter me from pursuing my new obsession. Whether it be on the car ride home, at church, or wherever I found myself to be, I would spend all my time browsing Cydia[^cydia], looking for cool packages to try. Unbeknownst to little Anjie, the honeymoon period was soon to end. 
 
-Around that time, newer iPhones shipped with a voice assistant, "Siri", that replaced the Voice Controls interface their predecessors had. Wanting this new feature for myself, I browsed relentlessly for packages, and finally found one. I instantly clicked install.
+Around that time, newer iPhones shipped with a voice assistant, "Siri", that replaced the Voice Controls interface their predecessors had. Wanting to try this new feature for myself, I browsed relentlessly for packages. Finally, I found one and instantly clicked install.
 
 > [!QUOTE] ...
 
 > [!QUOTE] **It bricked my phone.**
 
-I was devastated. Whoever published that package probably had a good chuckle at the expense of a child who had *barely* seen his thirteenth summer. After several fruitless attempts at salvaging my phone, I reluctantly accepted the futility. In the end, I factory reset my phone... and without skipping a beat, promptly went back to tinkering. The experience, albeit discouraging, was one of my first true tastes of technological curiosity. 
+I was devastated. Whoever published that package probably had a good chuckle at the expense of a child who had *barely* seen his thirteenth summer. After several fruitless attempts at salvaging my phone, I reluctantly accepted the futility. In the end, I factory reset my phone... and, without skipping a beat, promptly went back to tinkering. The experience, albeit discouraging, was one of my first true tastes of technological curiosity. 
 
 And I loved it.
 
