@@ -16,6 +16,7 @@ I walk outside on a cold winter morning. The chilling wind hits like needles on 
 
 Notes:
 
+I'm young and dumb, but in my own way, im searching
 Themes of passage of time
 Themes of finding strength in hard times (perseverence)\
 How the song continues to resonate with me more and more over time. 
