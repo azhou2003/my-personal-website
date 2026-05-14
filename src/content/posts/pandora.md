@@ -1,7 +1,7 @@
 ---
 title: "Pandora's Box"
 date: "2026-05-04"
-tags: ["Musings", "Tech", "Introspective", "Writing"]
+tags: ["Opinion", "Tech"]
 summary: "Did you know? Pandora's Box was actually Pandora's Ja... Shut up."
 image: "/journal.jpeg"
 ---

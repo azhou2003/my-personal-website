@@ -1,7 +1,7 @@
 ---
 title: "Even Children Get Older"
 date: "2026-05-10"
-tags: ["Musings", "Writing"]
+tags: ["Musings"]
 summary: ""
 image: "/journal.jpeg"
 ---
