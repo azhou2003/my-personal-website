@@ -22,20 +22,6 @@ My ruminations end abruptly as my mom exits the house and unlocks the car door. 
 
 ---
 
-In summer camp many moons ago, I went on a field trip to watch the new *Spy Kids* movie. I don't remember much from that movie anymore, but I do recall, during the climax, there was a passing of the torch moment when the protagonists of the original trilogy made a cameo to give advice to the new guard: 
-
-> [!QUOTE] *"Spy Kids have always been able to beat the bad guys because adults over-think things. But to a kid, everything is possible."*
->
-> — Juni Cortez from *Spy Kids: All the Time in the World*
-
-Even at that age, I cringed a little hearing such a cheesy line. Yet, although it may be cheesy, it is also true. 
-
-There was a time when I lived more inside my head than I did in reality. I would create elaborate worlds and systems and indulge in month-long storylines all inside my very own head. However, as I grew older, my own expectations grew alongside, and so did others' of me. Fantasies no longer felt responsible when reality could never meet them. Overtime, I would stop myself more and more often whenever I caught myself dreaming. One day, no different than any other, the dreaming stopped.
-
-I wonder why moments like these are so memorable, amongst all else. 
-
----
-
 On the drive home from work, at the red light prior to arriving at my apartment building, the song "Landslide" plays from my Spotify playlist. I listen closely as the melody guides me up the garage and into a parking spot. Instead of hastily getting out of the car as I would usually do, I take a moment to let the song finish. Afterward, I sit and listen to it a few more times.
 
 It's strange how you can experience a place, a book, a movie, or in this specific instance a song so many times, but one day, out of nowhere, it grabs you out of your self-trained apathy and places you uncomfortably in the present. Various emotions and feelings wash over me as I listen: nostalgia, anxiety, self-acceptance, forgiveness, and the like. I don't usually let them engulf me for so long, but maybe it's okay to let them simmer once in a while. And, for what it's worth, what a beatiful song "Landslide" is. 
