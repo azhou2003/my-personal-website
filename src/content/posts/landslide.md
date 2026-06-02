@@ -42,7 +42,7 @@ It's strange how you can experience a place, a book, a movie, or in this specifi
 
 The song manages to capture the bittersweet nature of growth, change, and the general passage of time. It exemplifies a core aspect of the human condition: that the beauty of life is inseparable from the temporalness of it. It contains themes of finding strength when presented with life's inevitable challenges, and of facing similar challenges again and again with the same strength especially when it is difficult. And suddenly, while listening to this beautiful song, I find myself worrying again like that innocent kid did, on a cold winter morning so many years ago. 
 
-Because, although I may appear a grown man on the outside, on the inside, I'm still that lost kid searching for happiness. And even if I often take steps in the wrong direction, in my own young, dumb, and half-assed way, I still search. 
+Although I may appear a grown man on the outside, on the inside, I'm still that lost kid searching for happiness. A lost kid who often takes steps in the wrong direction. A lost kid who, in his own young, dumb, and half-assed way, continues searching.
 
 > [!QUOTE] *But time makes you bolder* 
 > *Even children get older* 
