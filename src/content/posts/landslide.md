@@ -44,7 +44,7 @@ The song captures the bittersweet nature of growth, change, and the passage of t
 
 So, on a day no different from any other, in a brief moment of clarity when sitting alone in my car appreciating a beautiful song, I find myself worrying again like that innocent kid did, on a cold winter morning so many years ago. 
 
-Despite convincing myself that I'm grown, on the inside, I will always be that same lost kid searching for happiness. That same lost kid who often takes steps in the wrong direction. That same lost kid who, in his own young, dumb, and half-assed way, still continues searching nonetheless. 
+Despite convincing myself that I'm grown, I will always be that same lost kid searching for happiness. That same lost kid who often takes steps in the wrong direction. That same lost kid who, in his own young, dumb, and half-assed way, still continues searching nonetheless. 
 
 > [!QUOTE] *But time makes you bolder* 
 > *Even children get older* 
