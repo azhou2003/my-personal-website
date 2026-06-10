@@ -12,23 +12,25 @@ Today, I am a software engineer. I enjoy what I do, yet in my personal life, I f
 
 ### Out of Curiosity, Pandora Opens the Box
 
-When I was twelve, I discovered how to jailbreak[^jailbreak] my iPhone 4. That very night, instead of sleeping, I spent countless hours hidden under my blanket tinkering with the design of the home screen. I could change the layout of apps, experiment with various themes, or even add custom screen transitions. My child self was overwhelmed by the seemingly infinite possibilities at my fingertips. The following school day, my poor decision caught up to me as I struggled to keep my eyes peeled open in class. To noone's surprise, this feeble consequence did not deter me from pursuing my new obsession. Whether it be on the car ride home, at church, or wherever I found myself to be, I would spend all my time browsing Cydia[^cydia], foraging for cool packages to try. Unbeknownst to little Anjie, the honeymoon period would soon end. 
+When I was twelve, I discovered how to jailbreak[^jailbreak] my iPhone 4. That very night, instead of sleeping, I spent countless hours hidden under my blanket tinkering with the design of the home screen. I could change the layout of apps, experiment with various themes, or even add custom screen transitions. My child self was overwhelmed by the seemingly infinite possibilities at my fingertips. 
 
-Around that time, newer iPhones shipped with a voice assistant, "Siri", that replaced the Voice Controls interface their predecessors had. Wanting to try out this exciting new feature for myself, I search Cydia relentlessly. After only a few minutes, I finally found one and, without a second thought, clicked install. After the installation was done, I restarted my phone.
+The following school day, my poor decision caught up to me as I struggled to keep my eyes open in class. To noone's surprise, this feeble consequence did not deter me from pursuing my new obsession. Whether it be on the car ride home, at church, or wherever I found myself to be, I would spend all my time browsing Cydia[^cydia], foraging for cool packages to try. Unbeknownst to little Anjie, the honeymoon period would soon end. 
 
-> [!QUOTE] Staring at the blinding Apple logo, I waited.
+Around that time, newer iPhones shipped with a voice assistant, "Siri", that replaced the Voice Controls interface their predecessors had. Wanting to try out this exciting new feature for myself, I searched Cydia relentlessly. After only a few minutes, I finally found one and, without a second thought, clicked install. After the installation was done, I was prompted to restart my phone.
 
-> [!QUOTE] ...
+Staring at the blinding Apple logo, I waited.
 
-> [!QUOTE] and waited.
+...
 
-> [!QUOTE] ...
+and waited.
 
-> [!QUOTE] **My phone would not start up.**
+...
+
+**My phone would not start up.**
 
 Absolute Devastation. Whoever published that package probably had a good chuckle at the expense of a child who had *barely* seen his thirteenth summer. Thirteen summers to find my life's calling, and it all came crashing down with just the press of a button. 
 
-> [!QUOTE] *\*sigh\**
+*sigh*
 
 After several fruitless attempts at salvaging my phone, I reluctantly accepted the futility of the endeavor. In the end, I factory reset the phone... and promptly went back to tinkering. The experience, albeit discouraging, was one of my first true tastes of technological curiosity. 
 
@@ -46,7 +48,7 @@ It is without a doubt that technology has defined my life up until now. From the
 
 I no longer get the same fulfillment from new things. When I was exploring and learning the world, everything new was so pure, so exciting. Now, as an arrogant young man, everything new suddenly challenges my world view. The child that used to seek novelty grew into the adult that desires stability. 
 
-When I look back, perhaps with the rose-tinted glasses that was my naivete, it felt like every incremental advancement pushed the boundaries of human capabilities. It was as if, through sheer human spirit, we found a way to carve a memory of our existence into the infinite expanse of the cosmos. Now that Tech itself is a leading industry, the loudest ideas feel so soulless — no longer pushing the boundaries of human achievement, but numbers on a stock exchange.
+When I look back, perhaps with the rose-tinted glasses that was my naivete, it felt like every incremental advancement pushed the boundaries of human capabilities. It was as if, through sheer human spirit, we found a way to carve a memory of our existence into cosmos. Now that Tech itself is a leading industry, the loudest ideas feel so soulless — no longer pushing the boundaries of human achievement, but numbers on a stock exchange.
 
 #### On Social Media
 
@@ -64,7 +66,7 @@ Maybe it is okay not to know everything.
 
 #### On Artificial Intelligence
 
-At my job, I work closely with AI. Outside work, I occasionally speak to someone who is terrified of what AI could do to their livelihood. I feel for them, yet I have difficulty looking into their eyes. My mind races, as the eternal, internal conflict rages.
+At my job, I work closely with AI. Outside work, I occasionally speak to someone who is terrified of what AI could do to their livelihood. I feel for them, yet I have difficulty looking into their eyes. My mind races as an internal conflict rages.
 
 **Why do we care so much about productivity?** It seems we've reached a point where the value is no longer in the reward, but the hustle. Instead of letting things simmer, we continue to stir. What happened to taking a step and looking back?
 
