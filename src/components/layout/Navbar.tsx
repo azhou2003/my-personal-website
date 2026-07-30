@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ThemeToggle } from "@/components/theme";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -96,9 +95,7 @@ const Navbar: React.FC = () => {
             Blog
           </Link>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center justify-self-end">
-          <ThemeToggle />
-        </div>
+        <div aria-hidden />
       </div>
 
       <div className="hidden sm:flex items-center justify-between">
@@ -128,7 +125,6 @@ const Navbar: React.FC = () => {
           <Link href="/blog" className={getLinkClasses("/blog")}>
             Blog
           </Link>
-          <ThemeToggle />
         </div>
       </div>
     </nav>

@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { GlobalStars } from "@/components/layout";
-import { ThemeProvider } from "@/components/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,17 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark">
       <head>
         {/* Remove all favicon links. You will add your own favicon code here. */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative isolate`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <GlobalStars />
-          <div className="relative z-10">{children}</div>
-        </ThemeProvider>
+        <GlobalStars />
+        <div className="relative z-10">{children}</div>
         <Analytics />
       </body>
     </html>

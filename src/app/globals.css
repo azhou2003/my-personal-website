@@ -112,6 +112,10 @@
   --blog-back-to-top-desktop-nudge: 0px;
 }
 
+html {
+  color-scheme: dark;
+}
+
 .dark {
   /* Semantic color tokens (dark mode overrides) */
   --color-bg: #2e2a27;
