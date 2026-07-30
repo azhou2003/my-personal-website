@@ -5,7 +5,7 @@ Personal website built with Next.js App Router, featuring:
 - a portfolio section loaded from JSON
 - a slide-driven About section loaded from JSON
 - rotating footer quotes loaded from JSON
-- dark mode support
+- a dark-only visual theme
 
 ## Tech Stack
 
@@ -15,6 +15,18 @@ Personal website built with Next.js App Router, featuring:
 - Tailwind CSS v4 (`@tailwindcss/postcss`)
 - Framer Motion
 - Gray Matter + Remark (markdown parsing/rendering)
+
+## Styling
+
+The site uses a single dark theme. `src/app/layout.tsx` statically applies the
+`dark` class to the root `<html>` element, and `src/app/globals.css` sets
+`color-scheme: dark` for native browser controls. There is no theme provider,
+theme preference persistence, system-theme detection, or user-facing theme
+switcher.
+
+Use the semantic CSS variables in `src/app/globals.css` and the established
+Tailwind palette for new colors. Do not add light-mode variants or theme
+switching behavior.
 
 ## Local Development
 
