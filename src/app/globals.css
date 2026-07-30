@@ -1029,6 +1029,111 @@ body.dark input[type="text"] {
   color: var(--color-hero-kicker);
 }
 
+/* The portfolio route layers celestial detail over the existing timeline stops. */
+.celestial-route-path {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: clamp(5rem, 14vw, 8.5rem);
+  height: 100%;
+  transform: translateX(-50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.celestial-route-path path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-timeline-line) 72%, transparent);
+  stroke-width: 1.35;
+  stroke-dasharray: 3 8;
+  vector-effect: non-scaling-stroke;
+}
+
+.celestial-body {
+  position: relative;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 2px solid color-mix(in srgb, var(--celestial-body-primary) 72%, #fff 28%);
+  border-radius: 999px;
+  background: radial-gradient(circle at 31% 27%, color-mix(in srgb, #fff 65%, var(--celestial-body-primary)), var(--celestial-body-primary) 38%, var(--celestial-body-secondary) 100%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-bg) 84%, transparent), 0 5px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease, filter 280ms ease;
+}
+
+.celestial-body::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  border: 1px solid color-mix(in srgb, var(--celestial-body-primary) 64%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.72) rotate(-18deg);
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.celestial-body::before {
+  content: "";
+  position: absolute;
+  inset: 0.18rem;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.celestial-body--cratered { filter: saturate(0.7) contrast(1.08); }
+.celestial-body--cratered::before { background: radial-gradient(circle at var(--celestial-texture-x) var(--celestial-texture-y), color-mix(in srgb, var(--celestial-body-secondary) 78%, transparent) 0 14%, transparent 16%), radial-gradient(circle at calc(100% - var(--celestial-texture-x)) 72%, color-mix(in srgb, var(--celestial-body-secondary) 60%, transparent) 0 11%, transparent 13%), radial-gradient(circle at 34% 76%, var(--celestial-body-detail-soft) 0 8%, transparent 10%); transform: scale(var(--celestial-texture-scale)); }
+
+.celestial-body--banded::before { background: repeating-linear-gradient(var(--celestial-texture-angle), transparent 0 11%, var(--celestial-body-detail-soft) 13% 18%, transparent 21% 31%), linear-gradient(90deg, transparent, var(--celestial-body-detail), transparent); opacity: 0.88; transform: scale(var(--celestial-texture-scale)); }
+
+.celestial-body--ringed::before { inset: -0.2rem -0.4rem; border: 1px solid var(--celestial-body-detail); border-left-color: transparent; border-right-color: var(--celestial-body-detail-soft); border-radius: 50%; transform: rotate(var(--celestial-texture-angle)) scaleY(0.32); }
+
+.celestial-body--volcanic::before { background: radial-gradient(circle at var(--celestial-texture-x) var(--celestial-texture-y), color-mix(in srgb, #ffd59a 78%, var(--celestial-body-detail)) 0 7%, transparent 9%), radial-gradient(circle at 68% 71%, var(--celestial-body-detail) 0 11%, transparent 14%), radial-gradient(circle at 33% 31%, color-mix(in srgb, var(--celestial-body-secondary) 74%, transparent) 0 13%, transparent 16%); transform: scale(var(--celestial-texture-scale)); }
+
+.celestial-body--clouded::before { background: radial-gradient(ellipse at var(--celestial-texture-x) 34%, var(--celestial-body-detail-soft) 0 17%, transparent 21%), radial-gradient(ellipse at 38% var(--celestial-texture-y), var(--celestial-body-detail) 0 13%, transparent 18%), radial-gradient(ellipse at 74% 72%, var(--celestial-body-detail-soft) 0 14%, transparent 19%); filter: blur(0.6px); transform: rotate(var(--celestial-texture-angle)) scale(var(--celestial-texture-scale)); }
+
+.celestial-body--oceanic::before { background: conic-gradient(from var(--celestial-texture-angle) at var(--celestial-texture-x) var(--celestial-texture-y), var(--celestial-body-detail-soft), transparent 18%, var(--celestial-body-detail) 35%, transparent 51%, var(--celestial-body-detail-soft) 72%, transparent), radial-gradient(circle at 72% 30%, color-mix(in srgb, #fff 58%, transparent) 0 9%, transparent 12%); transform: scale(var(--celestial-texture-scale)); }
+
+.group:hover .celestial-body,
+.group:focus-within .celestial-body,
+.celestial-body.is-focused {
+  transform: scale(1.38);
+  filter: saturate(1.12) brightness(1.08);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-bg) 80%, transparent), 0 0 1.35rem color-mix(in srgb, var(--celestial-body-primary) 68%, transparent), 0 5px 13px rgba(0, 0, 0, 0.3);
+}
+
+.group:hover .celestial-body::after,
+.group:focus-within .celestial-body::after,
+.celestial-body.is-focused::after { opacity: 0.78; transform: scale(1.14) rotate(-18deg); }
+
+.celestial-mission-marker {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.14rem;
+  color: var(--color-timeline-date);
+  font-family: var(--font-sans, Arial, sans-serif);
+  line-height: 1.1;
+  text-align: inherit;
+  transition: transform 280ms ease, color 280ms ease;
+}
+
+.celestial-mission-marker b { font-size: 0.69rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.celestial-mission-marker small { font-size: 0.82rem; letter-spacing: 0.025em; }
+.celestial-mission-marker.is-focused { color: var(--color-fg); transform: scale(1.08); }
+
+@media (max-width: 640px) {
+  .celestial-route-path { width: 5.2rem; }
+  .celestial-body { width: 1.35rem; height: 1.35rem; }
+  .celestial-mission-marker b { font-size: 0.59rem; letter-spacing: 0.1em; }
+  .celestial-mission-marker small { font-size: 0.72rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celestial-body,
+  .celestial-body::after,
+  .celestial-mission-marker { transition: none; }
+}
+
 /* Responsive text scaling */
 @media (max-width: 640px) {
   .hero-title {

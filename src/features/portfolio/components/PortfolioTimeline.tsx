@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { FadeInSection } from "@/components/ui";
 import { StaticTagList } from "@/components/ui/tags";
@@ -12,12 +12,47 @@ interface PortfolioTimelineProps {
   triggerKey: number;
 }
 
+const CELESTIAL_SURFACES = [
+  "celestial-body--cratered",
+  "celestial-body--banded",
+  "celestial-body--ringed",
+  "celestial-body--volcanic",
+  "celestial-body--clouded",
+  "celestial-body--oceanic",
+] as const;
+
+function getCelestialBody(title: string) {
+  let hash = 0;
+  for (let index = 0; index < title.length; index += 1) {
+    hash = (hash * 31 + title.charCodeAt(index)) >>> 0;
+  }
+
+  const hue = hash % 360;
+  const secondaryHue = (hue + 24 + ((hash >>> 9) % 40)) % 360;
+  const detailHue = (hue + 118 + ((hash >>> 15) % 90)) % 360;
+
+  return {
+    className: CELESTIAL_SURFACES[hash % CELESTIAL_SURFACES.length],
+    primary: `hsl(${hue} ${58 + ((hash >>> 4) % 20)}% ${52 + ((hash >>> 11) % 14)}%)`,
+    secondary: `hsl(${secondaryHue} ${42 + ((hash >>> 20) % 18)}% ${25 + ((hash >>> 25) % 13)}%)`,
+    detail: `hsl(${detailHue} ${48 + ((hash >>> 7) % 24)}% ${56 + ((hash >>> 17) % 18)}% / 0.58)`,
+    detailSoft: `hsl(${detailHue} ${36 + ((hash >>> 3) % 22)}% ${65 + ((hash >>> 22) % 16)}% / 0.36)`,
+    textureX: `${16 + ((hash >>> 2) % 62)}%`,
+    textureY: `${14 + ((hash >>> 12) % 66)}%`,
+    textureAngle: `${(hash >>> 6) % 180}deg`,
+    textureScale: `${1 + ((hash >>> 16) % 5) * 0.08}`,
+  };
+}
+
 export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTimelineProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [activeMobileIndex, setActiveMobileIndex] = useState<number | null>(null);
   const [activeDesktopIndex, setActiveDesktopIndex] = useState<number | null>(null);
   const [timelineScaleByIndex, setTimelineScaleByIndex] = useState<Record<number, number>>({});
+  const [routeOffsetByIndex, setRouteOffsetByIndex] = useState<Record<number, number>>({});
 
+  const timelineRef = useRef<HTMLDivElement | null>(null);
+  const routePathRef = useRef<SVGPathElement | null>(null);
   const timelineRowRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const lastScrollYRef = useRef(0);
   const lastSnapAtRef = useRef(0);
@@ -311,6 +346,47 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
         return prev;
       });
 
+      const timeline = timelineRef.current;
+      const routePath = routePathRef.current;
+      const routeSvg = routePath?.ownerSVGElement;
+      if (timeline && routePath && routeSvg) {
+        const timelineRect = timeline.getBoundingClientRect();
+        const routeRect = routeSvg.getBoundingClientRect();
+        const pathLength = routePath.getTotalLength();
+        const nextRouteOffsets: Record<number, number> = {};
+
+        for (let idx = 0; idx < projects.length; idx += 1) {
+          const row = timelineRowRefs.current[idx];
+          if (!row || routeRect.height === 0) continue;
+
+          const rowRect = row.getBoundingClientRect();
+          const targetY = ((rowRect.top + rowRect.height / 2 - routeRect.top) / routeRect.height) * 1000;
+          let low = 0;
+          let high = pathLength;
+          for (let iteration = 0; iteration < 16; iteration += 1) {
+            const midpoint = (low + high) / 2;
+            if (routePath.getPointAtLength(midpoint).y < targetY) {
+              low = midpoint;
+            } else {
+              high = midpoint;
+            }
+          }
+
+          const point = routePath.getPointAtLength((low + high) / 2);
+          const pointX = routeRect.left + (point.x / 100) * routeRect.width;
+          nextRouteOffsets[idx] = Number((pointX - (timelineRect.left + timelineRect.width / 2)).toFixed(2));
+        }
+
+        setRouteOffsetByIndex((prev) => {
+          const nextKeys = Object.keys(nextRouteOffsets);
+          if (Object.keys(prev).length !== nextKeys.length) return nextRouteOffsets;
+          for (const key of nextKeys) {
+            if (prev[Number(key)] !== nextRouteOffsets[Number(key)]) return nextRouteOffsets;
+          }
+          return prev;
+        });
+      }
+
       let candidateIndex = closestIndex;
       const nearTop = window.scrollY <= 20;
       const nearBottom =
@@ -358,13 +434,13 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
 
   return (
     <div
-      className="relative w-full max-w-4xl mx-auto py-16 flex justify-center"
+      ref={timelineRef}
+      className="celestial-route relative w-full max-w-4xl mx-auto py-16 flex justify-center"
       style={{ overflowX: isMobile ? "hidden" : "visible" }}
     >
-      <div
-        className="absolute left-1/2 top-0 bottom-0 w-1 bg-[var(--color-timeline-line)] -translate-x-1/2 z-0"
-        style={{ minHeight: "100%" }}
-      />
+      <svg className="celestial-route-path" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true">
+        <path ref={routePathRef} d="M50 0 C21 112 80 192 50 316 S20 534 50 650 S80 846 50 1000" />
+      </svg>
       <div className="flex flex-col gap-24 w-full relative z-10 pb-28 sm:pb-0">
         {projects.length === 0 && (
           <div className="text-center text-border-light dark:text-border-dark">
@@ -372,6 +448,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
           </div>
         )}
         {projects.map((project, idx) => {
+          const celestialBody = getCelestialBody(project.title);
           const isLeft = idx % 2 === 0;
           const isActiveOnMobile = isMobile && activeMobileIndex === idx;
           const isActiveOnDesktop = !isMobile && activeDesktopIndex === idx;
@@ -401,6 +478,16 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
             borderColor: "var(--color-about-surface-border)",
             boxShadow: "var(--color-about-surface-shadow-card)",
           };
+          const celestialBodyStyle = {
+            "--celestial-body-primary": celestialBody.primary,
+            "--celestial-body-secondary": celestialBody.secondary,
+            "--celestial-body-detail": celestialBody.detail,
+            "--celestial-body-detail-soft": celestialBody.detailSoft,
+            "--celestial-texture-x": celestialBody.textureX,
+            "--celestial-texture-y": celestialBody.textureY,
+            "--celestial-texture-angle": celestialBody.textureAngle,
+            "--celestial-texture-scale": celestialBody.textureScale,
+          } as CSSProperties;
 
           return (
             <FadeInSection key={`${triggerKey}-${idx}`} delay={idx * 40}>
@@ -414,16 +501,22 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                   transformOrigin: "center center",
                   transition: "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
-              >
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
-                  <div className={`w-6 h-6 rounded-full border-4 border-[var(--color-timeline-line)] shadow-lg bg-[var(--color-timeline-fill)] transition-transform duration-300 group-hover:scale-125 group-focus:scale-125 ${isFocused ? "scale-125" : ""}`} />
-                </div>
-                <div className="w-1/2 flex justify-end pr-6 sm:pr-6 md:pr-8 lg:pr-10 pl-6 sm:pl-6 md:pl-8 lg:pl-10">
+                >
+                  <div
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto"
+                    style={{ marginLeft: `${routeOffsetByIndex[idx] ?? 0}px` }}
+                  >
+                    <div
+                      className={`celestial-body ${celestialBody.className} ${isFocused ? "is-focused" : ""}`}
+                      style={celestialBodyStyle}
+                      aria-label={`Planet marker for ${project.title}`}
+                    />
+                  </div>
+                <div className="w-1/2 flex justify-end pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 pl-12 sm:pl-14 md:pl-16 lg:pl-18 xl:pl-20 2xl:pl-24">
                   {isLeft ? (
-                    <span
-                      className={`text-[0.88rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.03em] sm:tracking-[0.04em] leading-none select-none whitespace-nowrap transition-all duration-300 sm:group-hover:scale-110 sm:group-focus:scale-110 ${isFocused ? "sm:scale-110" : ""}`}
-                    >
-                      {formatDate(project.date, "MMMM yyyy")}
+                    <span className={`celestial-mission-marker ${isFocused ? "is-focused" : ""}`}>
+                      <b>Mission {String(idx + 1).padStart(2, "0")}</b>
+                      <small>{formatDate(project.date, "MMMM yyyy")}</small>
                     </span>
                   ) : (
                     <div className="flex justify-end relative w-full">
@@ -467,7 +560,7 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                     </div>
                   )}
                 </div>
-                <div className="w-1/2 flex justify-start pl-6 sm:pl-6 md:pl-8 lg:pl-10 pr-6 sm:pr-6 md:pr-8 lg:pr-10">
+                <div className="w-1/2 flex justify-start pl-12 sm:pl-14 md:pl-16 lg:pl-18 xl:pl-20 2xl:pl-24 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24">
                   {isLeft ? (
                     <div className="flex justify-start relative w-full">
                       <div className="group relative flex items-center justify-center">
@@ -509,8 +602,9 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                       </div>
                     </div>
                   ) : (
-                    <span className={`text-[0.88rem] sm:text-[1.02rem] text-[var(--color-timeline-date)] font-sans font-semibold tracking-[0.03em] sm:tracking-[0.04em] leading-none select-none whitespace-nowrap transition-all duration-300 sm:group-hover:scale-110 sm:group-focus:scale-110 ${isFocused ? "sm:scale-110" : ""}`}>
-                      {formatDate(project.date, "MMMM yyyy")}
+                    <span className={`celestial-mission-marker ${isFocused ? "is-focused" : ""}`}>
+                      <b>Mission {String(idx + 1).padStart(2, "0")}</b>
+                      <small>{formatDate(project.date, "MMMM yyyy")}</small>
                     </span>
                   )}
                 </div>
