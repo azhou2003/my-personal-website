@@ -425,12 +425,15 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
     requestUpdate();
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
+    const resizeObserver = new ResizeObserver(requestUpdate);
+    if (timelineRef.current) resizeObserver.observe(timelineRef.current);
 
     return () => {
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
+      resizeObserver.disconnect();
     };
-  }, [projects]);
+  }, [projects, activeMobileIndex]);
 
   return (
     <div
@@ -610,10 +613,10 @@ export default function PortfolioTimeline({ projects, triggerKey }: PortfolioTim
                 </div>
               </div>
               <div
-                className={`${isMobile ? "" : "hidden"} transition-all duration-300 ease-out overflow-hidden ${
+                className={`${isMobile ? "h-[clamp(12rem,30svh,15rem)] mt-3" : "hidden"} transition-all duration-300 ease-out overflow-hidden ${
                   isActiveOnMobile
-                    ? "max-h-64 opacity-100 translate-y-0 mt-3"
-                    : "max-h-0 opacity-0 -translate-y-2 mt-0 pointer-events-none"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
                 }`}
               >
                 <div className="relative mx-3">

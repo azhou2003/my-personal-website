@@ -116,7 +116,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     setResolvedActiveSlideIndex(nextIndex);
   }, [getClosestSlideIndex, setResolvedActiveSlideIndex]);
 
-  const scrollToSlide = React.useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+  const scrollToSlide = React.useCallback((index: number, behavior: ScrollBehavior | "instant" = "smooth") => {
     const scrollEl = scrollRef.current;
     const slideEls = getSlideElements();
     if (!scrollEl || slideEls.length === 0 || aboutSlides.length === 0) return;
@@ -129,10 +129,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     const maxScrollLeft = Math.max(0, scrollEl.scrollWidth - scrollEl.clientWidth);
     const clampedLeft = Math.max(0, Math.min(maxScrollLeft, centeredLeft));
 
-    scrollEl.scrollTo({
-      left: clampedLeft,
-      behavior,
-    });
+    if (behavior === "instant") {
+      scrollEl.scrollLeft = clampedLeft;
+      return;
+    }
+
+    scrollEl.scrollTo({ left: clampedLeft, behavior });
   }, [aboutSlides.length, getSlideElements]);
 
   const scrollBySlide = React.useCallback((direction: -1 | 1) => {
@@ -264,9 +266,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   }, [isExpanded, scrollBySlide]);
 
   React.useEffect(() => {
-    if (!isExpanded || activeSlideIndex === undefined || aboutSlides.length === 0) return;
-    scrollToSlide(activeSlideIndex, "auto");
-  }, [isExpanded, activeSlideIndex, aboutSlides.length, scrollToSlide]);
+    if (isExpanded && !isActive && activeSlideIndex !== undefined && aboutSlides.length > 0) {
+      scrollToSlide(activeSlideIndex, "instant");
+    }
+  }, [isExpanded, isActive, activeSlideIndex, aboutSlides.length, scrollToSlide]);
 
   React.useEffect(() => {
     if (!isExpanded) {
