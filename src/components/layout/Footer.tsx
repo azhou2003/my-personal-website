@@ -143,7 +143,7 @@ const Footer: React.FC = () => {
                 style={{ background: "var(--color-status-dot)" }}
               />
             </span>
-            <span>Waiting for NiKo to win a Major</span>
+            <span>Waiting for Winds of Winter</span>
           </div>
           <span>© {new Date().getFullYear()} Anjie Zhou</span>
         </div>

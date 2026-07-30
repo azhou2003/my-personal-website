@@ -18,7 +18,7 @@ const STARS = Array.from({ length: 20 }, (_, index) => {
 
 export default function GlobalStars() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none hidden dark:block" aria-hidden>
+    <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden>
       {STARS.map((star) => (
         <span
           key={star.id}
