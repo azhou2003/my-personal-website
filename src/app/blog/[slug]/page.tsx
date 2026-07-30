@@ -7,7 +7,6 @@ import {
   BlogTableOfContents,
   MarkdownContent,
   ReaderPreferences,
-  ReadingProgress,
 } from "@/features/blog/components";
 import { formatDate } from "@/lib/formatDate";
 import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/markdown";
@@ -66,7 +65,6 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
 
   return (
     <>
-      <ReadingProgress />
       <BlogTableOfContents topLabel={data.title || resolvedParams.slug} />
       <main className="blog-post-shell mx-auto w-full py-16 px-4">
         <div id="top" aria-hidden="true" />

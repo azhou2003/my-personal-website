@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { List } from "lucide-react";
 
 type TocItem = {
@@ -43,6 +43,8 @@ export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfCon
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+  const isNavigatingRef = useRef(false);
+  const navigationTimerRef = useRef<number | null>(null);
 
   const closeToc = () => {
     window.requestAnimationFrame(() => {
@@ -61,6 +63,15 @@ export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfCon
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(
+    () => () => {
+      if (navigationTimerRef.current) {
+        window.clearTimeout(navigationTimerRef.current);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (items.length === 0) {
@@ -86,12 +97,28 @@ export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfCon
       }
     };
 
+    const handleScroll = () => {
+      if (!isNavigatingRef.current) {
+        updateActive();
+        return;
+      }
+
+      if (navigationTimerRef.current) {
+        window.clearTimeout(navigationTimerRef.current);
+      }
+
+      navigationTimerRef.current = window.setTimeout(() => {
+        isNavigatingRef.current = false;
+        navigationTimerRef.current = null;
+      }, 150);
+    };
+
     updateActive();
-    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", updateActive);
 
     return () => {
-      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", updateActive);
     };
   }, [items]);
@@ -116,6 +143,22 @@ export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfCon
   }
 
   const tocItems: TocItem[] = [{ id: "top", text: topLabel, level: 2 }, ...items];
+
+  const handleTocLinkClick = (id: string) => {
+    setActiveId(id);
+    isNavigatingRef.current = true;
+
+    if (navigationTimerRef.current) {
+      window.clearTimeout(navigationTimerRef.current);
+    }
+
+    navigationTimerRef.current = window.setTimeout(() => {
+      isNavigatingRef.current = false;
+      navigationTimerRef.current = null;
+    }, 150);
+
+    closeToc();
+  };
 
   return (
     <>
@@ -145,9 +188,9 @@ export default function BlogTableOfContents({ topLabel = "Top" }: BlogTableOfCon
             {tocItems.map((item) => (
             <a
               key={item.id}
-              href={`#${item.id}`}
-              title={item.text}
-              onClick={closeToc}
+               href={`#${item.id}`}
+               title={item.text}
+               onClick={() => handleTocLinkClick(item.id)}
               className={`blog-toc-link ${activeId === item.id ? "is-active" : ""} ${
                 item.level === 4 ? "is-grandchild" : item.level === 3 ? "is-child" : ""
               }`}
