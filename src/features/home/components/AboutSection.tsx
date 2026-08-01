@@ -28,6 +28,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [internalActiveSlideIndex, setInternalActiveSlideIndex] = React.useState(0);
   const [descriptionModalSlideId, setDescriptionModalSlideId] = React.useState<string | null>(null);
+  const [loadedImageIds, setLoadedImageIds] = React.useState<Set<string>>(() => new Set());
   const slideNavLockRef = React.useRef(false);
   const slideNavUnlockTimerRef = React.useRef<number | null>(null);
   const isActiveRef = React.useRef(isActive);
@@ -176,6 +177,16 @@ const AboutSection: React.FC<AboutSectionProps> = ({
         });
       }
       return null;
+    });
+  }, []);
+
+  const markImageLoaded = React.useCallback((slideId: string) => {
+    setLoadedImageIds((loadedIds) => {
+      if (loadedIds.has(slideId)) return loadedIds;
+
+      const nextLoadedIds = new Set(loadedIds);
+      nextLoadedIds.add(slideId);
+      return nextLoadedIds;
     });
   }, []);
 
@@ -443,6 +454,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                 {aboutSlides.map((slide, index) => {
               const linksToRender = slide.links ?? defaultSlideLinks;
               const isCurrentSlide = index === resolvedActiveSlideIndex;
+              const shouldEagerLoadImage =
+                isActive &&
+                (isCurrentSlide || index === (resolvedActiveSlideIndex + 1) % aboutSlides.length);
+              const desktopImageId = `${slide.id}-desktop`;
+              const mobileImageId = `${slide.id}-mobile`;
+              const isDesktopImageLoaded = loadedImageIds.has(desktopImageId);
+              const isMobileImageLoaded = loadedImageIds.has(mobileImageId);
               const currentSlideLabel = String(index + 1).padStart(2, "0");
               const totalSlidesLabel = String(aboutSlides.length).padStart(2, "0");
               const desktopShadowColors = slide.shadowProfile?.desktopColors ?? fallbackShadowColors;
@@ -489,9 +507,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             alt={slide.imageAlt}
                             width={352}
                             height={480}
-                            quality={95}
-                            sizes="(min-width: 1280px) 22rem, 18rem"
-                            className="w-[21rem] h-[29rem] object-cover select-none"
+                            quality={75}
+                            sizes="(min-width: 1024px) 21rem, 1px"
+                            loading={shouldEagerLoadImage ? "eager" : "lazy"}
+                            onLoad={() => markImageLoaded(desktopImageId)}
+                            className={`w-[21rem] h-[29rem] object-cover select-none transition-opacity duration-300 ${isDesktopImageLoaded ? "opacity-100" : "opacity-0"}`}
                             style={{ objectPosition: slide.imagePosition ?? "center" }}
                             draggable="false"
                           />
@@ -532,9 +552,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({
                             alt={slide.imageAlt}
                             width={352}
                             height={480}
-                            quality={95}
-                            sizes="(min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
-                            className="w-56 sm:w-64 lg:w-[19rem] h-[clamp(10.5rem,28svh,16rem)] sm:h-[clamp(12rem,30svh,18rem)] lg:h-[24rem] object-cover select-none"
+                            quality={75}
+                            sizes="(min-width: 1024px) 1px, (min-width: 640px) 16rem, 14rem"
+                            loading={shouldEagerLoadImage ? "eager" : "lazy"}
+                            onLoad={() => markImageLoaded(mobileImageId)}
+                            className={`w-56 sm:w-64 lg:w-[19rem] h-[clamp(10.5rem,28svh,16rem)] sm:h-[clamp(12rem,30svh,18rem)] lg:h-[24rem] object-cover select-none transition-opacity duration-300 ${isMobileImageLoaded ? "opacity-100" : "opacity-0"}`}
                             style={{ objectPosition: slide.imagePosition ?? "center" }}
                             draggable="false"
                           />
