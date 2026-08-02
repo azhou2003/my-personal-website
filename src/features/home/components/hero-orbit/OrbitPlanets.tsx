@@ -118,7 +118,7 @@ export default function OrbitPlanets({
             style={{
               width: `${dimensions.planetSize}px`,
               height: `${dimensions.planetSize}px`,
-              backgroundImage: "url('/earthy-earth.jpg')",
+              backgroundImage: "url('/earthy-earth.webp')",
               backgroundSize: "300% 100%",
               backgroundPosition: "0% center",
               backgroundRepeat: "repeat-x",
@@ -142,7 +142,7 @@ export default function OrbitPlanets({
             style={{
               width: `${dimensions.planetSize}px`,
               height: `${dimensions.planetSize}px`,
-              backgroundImage: "url('/earthy-mars.jpg')",
+              backgroundImage: "url('/earthy-mars.webp')",
               backgroundSize: "300% 100%",
               backgroundPosition: "0% center",
               backgroundRepeat: "repeat-x",
