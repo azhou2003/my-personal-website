@@ -66,6 +66,7 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
   return (
     <>
       <BlogTableOfContents topLabel={data.title || resolvedParams.slug} />
+      <ReaderPreferences />
       <main className="blog-post-shell mx-auto w-full py-16 px-4">
         <div id="top" aria-hidden="true" />
         <Link href="/blog" className="text-accent underline text-sm mb-8 inline-block">
@@ -82,9 +83,6 @@ export default async function BlogPostPage({ params }: { params: BlogPageParams 
             </div>
           </div>
           {data.tags && Array.isArray(data.tags) && <StaticTagList tags={data.tags} className="blog-post-tags" />}
-          <div className="blog-post-reader-row">
-            <ReaderPreferences />
-          </div>
           <div className="blog-post-content-divider" aria-hidden="true" />
         </header>
         <MarkdownContent html={content} />

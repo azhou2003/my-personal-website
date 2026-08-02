@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
 
 const FONT_KEY = "readerFontScale";
 const WIDTH_KEY = "readerProseWidth";
@@ -21,6 +22,7 @@ export default function ReaderPreferences() {
   const [fontIndex, setFontIndex] = useState(1);
   const [wideMode, setWideMode] = useState(false);
   const [lineHeightIndex, setLineHeightIndex] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const savedScale = Number(localStorage.getItem(FONT_KEY));
@@ -36,6 +38,19 @@ export default function ReaderPreferences() {
     setLineHeightIndex(safeLineHeightIndex);
     applyPreferences(FONT_OPTIONS[safeIndex], savedWide, LINE_HEIGHT_OPTIONS[safeLineHeightIndex]);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen]);
 
   const decreaseFontSize = () => {
     setFontIndex((previous) => {
@@ -77,42 +92,62 @@ export default function ReaderPreferences() {
   };
 
   return (
-    <div className="reader-tools" role="group" aria-label="Reader preferences">
-      <span className="reader-tools-label">Reader</span>
-      <button
-        type="button"
-        onClick={decreaseFontSize}
-        className="reader-tool-button"
-        aria-label="Decrease reader font size"
-        disabled={fontIndex === 0}
-      >
-        A-
-      </button>
-      <button
-        type="button"
-        onClick={increaseFontSize}
-        className="reader-tool-button"
-        aria-label="Increase reader font size"
-        disabled={fontIndex === FONT_OPTIONS.length - 1}
-      >
-        A+
-      </button>
-      <button
-        type="button"
-        onClick={toggleWidth}
-        aria-pressed={wideMode}
-        className={`reader-tool-button reader-tool-measure ${wideMode ? "is-active" : ""}`}
-      >
-        {wideMode ? "Measure: Wide" : "Measure: Classic"}
-      </button>
-      <button
-        type="button"
-        onClick={cycleLineHeight}
-        className="reader-tool-button"
-        aria-label="Cycle line spacing"
-      >
-        Leading: {LINE_HEIGHT_LABELS[lineHeightIndex]}
-      </button>
-    </div>
+    <>
+      {isOpen && <div aria-hidden="true" className="reader-tools-overlay" onClick={() => setIsOpen(false)} />}
+      <div className={`reader-tools ${isOpen ? "is-open" : ""}`}>
+        {isOpen && (
+          <section id="reader-preferences-panel" className="reader-tools-panel" aria-label="Reader preferences">
+            <p className="reader-tools-label">Reader settings</p>
+            <div className="reader-tools-actions" role="group" aria-label="Reader preferences">
+              <button
+                type="button"
+                onClick={decreaseFontSize}
+                className="reader-tool-button"
+                aria-label="Decrease reader font size"
+                disabled={fontIndex === 0}
+              >
+                A-
+              </button>
+              <button
+                type="button"
+                onClick={increaseFontSize}
+                className="reader-tool-button"
+                aria-label="Increase reader font size"
+                disabled={fontIndex === FONT_OPTIONS.length - 1}
+              >
+                A+
+              </button>
+              <button
+                type="button"
+                onClick={toggleWidth}
+                aria-pressed={wideMode}
+                className={`reader-tool-button reader-tool-measure ${wideMode ? "is-active" : ""}`}
+              >
+                {wideMode ? "Measure: Wide" : "Measure: Classic"}
+              </button>
+              <button
+                type="button"
+                onClick={cycleLineHeight}
+                className="reader-tool-button"
+                aria-label="Cycle line spacing"
+              >
+                Leading: {LINE_HEIGHT_LABELS[lineHeightIndex]}
+              </button>
+            </div>
+          </section>
+        )}
+        <button
+          type="button"
+          className="reader-tools-toggle"
+          aria-label="Toggle reader settings"
+          aria-expanded={isOpen}
+          aria-controls="reader-preferences-panel"
+          onClick={() => setIsOpen((previous) => !previous)}
+        >
+          <SlidersHorizontal size={15} aria-hidden="true" />
+          <span>Reader</span>
+        </button>
+      </div>
+    </>
   );
 }
