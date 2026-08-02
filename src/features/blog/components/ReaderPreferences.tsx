@@ -98,41 +98,56 @@ export default function ReaderPreferences() {
         {isOpen && (
           <section id="reader-preferences-panel" className="reader-tools-panel" aria-label="Reader preferences">
             <p className="reader-tools-label">Reader settings</p>
-            <div className="reader-tools-actions" role="group" aria-label="Reader preferences">
-              <button
-                type="button"
-                onClick={decreaseFontSize}
-                className="reader-tool-button"
-                aria-label="Decrease reader font size"
-                disabled={fontIndex === 0}
-              >
-                A-
-              </button>
-              <button
-                type="button"
-                onClick={increaseFontSize}
-                className="reader-tool-button"
-                aria-label="Increase reader font size"
-                disabled={fontIndex === FONT_OPTIONS.length - 1}
-              >
-                A+
-              </button>
-              <button
-                type="button"
-                onClick={toggleWidth}
-                aria-pressed={wideMode}
-                className={`reader-tool-button reader-tool-measure ${wideMode ? "is-active" : ""}`}
-              >
-                {wideMode ? "Measure: Wide" : "Measure: Classic"}
-              </button>
-              <button
-                type="button"
-                onClick={cycleLineHeight}
-                className="reader-tool-button"
-                aria-label="Cycle line spacing"
-              >
-                Leading: {LINE_HEIGHT_LABELS[lineHeightIndex]}
-              </button>
+            <div className="reader-tools-section" role="group" aria-label="Typography settings">
+              <p className="reader-tools-section-label">Type</p>
+              <div className="reader-tools-control">
+                <span>Text size</span>
+                <div className="reader-tools-actions">
+                  <button
+                    type="button"
+                    onClick={decreaseFontSize}
+                    className="reader-tool-button"
+                    aria-label="Decrease reader font size"
+                    disabled={fontIndex === 0}
+                  >
+                    A-
+                  </button>
+                  <button
+                    type="button"
+                    onClick={increaseFontSize}
+                    className="reader-tool-button"
+                    aria-label="Increase reader font size"
+                    disabled={fontIndex === FONT_OPTIONS.length - 1}
+                  >
+                    A+
+                  </button>
+                </div>
+              </div>
+              <div className="reader-tools-control">
+                <span>Line spacing</span>
+                <button
+                  type="button"
+                  onClick={cycleLineHeight}
+                  className="reader-tool-button"
+                  aria-label="Cycle line spacing"
+                >
+                  {LINE_HEIGHT_LABELS[lineHeightIndex]}
+                </button>
+              </div>
+            </div>
+            <div className="reader-tools-section" role="group" aria-label="Layout settings">
+              <p className="reader-tools-section-label">Layout</p>
+              <div className="reader-tools-control">
+                <span>Column width</span>
+                <button
+                  type="button"
+                  onClick={toggleWidth}
+                  aria-pressed={wideMode}
+                  className={`reader-tool-button reader-tool-measure ${wideMode ? "is-active" : ""}`}
+                >
+                  {wideMode ? "Wide" : "Classic"}
+                </button>
+              </div>
             </div>
           </section>
         )}
