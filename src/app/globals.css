@@ -353,6 +353,10 @@ h1, h2, h3, h4 {
   transform: translateX(0);
 }
 
+.reader-tools.is-open .reader-tools-toggle {
+  display: none;
+}
+
 .reader-tools-panel {
   width: 18rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
@@ -471,7 +475,11 @@ h1, h2, h3, h4 {
 }
 
 .reader-tools-overlay {
-  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: block;
+  background: transparent;
 }
 
 .blog-toc {
@@ -1306,5 +1314,28 @@ html, body {
 @media (min-width: 769px) {
   :root {
     --blog-back-to-top-desktop-nudge: 0.75rem;
+  }
+
+  .reader-tools {
+    right: 0;
+  }
+
+  .reader-tools-toggle {
+    border-color: color-mix(in srgb, var(--color-nav-active) 42%, var(--color-border));
+    background: color-mix(in srgb, var(--color-bg) 96%, transparent);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .reader-tools-toggle span {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .reader-tools-toggle:hover,
+  .reader-tools-toggle:focus-visible {
+    border-color: color-mix(in srgb, var(--color-nav-active) 72%, var(--color-border));
+    background: color-mix(in srgb, var(--color-bg) 96%, transparent);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
   }
 }
